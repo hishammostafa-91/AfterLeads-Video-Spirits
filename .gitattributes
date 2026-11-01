@@ -1,0 +1,29 @@
+# Line endings: LF everywhere except Windows batch files (docs/02-architecture.md §2.14).
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.gif binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.wav binary
+*.flac binary
+*.mp3 binary
+*.mp4 binary
+*.mov binary
+*.mkv binary
+*.zip binary
+*.sqlite binary
+
+# Generated files (collapsed in diffs on GitHub)
+app/src/ipc/bindings/** linguist-generated=true
+Cargo.lock linguist-generated=true
+pnpm-lock.yaml linguist-generated=true

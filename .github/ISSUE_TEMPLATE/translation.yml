@@ -1,0 +1,18 @@
+name: Translation
+description: Report a translation problem or offer a new language.
+labels: ["translation"]
+body:
+  - type: input
+    id: locale
+    attributes:
+      label: Language / locale
+      placeholder: "ar, fr, es, de, pt-BR, or a new one"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Message keys or screens affected, current text, suggested text.
+    validations:
+      required: true

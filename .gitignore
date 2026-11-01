@@ -1,0 +1,35 @@
+# Build outputs
+/target/
+/app/dist/
+/app/src-tauri/target/
+/vcpkg_installed/
+coverage/
+test-results/
+playwright-report/
+__pycache__/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Partial downloads and logs
+*.part
+*.log
+
+# Secrets (SEC-15) — keys never live in the repository
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+.alvs-keys/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/

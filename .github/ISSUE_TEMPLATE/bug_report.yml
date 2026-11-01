@@ -1,0 +1,41 @@
+name: Bug report
+description: Something does not work as expected.
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Help › About shows the version and commit.
+      placeholder: "1.0.0 (3f2a9c1)"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Create a project…\n2. Import…\n3. …"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result (include any error code such as E2003)
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Windows version, GPU, and UI language
+      placeholder: "Windows 11 24H2, NVIDIA RTX 3060, Arabic"
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Optional. Help › Create Diagnostics Bundle, then attach the ZIP (paths are redacted by default).
