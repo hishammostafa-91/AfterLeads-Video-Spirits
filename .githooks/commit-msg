@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# Conventional Commits + DCO sign-off (docs/10-execution.md §10.4.4).
+set -u
+msg_file="$1"
+first="$(grep -v '^#' "$msg_file" | sed -e 's/\r$//' | sed -n '/./{p;q;}')"
+
+if printf '%s' "$first" | grep -Eq '^(Merge (branch|pull request|remote-tracking branch) |Revert ")'; then
+  :
+elif ! printf '%s' "$first" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|i18n)(\([a-z0-9-]+\))?!?: .{1,100}$'; then
+  echo "commit-msg: first line must follow Conventional Commits, e.g. 'feat(timeline): add ripple trim'." >&2
+  echo "Types: feat fix docs style refactor perf test build ci chore revert i18n. Got: '$first'" >&2
+  exit 1
+fi
+
+if ! grep -v '^#' "$msg_file" | grep -Eq '^Signed-off-by: .+ <[^>]+@[^>]+>'; then
+  echo "commit-msg: missing DCO sign-off. Commit with 'git commit -s'." >&2
+  exit 1
+fi
+exit 0

@@ -1,0 +1,417 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+"""Documentation consistency checks for AfterLeads-Video-Spirits.
+
+Implements VER-01..VER-08, VER-10, VER-11 and VER-14 from docs/11-verification.md.
+Standard library only. Exit code 0 = all checks pass, 1 = findings, 2 = usage error.
+
+Usage:
+    python tools/docs/check_docs.py
+    python tools/docs/check_docs.py --hash-word <word>
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import re
+import sys
+import unicodedata
+from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+DOCS = ROOT / "docs"
+REPO_URL = "https://github.com/hishammostafa-91/AfterLeads-Video-Spirits"
+PAGES_HOST = "hishammostafa-91.github.io"
+
+CATALOG = "12-catalogs.md"
+CANONICAL = {
+    "G": "00-index.md", "OD": "00-index.md",
+    "UC": "01-product.md", "REQ": "01-product.md", "NFR": "01-product.md",
+    "ADR": "02-architecture.md", "CMP": "02-architecture.md",
+    "THR": "05-security.md", "SEC": "05-security.md",
+    "AGT": "06-ai-automation.md", "CMD": "06-ai-automation.md",
+    "UXP": "07-experience.md", "PNL": "07-experience.md", "DLG": "07-experience.md", "WS": "07-experience.md",
+    "OPS": "08-operations.md",
+    "T": "09-quality.md", "GATE": "09-quality.md",
+    "WP": "10-execution.md", "R": "10-execution.md",
+    "VER": "11-verification.md", "C": "11-verification.md",
+    "E": CATALOG,
+}
+for _p in ("VFX", "AFX", "TRS", "BLM", "EAS", "MSK", "TAN", "TPL", "GEN", "XP", "SQP", "FPS",
+           "KB", "LOC", "MDL", "FNT", "LUT", "CLR"):
+    CANONICAL[_p] = CATALOG
+
+SIMPLE_PREFIXES = sorted((p for p in CANONICAL if p not in ("REQ", "NFR", "T", "E")), key=len, reverse=True)
+ID_RE = re.compile(
+    r"(?<![A-Za-z0-9_-])("
+    r"REQ-[A-Z0-9]+-\d{3}"
+    r"|NFR-[A-Z]+-\d{2}"
+    r"|T-[A-Z0-9]+-\d{3}"
+    r"|E\d{4}"
+    r"|(?:" + "|".join(SIMPLE_PREFIXES) + r")-\d{2,3}"
+    r")(?![A-Za-z0-9_])"
+)
+RANGE_RE = re.compile(
+    r"(?<![A-Za-z0-9_-])((?:[A-Z][A-Z0-9]*-)+)(\d{2,4})\.\.(?:((?:[A-Z][A-Z0-9]*-)+))?(\d{2,4})(?![A-Za-z0-9_])"
+)
+WP_RE = re.compile(r"\bWP-\d{2}\b")
+TEST_RE = re.compile(r"\bT-[A-Z0-9]+-\d{3}\b")
+
+
+def prefix_of(identifier: str) -> str:
+    if identifier.startswith("REQ-"):
+        return "REQ"
+    if identifier.startswith("NFR-"):
+        return "NFR"
+    if identifier.startswith("T-"):
+        return "T"
+    if re.fullmatch(r"E\d{4}", identifier):
+        return "E"
+    return identifier.split("-", 1)[0]
+
+
+def expand_ranges(text: str) -> list[str]:
+    """Expand ranges such as REQ-EDT-001..REQ-EDT-004 or MSK-01..03 into individual IDs."""
+    out: list[str] = []
+    for m in RANGE_RE.finditer(text):
+        pre1, start, pre2, end = m.group(1), m.group(2), m.group(3), m.group(4)
+        if pre2 and pre2 != pre1:
+            continue
+        a, b = int(start), int(end)
+        if b < a or b - a > 500:
+            continue
+        width = len(start)
+        for n in range(a, b + 1):
+            candidate = f"{pre1}{n:0{width}d}"
+            if ID_RE.fullmatch(candidate):
+                out.append(candidate)
+    return out
+
+
+def ids_in(text: str) -> list[str]:
+    return [m.group(1) for m in ID_RE.finditer(text)] + expand_ranges(text)
+
+
+def strip_code(text: str) -> str:
+    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    return re.sub(r"`[^`\n]*`", "", text)
+
+
+def slugify(heading: str) -> str:
+    """GitHub-style heading anchor."""
+    s = heading.strip().lower()
+    kept = []
+    for ch in s:
+        cat = unicodedata.category(ch)
+        if ch in (" ", "-", "_") or cat[0] in ("L", "M", "N"):
+            kept.append(ch)
+    return "".join(kept).replace(" ", "-")
+
+
+def markdown_files() -> list[Path]:
+    files = sorted(DOCS.glob("*.md"))
+    files += sorted(p for p in ROOT.glob("*.md"))
+    for sub in (".opencode", ".specify/memory", ".github"):
+        base = ROOT / sub
+        if base.exists():
+            files += sorted(base.rglob("*.md"))
+    return [f for f in files if f.is_file()]
+
+
+def text_files() -> list[Path]:
+    skip_dirs = {".git", "node_modules", "target", "dist", "vcpkg_installed", ".venv", "__pycache__"}
+    out = []
+    for p in ROOT.rglob("*"):
+        if any(part in skip_dirs for part in p.relative_to(ROOT).parts):
+            continue
+        if not p.is_file() or p.name in ("LICENSE", "denylist.sha256"):
+            continue
+        try:
+            data = p.read_bytes()
+        except OSError:
+            continue
+        if b"\x00" in data[:4096]:
+            continue
+        out.append(p)
+    return out
+
+
+def rel(p: Path) -> str:
+    return p.relative_to(ROOT).as_posix()
+
+
+class Report:
+    def __init__(self) -> None:
+        self.findings: dict[str, list[str]] = defaultdict(list)
+
+    def add(self, check: str, message: str) -> None:
+        self.findings[check].append(message)
+
+    def print_and_code(self) -> int:
+        if not self.findings:
+            print("check_docs: all checks passed")
+            return 0
+        total = 0
+        for check in sorted(self.findings):
+            items = self.findings[check]
+            total += len(items)
+            print(f"\n[{check}] {len(items)} finding(s)")
+            for item in items[:200]:
+                print(f"  - {item}")
+        print(f"\ncheck_docs: {total} finding(s)")
+        return 1
+
+
+def table_cells(line: str) -> list[str]:
+    return [c.strip() for c in line.strip().strip("|").split("|")]
+
+
+def collect_definitions(report: Report) -> dict[str, list[str]]:
+    defs: dict[str, list[str]] = defaultdict(list)
+    for md in markdown_files():
+        lines = md.read_text(encoding="utf-8").splitlines()
+        for n, line in enumerate(lines, 1):
+            found: list[str] = []
+            if line.startswith("|"):
+                first = table_cells(line)[0]
+                if ID_RE.fullmatch(first):
+                    found.append(first)
+            elif line.startswith("#"):
+                found += [i for i in ids_in(line) if ID_RE.fullmatch(i)]
+            elif re.match(r"^- \*\*G-\d{2}\b", line):
+                found.append(re.match(r"^- \*\*(G-\d{2})", line).group(1))
+            for ident in found:
+                canonical = CANONICAL.get(prefix_of(ident))
+                if canonical and md.parent == DOCS and md.name == canonical:
+                    defs[ident].append(f"{rel(md)}:{n}")
+                elif md.parent == DOCS and line.startswith("|"):
+                    # An ID as first cell of a table in a non-canonical doc is a duplicate definition.
+                    report.add("VER-01", f"{ident} defined outside its canonical document at {rel(md)}:{n}")
+    return defs
+
+
+def check_ids(report: Report, defs: dict[str, list[str]]) -> None:
+    for ident, places in defs.items():
+        if len(places) > 1:
+            report.add("VER-01", f"{ident} defined more than once: {', '.join(places)}")
+    for md in markdown_files():
+        text = md.read_text(encoding="utf-8")
+        for n, line in enumerate(text.splitlines(), 1):
+            for ident in ids_in(line):
+                if ident not in defs:
+                    report.add("VER-01", f"{ident} referenced at {rel(md)}:{n} is not defined")
+
+
+def parse_requirements() -> dict[str, dict[str, object]]:
+    reqs: dict[str, dict[str, object]] = {}
+    for line in (DOCS / "01-product.md").read_text(encoding="utf-8").splitlines():
+        if line.startswith("| REQ-"):
+            c = table_cells(line)
+            reqs[c[0]] = {"pri": c[2], "rel": c[3], "wp": set(WP_RE.findall(c[4])),
+                          "tests": set(TEST_RE.findall(c[5]))}
+        elif line.startswith("| NFR-"):
+            c = table_cells(line)
+            reqs[c[0]] = {"pri": "P0", "rel": c[3], "wp": None, "tests": set(TEST_RE.findall(c[4]))}
+    return reqs
+
+
+def parse_wp_cards() -> dict[str, set[str]]:
+    implements: dict[str, set[str]] = {}
+    current = None
+    for line in (DOCS / "10-execution.md").read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^### (WP-\d{2})\b", line)
+        if m:
+            current = m.group(1)
+            implements[current] = set()
+            continue
+        if current and line.startswith("- **Implements:**"):
+            implements[current] |= {i for i in ids_in(line) if i.startswith(("REQ-", "NFR-"))}
+    return implements
+
+
+def parse_tests() -> dict[str, set[str]]:
+    covers: dict[str, set[str]] = {}
+    in_catalog = False
+    for line in (DOCS / "09-quality.md").read_text(encoding="utf-8").splitlines():
+        if line.startswith("## 9.10"):
+            in_catalog = True
+            continue
+        if in_catalog and line.startswith("## "):
+            break
+        if in_catalog and line.startswith("| T-"):
+            c = table_cells(line)
+            covers[c[0]] = {i for i in ids_in(c[-1]) if i.startswith(("REQ-", "NFR-", "THR-"))}
+    return covers
+
+
+def check_traceability(report: Report) -> None:
+    reqs = parse_requirements()
+    cards = parse_wp_cards()
+    tests = parse_tests()
+    for rid, r in reqs.items():
+        if rid.startswith("REQ-"):
+            if r["pri"] in ("P0", "P1") and r["rel"] == "1.0":
+                if not r["wp"]:
+                    report.add("VER-02", f"{rid} has no work package")
+                if not r["tests"]:
+                    report.add("VER-02", f"{rid} has no test")
+                implementing = {wp for wp, ids in cards.items() if rid in ids}
+                if implementing != r["wp"]:
+                    report.add("VER-03", f"{rid}: 01 lists {sorted(r['wp'])} but cards implementing it are {sorted(implementing)}")
+            elif r["pri"] == "P2":
+                if r["wp"] or r["tests"]:
+                    report.add("VER-02", f"{rid} is P2 but lists work packages or tests")
+        for t in r["tests"]:
+            if t not in tests:
+                report.add("VER-04", f"{rid} lists {t} which is not in the test catalog")
+            elif rid not in tests[t]:
+                report.add("VER-03", f"{t} does not list {rid} in its Covers column")
+    for t, covered in tests.items():
+        if not covered:
+            report.add("VER-04", f"{t} covers no REQ, NFR or THR")
+        if t.startswith("T-E2E-"):
+            continue
+        for rid in covered:
+            if rid.startswith(("REQ-", "NFR-")):
+                if rid not in reqs:
+                    report.add("VER-04", f"{t} covers unknown {rid}")
+                elif t not in reqs[rid]["tests"]:
+                    report.add("VER-03", f"{t} covers {rid} but 01 does not list {t} for it")
+    for wp, ids in cards.items():
+        for rid in ids:
+            if rid.startswith("REQ-") and rid in reqs and wp not in (reqs[rid]["wp"] or set()):
+                report.add("VER-03", f"{wp} implements {rid} but 01 does not list {wp}")
+
+
+def check_threats(report: Report) -> None:
+    for line in (DOCS / "05-security.md").read_text(encoding="utf-8").splitlines():
+        if line.startswith("| THR-"):
+            c = table_cells(line)
+            if not re.search(r"\bSEC-\d{2}\b", c[2]):
+                report.add("VER-14", f"{c[0]} has no SEC control")
+            if not TEST_RE.search(c[3]):
+                report.add("VER-14", f"{c[0]} has no test")
+
+
+def check_rule_sync(report: Report) -> None:
+    pattern = re.compile(r"<!-- G-RULES:BEGIN -->(.*?)<!-- G-RULES:END -->", re.S)
+    blocks = {}
+    for path in (DOCS / "00-index.md", ROOT / "AGENTS.md", ROOT / ".specify" / "memory" / "constitution.md"):
+        if not path.exists():
+            report.add("VER-05", f"{rel(path)} is missing")
+            continue
+        m = pattern.search(path.read_text(encoding="utf-8"))
+        if not m:
+            report.add("VER-05", f"{rel(path)} has no G-RULES block")
+            continue
+        blocks[rel(path)] = m.group(1).strip()
+    if len(set(blocks.values())) > 1:
+        report.add("VER-05", "G-RULES blocks differ between: " + ", ".join(blocks))
+
+
+def check_placeholders_identity_links(report: Report) -> None:
+    for md in markdown_files():
+        raw = md.read_text(encoding="utf-8")
+        plain = strip_code(raw)
+        for n, line in enumerate(plain.splitlines(), 1):
+            if re.search(r"\b(TODO|TBD|FIXME)\b", line):
+                report.add("VER-06", f"placeholder at {rel(md)}:{n}")
+        for n, line in enumerate(raw.splitlines(), 1):
+            if re.search(r"video spirits", line, flags=re.I):
+                report.add("VER-07", f"product name written without the AfterLeads- prefix at {rel(md)}:{n}")
+            for m in re.finditer(r"https://github\.com/([A-Za-z0-9-]+)/AfterLeads-Video-Spirits", line):
+                if not m.group(0).startswith(REPO_URL):
+                    report.add("VER-07", f"repository URL differs from the constant at {rel(md)}:{n}")
+            for m in re.finditer(r"([A-Za-z0-9-]+)\.github\.io/AfterLeads-Video-Spirits", line):
+                if m.group(1) + ".github.io" != PAGES_HOST:
+                    report.add("VER-07", f"pages host differs from the constant at {rel(md)}:{n}")
+        for n, line in enumerate(raw.splitlines(), 1):
+            for m in re.finditer(r"\]\(([^)\s]+)\)", line):
+                target = m.group(1)
+                if target.startswith(("http://", "https://", "mailto:")):
+                    continue
+                path_part, _, anchor = target.partition("#")
+                dest = (md.parent / path_part).resolve() if path_part else md
+                if not dest.exists():
+                    report.add("VER-10", f"broken link {target} at {rel(md)}:{n}")
+                    continue
+                if anchor and dest.suffix == ".md":
+                    slugs = set()
+                    seen: dict[str, int] = defaultdict(int)
+                    for h in re.findall(r"^#{1,6}\s+(.*)$", dest.read_text(encoding="utf-8"), flags=re.M):
+                        s = slugify(h)
+                        slugs.add(s if seen[s] == 0 else f"{s}-{seen[s]}")
+                        seen[s] += 1
+                    if anchor not in slugs:
+                        report.add("VER-10", f"missing anchor #{anchor} in {rel(dest)} (from {rel(md)}:{n})")
+
+
+def load_denylist() -> set[str]:
+    path = ROOT / "tools" / "docs" / "denylist.sha256"
+    if not path.exists():
+        return set()
+    return {l.strip() for l in path.read_text(encoding="utf-8").splitlines() if l.strip()}
+
+
+def check_denylist(report: Report) -> None:
+    deny = load_denylist()
+    if not deny:
+        report.add("VER-08", "tools/docs/denylist.sha256 is missing or empty")
+        return
+    for f in text_files():
+        try:
+            text = f.read_text(encoding="utf-8", errors="ignore").lower()
+        except OSError:
+            continue
+        for n, line in enumerate(text.splitlines(), 1):
+            for token in set(re.findall(r"[a-z0-9]+", line)):
+                if hashlib.sha256(token.encode()).hexdigest() in deny:
+                    report.add("VER-08", f"denied token at {rel(f)}:{n}")
+
+
+def check_shortcuts(report: Report) -> None:
+    binds: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for line in (DOCS / CATALOG).read_text(encoding="utf-8").splitlines():
+        if not line.startswith("| KB-"):
+            continue
+        c = table_cells(line)
+        kid, shortcut, ctx = c[0], c[4], c[5]
+        if shortcut in ("—", ""):
+            continue
+        for part in re.split(r"\(also |\)| / ", shortcut):
+            part = re.sub(r" \(.*", "", part.strip())
+            if part and part != "—":
+                binds[part].append((kid, ctx))
+    for key, uses in binds.items():
+        for i, (a_id, a_ctx) in enumerate(uses):
+            for b_id, b_ctx in uses[i + 1:]:
+                if a_ctx == b_ctx or "global" in (a_ctx, b_ctx):
+                    report.add("VER-11", f"{key} bound to {a_id} ({a_ctx}) and {b_id} ({b_ctx})")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--hash-word", help="print the SHA-256 denylist hash of a word and exit")
+    args = parser.parse_args()
+    if args.hash_word:
+        print(hashlib.sha256(args.hash_word.strip().lower().encode()).hexdigest())
+        return 0
+    if not DOCS.exists():
+        print("docs/ folder not found", file=sys.stderr)
+        return 2
+    report = Report()
+    defs = collect_definitions(report)
+    check_ids(report, defs)
+    check_traceability(report)
+    check_threats(report)
+    check_rule_sync(report)
+    check_placeholders_identity_links(report)
+    check_denylist(report)
+    check_shortcuts(report)
+    return report.print_and_code()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

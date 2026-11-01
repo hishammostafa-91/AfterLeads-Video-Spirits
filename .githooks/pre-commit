@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# Git protocol enforcement (docs/10-execution.md §10.4.13): no commits on main, no large files, no secrets.
+set -u
+
+branch="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
+case "$branch" in
+  main|master)
+    echo "pre-commit: committing on '$branch' is not allowed (G-03)." >&2
+    echo "Start a work branch: pwsh -File tools/git/New-WorkBranch.ps1 -Type <type> -Number <NNN> -Slug <slug>" >&2
+    exit 1
+    ;;
+esac
+
+max_bytes=5242880
+status=0
+while IFS= read -r -d '' file; do
+  size="$(git cat-file -s ":$file" 2>/dev/null || echo 0)"
+  if [ "$size" -gt "$max_bytes" ]; then
+    echo "pre-commit: '$file' is larger than 5 MB ($size bytes). Large media must not be committed (docs/09 §9.3)." >&2
+    status=1
+  fi
+  base="$(basename -- "$file")"
+  case "$base" in
+    .env|*.env|.env.*|*.pem|*.pfx|*.p12|*.key)
+      case "$base" in
+        *.env.example) ;;
+        *) echo "pre-commit: '$file' looks like a secret file and must not be committed (SEC-15)." >&2; status=1 ;;
+      esac
+      ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=AM -z)
+
+if git diff --cached -U0 --diff-filter=AM | grep -E '^\+' | grep -Eq -- '-----BEGIN ([A-Z]+ )?PRIVATE KEY-----|dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5|dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5|untrusted comment: (rsign|minisign) encrypted secret key'; then
+  echo "pre-commit: a private key appears in the staged changes (SEC-15). Remove it and keep keys outside the repository." >&2
+  status=1
+fi
+
+exit $status
