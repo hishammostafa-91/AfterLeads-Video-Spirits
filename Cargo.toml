@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# Cargo workspace (docs/02-architecture.md §2.13; WP-00 card).
+[workspace]
+members = ["crates/*"]
+resolver = "3"
