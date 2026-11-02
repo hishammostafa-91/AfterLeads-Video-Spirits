@@ -22,9 +22,9 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 **Purpose**: Record the already-established baseline as evidence (constitution III, G-09). These tasks verify and capture; they create no product code.
 
-- [ ] T001 Run `pwsh -File tools/setup/Test-DevEnvironment.ps1` and confirm every check prints PASS (zero FAIL, zero WARN); save the full table as pull-request evidence (tools/setup/Test-DevEnvironment.ps1)
-- [ ] T002 Confirm hooks are active in this clone: `git config --get core.hooksPath` prints `.githooks`, and `pwsh -File tools/git/Install-Hooks.ps1` reports already-installed (docs/10 §10.4.12) (tools/git/Install-Hooks.ps1)
-- [ ] T003 Capture (one-time) Spec Kit evidence for the pull-request evidence pack: `git diff .specify/memory/constitution.md` is empty, `.opencode/commands/speckit.*.md` files exist and are committed (commit `311a773`), and no `specify extension add git` was used (docs/06 §6.11) (.specify/memory/constitution.md)
+- [x] T001 Run `pwsh -File tools/setup/Test-DevEnvironment.ps1` and confirm every check prints PASS (zero FAIL, zero WARN); save the full table as pull-request evidence (tools/setup/Test-DevEnvironment.ps1)
+- [x] T002 Confirm hooks are active in this clone: `git config --get core.hooksPath` prints `.githooks`, and `pwsh -File tools/git/Install-Hooks.ps1` reports already-installed (docs/10 §10.4.12) (tools/git/Install-Hooks.ps1)
+- [x] T003 Capture (one-time) Spec Kit evidence for the pull-request evidence pack: `git diff .specify/memory/constitution.md` is empty, `.opencode/commands/speckit.*.md` files exist and are committed (commit `311a773`), and no `specify extension add git` was used (docs/06 §6.11) (.specify/memory/constitution.md)
 
 ---
 
@@ -34,10 +34,10 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 **⚠ CRITICAL**: US3 and US4 cannot begin until this phase is complete.
 
-- [ ] T004 [P] Create `rust-toolchain.toml` at the repository root: channel `1.99.1`, components `rustfmt` and `clippy` (card; docs/00 §0.8) (rust-toolchain.toml)
-- [ ] T005 [P] Create `.cargo/config.toml` with `[target.x86_64-pc-windows-msvc] rustflags = ["-C", "target-feature=+crt-static", "-C", "control-flow-guard"]` verbatim from the card (.cargo/config.toml)
-- [ ] T006 [P] Create root `package.json` (private workspace root, name `afterleads-video-spirits` — an implementation assumption matching the lowercase identity pattern; docs/00 §0.5 pins only the Cargo package name — and no scripts that duplicate app tooling) and `pnpm-workspace.yaml` with `packages: ["app"]` (docs/02 §2.13) (package.json, pnpm-workspace.yaml)
-- [ ] T007 Verify the pinned toolchain resolves: `cargo --version` reports 1.99.1 (rustup auto-installs from `rust-toolchain.toml` on first use); `rustup component list --toolchain 1.99.1` shows `rustfmt` and `clippy` installed (rust-toolchain.toml)
+- [x] T004 [P] Create `rust-toolchain.toml` at the repository root: channel `1.99.1`, components `rustfmt` and `clippy` (card; docs/00 §0.8) (rust-toolchain.toml)
+- [x] T005 [P] Create `.cargo/config.toml` with `[target.x86_64-pc-windows-msvc] rustflags = ["-C", "target-feature=+crt-static", "-C", "control-flow-guard"]` verbatim from the card (.cargo/config.toml)
+- [x] T006 [P] Create root `package.json` (private workspace root, name `afterleads-video-spirits` — an implementation assumption matching the lowercase identity pattern; docs/00 §0.5 pins only the Cargo package name — and no scripts that duplicate app tooling) and `pnpm-workspace.yaml` with `packages: ["app"]` (docs/02 §2.13) (package.json, pnpm-workspace.yaml)
+- [x] T007 Verify the pinned toolchain resolves: `cargo --version` reports 1.99.1 (rustup auto-installs from `rust-toolchain.toml` on first use); `rustup component list --toolchain 1.99.1` shows `rustfmt` and `clippy` installed (rust-toolchain.toml)
 
 **Checkpoint**: Root manifests in place — user-story implementation can begin.
 
