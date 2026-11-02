@@ -1,0 +1,24 @@
+# Pull-request CI (OPS-03) — docs/08-operations.md §8.3.1, WP-01 scope.
+# Jobs whose targets do not exist yet are added by their owning work packages;
+# e2e-smoke is the card-sanctioned no-op until WP-05.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 tools/docs/check_docs.py
