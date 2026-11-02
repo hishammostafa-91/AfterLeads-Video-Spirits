@@ -206,3 +206,9 @@ Task: "Create tools/check_placeholders.py (D14)"                  # T015
 - No workspace/npm dependency changes (G-11); CI tools install via the pinned install-action.
 - The `e2e-smoke` no-op is the only sanctioned green-without-work step (card); it is visibly marked and replaced in WP-05.
 - Stop and ask (G-17) on any discrepancy with the canonical docs or the lockfile; do not improvise.
+
+---
+
+## Phase 9: Convergence
+
+- [ ] T032 After the owner merges WP-01, dispatch the Nightly CI workflow manually (Actions → Nightly CI → Run workflow) and record the run URL and outcomes in specs/001-ci-quality-gates/evidence.md (`dependency-audit` green; `docs-links` informational) — GitHub offers schedule/dispatch only for workflows present on the default branch, so this proof is structurally post-merge (quickstart §7; FR-011) (partial)
