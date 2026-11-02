@@ -12,7 +12,7 @@ python tools/git/check_commits.py <rev-range> --only dco
 
 | Behavior | Contract |
 |---|---|
-| `--only conventional` | checks only the first-line Conventional Commits format (types/scopes of 10 §10.4.5); GitHub merge commits exempt |
+| `--only conventional` | checks only the first-line Conventional Commits format (types/scopes of 10 §10.4.5); merge commits are exempt (10 §10.4.13 "merge commits allowed") |
 | `--only dco` | checks only the DCO rule: `Signed-off-by:` present and matching the author email |
 | no flag | both rules — the existing contract; sole current caller: `tools/verify.ps1` (`.githooks/commit-msg` implements its own bash copy of the same rules and does not call this tool) |
 | callers | `commits` job (`--only conventional`), `dco` job (`--only dco`), `verify.ps1` gate (no flag) |

@@ -8,8 +8,11 @@ Usage:
   python tools/git/check_commits.py <rev-range> --only conventional
   python tools/git/check_commits.py <rev-range> --only dco
 
-Rules: docs/10-execution.md §10.4.4–§10.4.5. Merge commits created by GitHub
-("Merge pull request …") are exempt from both checks; other merge commits need a sign-off.
+Rules: docs/10-execution.md §10.4.4–§10.4.5 and §10.4.13 ("merge commits allowed").
+Merge commits are exempt from the Conventional Commits check; merge commits
+created by GitHub — "Merge pull request #N ..." and the pull_request test-merge
+"Merge <sha> into <sha>" — are exempt from both checks (they are generated
+machinery, not author work); other merge commits still need a sign-off.
 The --only modes back the CI jobs `commits` and `dco` (WP-01 contracts/tools.md).
 """
 
@@ -25,6 +28,7 @@ MERGE_OR_REVERT = re.compile(
     r'^(Merge (branch|pull request|remote-tracking branch) |Revert ")'
 )
 GITHUB_MERGE = re.compile(r"^Merge pull request #\d+ ")
+GITHUB_TEST_MERGE = re.compile(r"^Merge [0-9a-f]{7,40} into [0-9a-f]{7,40}")
 SIGNOFF = re.compile(r"^Signed-off-by: .+ <([^>]+@[^>]+)>\s*$", re.M)
 MODES = ("conventional", "dco")
 
@@ -72,9 +76,9 @@ def main() -> int:
         first = next((l for l in lines if l.strip()), "").rstrip("\r")
         short = sha[:9]
         is_merge = len(parents.split()) > 1
-        if GITHUB_MERGE.match(first):
+        if GITHUB_MERGE.match(first) or GITHUB_TEST_MERGE.match(first):
             continue
-        if only in (None, "conventional"):
+        if only in (None, "conventional") and not is_merge:
             if not (MERGE_OR_REVERT.match(first) or CONVENTIONAL.match(first)):
                 problems.append(
                     f"{short}: first line is not a Conventional Commit: {first!r}"

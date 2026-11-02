@@ -16,6 +16,30 @@ G-09 evidence for the WP-01 pull request. Each entry names the task, command, an
   - The `--no-tests=pass` flag is now part of the `rust-test` step (ci.yml), research D6, and the contract; semantics: *tests pass + coverage measured* — real failures still fail.
   - T005–T008 delivered as commits `d1e118e` + `556e775` (rust-test, ui, build, e2e-smoke jobs; YAML parse-verified).
 
+## Phase 5 (US3)
+
+- **T017** — `tools/git/check_commits.py` extended with `--only conventional|dco` (default behavior unchanged).
+- **T019** — all invocation modes verified on `origin/main..HEAD`: default → `all commits OK` (exit 0, byte-identical behavior for `verify.ps1`); `--only conventional` → OK; `--only dco` → OK; `--only bogus` → exit 2 with the usage message; short range `HEAD~2..HEAD --only dco` → OK.
+- **T018** — `commits` and `dco` jobs added (checkout `fetch-depth: 0`); `ci.yml` now carries **all eight OPS-02 check names**: build, commits, dco, docs, e2e-smoke, rust-lint, rust-test, ui.
+
+## Phase 6 (US4)
+
+- **T020** — `.github/workflows/nightly.yml` created (two crons + per-job guards; dependency-audit windows-2025 with checkout/rustup/cargo-deny/pnpm setup; docs-links ubuntu + lychee, `continue-on-error`); YAML parse-verified with guards.
+- **T021** — G-19 sync confirmed: docs/08 §8.3.2 second-schedule note present (line 61, commit `4800224`), docs/00 set version 1.0.4, `check_docs.py` green.
+
+## Phase 7 (US5)
+
+- **T022** — `actions/cache` added to `rust-lint`, `rust-test`, `build` (cargo registry/git/target, key `cargo-<os>-<Cargo.lock hash>` with restore-keys) and `ui` (pnpm store, key `pnpm-<os>-<pnpm-lock hash>`) — research D7; no vcpkg cache until `vcpkg.json` exists (WP-06).
+- **T023 (in flight)** — failure demonstration running: work branch pushed; `ci/001-demo-failures` cut from its tip (G-04 stacking, owner-approved 2026-11-02) with three locally-verified violations (fmt exit 1 on `alvs-core`; clippy exit 101 `unused variable: unused_demo` on `alvs-model`; placeholders exit 1 `FIXME` at `alvs-formats/src/lib.rs:7`) committed with sign-off, plus a fourth **unsigned** commit created via the GitHub API (`b163d3e`, "ci: demo commit without sign-off") because the repository's own `commit-msg` hook correctly rejects such commits locally. Draft PR **#2** opened with the stacking disclosure body. Expected: `rust-lint` red on three steps, `dco` red, `commits` green. Results recorded below when the run completes.
+
+## Phase 8 (pre-push portion)
+
+- **T027** — pin-hygiene scan: all 20 `uses:` references across both workflows resolve to full 40-hex commit SHAs; exactly the six D1 actions (`actions/checkout`, `actions/cache`, `actions/upload-artifact`, `taiki-e/install-action`, `lycheeverse/lychee-action`, `pnpm/action-setup`); both workflows declare `permissions: contents: read` (SC-005).
+- **T028** — final `pwsh -File tools/verify.ps1` → exit 0 with the expected table: 8 PASS (`docs`, `commits`, `rust-format`, `rust-lint`, `dependency-policy`, `crate-rules`, `placeholders`, `rust-test`); `bindings-drift` + four UI gates SKIPPED (WP-02/04/05 targets).
+- **T029** — STATUS.md WP-01 next step set to `finish` (state stays `in-progress` until merge).
+- **T024/T025** — pending by design: they execute after `/wp-finish` opens the WP-01 pull request (T-QA-002 warm re-run; OPS-02 checklist + baselines in the PR body).
+
+
 ## Phase 4 (US2)
 
 - **T010** — `deny.toml` created (05 §5.6 allowlist verbatim; HTTP-client ban with wrapper allowances). Verification journey: first run `cargo deny check` → **advisories FAILED**: RUSTSEC-2024-0370 (`proc-macro-error` unmaintained, "no safe upgrade"), reached only via tauri's Linux-only GUI chain (`muda → gtk → glib → glib-macros`). Resolution: the policy graph is scoped to the shipped target — `[graph] targets = [{ triple = "x86_64-pc-windows-msvc" }]` (constitution: Windows-only product) — not an advisory ignore. Final run: **`advisories ok, bans ok, licenses ok, sources ok`**, exit 0. The banned-crate wrapper edges (reqwest←tauri, hyper←reqwest/hyper-util) hold: bans ok.
