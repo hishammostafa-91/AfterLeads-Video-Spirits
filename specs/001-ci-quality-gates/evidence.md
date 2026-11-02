@@ -64,6 +64,8 @@ G-09 evidence for the WP-01 pull request. Each entry names the task, command, an
 - **T026 — quickstart validation closed**: §1 (verify.ps1 8 PASS) ✓, §2 (deny + npm licenses green) ✓, §3 (pin scan 20/20) ✓, §4 (CI green on PR — runs 41519268766 and 41522690607) ✓, §5 (demo PR #2 matrix) ✓, §6 (warm duration 3m38s) ✓, §7 (nightly dispatch — **post-merge only**, tracked as T032 with rationale) ⏳, §8 (OPS-02 checklist in the PR body) ✓.
 - **T030 — evidence pack complete** (this file): baselines (T-SEC-001, T-QA-002), failure demonstrations (three runs, job- and step-level), tool verification journeys, review dispositions (plan round and code round), and gate tables — commands, results, and test IDs throughout (G-09). Only T032 (post-merge nightly dispatch proof) remains open, as accepted by the owner.
 
+- **T032 — closed (post-merge, 2026-11-02)**: Nightly CI dispatched manually on `main` via `workflow_dispatch` (run [41526461752](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/41526461752), enabled by the owner adding *Actions: write* to the PAT): `dependency-audit` **every step green** — `cargo deny check advisories` ✓, `pnpm install --frozen-lockfile` ✓, `pnpm audit --prod` ✓ (~1m) — and `docs-links` green (lychee, informational). The nightly watch works end to end on the default branch. *(Recorded on the WP-02 branch per docs/10 §10.5 step 7 — no direct commits on `main`.)*
+
 ## Reviewer findings and dispositions (2026-11-02, reviewer session on `origin/main...HEAD`)
 
 Verdict was APPROVE with zero CRITICAL/HIGH findings; the owner directed all five (F1–F5) to be resolved.
