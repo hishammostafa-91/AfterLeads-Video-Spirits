@@ -1,0 +1,134 @@
+# Pull-request CI (OPS-03) — docs/08-operations.md §8.3.1, WP-01 scope.
+# Jobs whose targets do not exist yet are added by their owning work packages;
+# e2e-smoke is the card-sanctioned no-op until WP-05.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: python3 tools/git/check_commits.py origin/main..HEAD --only conventional
+
+  dco:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: python3 tools/git/check_commits.py origin/main..HEAD --only dco
+
+  rust-test:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+      - run: rustup show
+      - uses: taiki-e/install-action@1919c4a95903d2c33e4a221102edca87309fc14b # v2.89.0
+        with:
+          tool: cargo-nextest,cargo-llvm-cov
+      - run: rustup component add llvm-tools-preview
+      - run: cargo llvm-cov nextest --workspace --locked --no-tests=pass --lcov --output-path lcov.info
+        env:
+          ALVS_FORCE_WARP: 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-lcov
+          path: lcov.info
+
+  rust-lint:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+      - run: rustup show
+      # Gate steps report independently (if: always()) so one run shows every
+      # failing gate — required by the WP-01 failure-demonstration evidence.
+      - run: cargo fmt --all -- --check
+        if: always()
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+        if: always()
+      - uses: taiki-e/install-action@1919c4a95903d2c33e4a221102edca87309fc14b # v2.89.0
+        if: always() # a later gate step always runs and needs the tool (demo finding, T023)
+        with:
+          tool: cargo-deny
+      - run: cargo deny check
+        if: always()
+      - run: python tools/check_deps.py
+        if: always()
+      - run: python tools/check_placeholders.py
+        if: always()
+
+  ui:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/AppData/Local/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.16.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C app build
+      - run: python tools/check_npm_licenses.py
+
+  build:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+      - run: rustup show
+      - run: cargo build -p afterleads-video-spirits --locked
+
+  e2e-smoke:
+    # No-op until WP-05 delivers the WebdriverIO + tauri-driver smoke suite
+    # (WP-01 card: "e2e-smoke added as a no-op job that reports success until WP-05").
+    runs-on: windows-2025
+    steps:
+      - run: >
+          echo "e2e-smoke: no-op by design until WP-05 replaces this step with the real smoke suite (T-E2E-001). Reporting success."
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 tools/docs/check_docs.py

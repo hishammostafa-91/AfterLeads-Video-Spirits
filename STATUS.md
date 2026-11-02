@@ -5,8 +5,8 @@ Dependencies: docs/10-execution.md §10.8. Baseline: documentation set 1.0.1 (ba
 
 | WP | Title | State | Branch | PR | Updated | Next step / question |
 |---|---|---|---|---|---|---|
-| WP-00 | Workstation and repository bootstrap | in-review | `chore/000-bootstrap` | — | 2026-11-02 | owner review |
-| WP-01 | CI and quality gates | todo | `ci/001-ci-quality-gates` | — | — | — |
+| WP-00 | Workstation and repository bootstrap | done | `chore/000-bootstrap` | #1 | 2026-11-02 | — |
+| WP-01 | CI and quality gates | in-review | `ci/001-ci-quality-gates` | #3 | 2026-11-02 | owner review |
 | WP-02 | Core types and project model | todo | `feat/002-core-model` | — | — | — |
 | WP-03 | Storage and application services | todo | `feat/003-storage-services` | — | — | — |
 | WP-04 | Design system and UI foundation | todo | `feat/004-design-system` | — | — | — |

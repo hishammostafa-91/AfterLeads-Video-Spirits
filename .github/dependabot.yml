@@ -1,0 +1,16 @@
+# Dependabot update proposal cadence — docs/05-security.md §5.6 rule 5
+# (weekly for cargo, npm, and actions), WP-01 card.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: "/app"
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

@@ -1,0 +1,93 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# cargo-deny policy — docs/05-security.md §5.6 (allowlist verbatim), WP-01 card.
+# HTTP-client ban per SEC-10: no crate may depend on an HTTP client except the
+# sanctioned chain (tauri's embedded client, ADR-023) and, from WP-21, ureq
+# wrapped by alvs-stt (docs/05 §5.7; wrapper semantics are per direct-parent
+# edge — research D12).
+
+[graph]
+# The product ships Windows-only (constitution technology constraints); policy
+# is enforced on the shipped target's dependency graph (WP-01 research D12).
+targets = [
+    { triple = "x86_64-pc-windows-msvc" },
+]
+all-features = false
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "BSL-1.0",
+    "MPL-2.0",
+    "CC0-1.0",
+    "Unlicense",
+    "WTFPL",
+    "CDLA-Permissive-2.0",
+    "LGPL-2.1-or-later",
+    "LGPL-2.1-only",
+    "LGPL-3.0-or-later",
+    "GPL-2.0-or-later",
+    "GPL-3.0-or-later",
+    "AGPL-3.0-or-later",
+    "OFL-1.1",
+    "CC-BY-4.0",
+]
+confidence-threshold = 0.8
+
+[advisories]
+version = 2
+yanked = "deny"
+
+[bans]
+multiple-versions = "warn"
+
+[[bans.deny]]
+name = "reqwest"
+wrappers = ["tauri"]
+reason = "SEC-10: HTTP clients only in sanctioned consumers; tauri embeds the updater/app client (ADR-023)"
+
+[[bans.deny]]
+name = "hyper"
+wrappers = ["reqwest", "hyper-util"]
+reason = "hyper is reachable only inside the sanctioned tauri->reqwest chain (Cargo.lock lines 2499/1332)"
+
+[[bans.deny]]
+name = "ureq"
+reason = "model-download client; gains wrappers = [\"alvs-stt\"] when WP-21 adds it (ADR-023, SEC-10)"
+
+[[bans.deny]]
+name = "isahc"
+reason = "HTTP client banned (SEC-10)"
+
+[[bans.deny]]
+name = "surf"
+reason = "HTTP client banned (SEC-10)"
+
+[[bans.deny]]
+name = "attohttpc"
+reason = "HTTP client banned (SEC-10)"
+
+[[bans.deny]]
+name = "minreq"
+reason = "HTTP client banned (SEC-10)"
+
+[[bans.deny]]
+name = "curl"
+reason = "HTTP client banned (SEC-10)"
+
+[[bans.deny]]
+name = "curl-sys"
+reason = "HTTP client banned (SEC-10)"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
