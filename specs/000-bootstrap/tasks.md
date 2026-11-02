@@ -51,7 +51,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Demonstrate main protection exactly as quickstart.md Scenario E: `git switch main`, `git commit --allow-empty -m "test: hook rejection evidence"` (no `-s`), confirm `.githooks/pre-commit` rejects with `committing on 'main' is not allowed (G-03)`, then `git switch chore/000-bootstrap`; capture the rejection output for the pull request; if the commit succeeds, STOP and report a gate failure (G-03, G-08) (.githooks/pre-commit)
+- [x] T008 [US1] Demonstrate main protection exactly as quickstart.md Scenario E: `git switch main`, `git commit --allow-empty -m "test: hook rejection evidence"` (no `-s`), confirm `.githooks/pre-commit` rejects with `committing on 'main' is not allowed (G-03)`, then `git switch chore/000-bootstrap`; capture the rejection output for the pull request; if the commit succeeds, STOP and report a gate failure (G-03, G-08) (.githooks/pre-commit)
 
 **Checkpoint**: Workstation (T001) and protection (T008) evidence exist — US1 is fully deliverable on its own.
 
@@ -65,7 +65,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Final US2 sign-off — re-run the FR-003 checks captured in T003 (constitution diff empty, speckit commands and `.specify/scripts/powershell/` present, commit `311a773`) to confirm nothing regressed during later phases; reference T003's captured evidence instead of duplicating it (specs/000-bootstrap/spec.md §FR-003)
+- [x] T009 [US2] Final US2 sign-off — re-run the FR-003 checks captured in T003 (constitution diff empty, speckit commands and `.specify/scripts/powershell/` present, commit `311a773`) to confirm nothing regressed during later phases; reference T003's captured evidence instead of duplicating it (specs/000-bootstrap/spec.md §FR-003)
 
 **Checkpoint**: US2 confirmed done; no new artifacts.
 
@@ -79,20 +79,20 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 3
 
-- [ ] T010 [US3] Create root `Cargo.toml`: workspace manifest with `members = ["crates/*"]` (the `app/src-tauri` member is added in T026), `resolver = "3"` (the resolver that edition-2024 member crates imply; without an explicit resolver cargo warns "virtual workspace defaulting to resolver 1" on every build), SPDX header comment, no `[package]` (Cargo.toml)
-- [ ] T011 [P] [US3] Create `crates/alvs-core`: `Cargo.toml` (SPDX header comment; `name = "alvs-core"`, `edition = "2024"`, `license = "AGPL-3.0-or-later"`) and `src/lib.rs` with the SPDX header and a one-line crate doc comment (`//!`) (crates/alvs-core/src/lib.rs)
-- [ ] T012 [P] [US3] Create `crates/alvs-model` identically (name `alvs-model`) (crates/alvs-model/src/lib.rs)
-- [ ] T013 [P] [US3] Create `crates/alvs-formats` identically (name `alvs-formats`) (crates/alvs-formats/src/lib.rs)
-- [ ] T014 [P] [US3] Create `crates/alvs-media` identically (name `alvs-media`) (crates/alvs-media/src/lib.rs)
-- [ ] T015 [P] [US3] Create `crates/alvs-render` identically (name `alvs-render`) (crates/alvs-render/src/lib.rs)
-- [ ] T016 [P] [US3] Create `crates/alvs-audio` identically (name `alvs-audio`) (crates/alvs-audio/src/lib.rs)
-- [ ] T017 [P] [US3] Create `crates/alvs-engine` identically (name `alvs-engine`) (crates/alvs-engine/src/lib.rs)
-- [ ] T018 [P] [US3] Create `crates/alvs-store` identically (name `alvs-store`) (crates/alvs-store/src/lib.rs)
-- [ ] T019 [P] [US3] Create `crates/alvs-jobs` identically (name `alvs-jobs`) (crates/alvs-jobs/src/lib.rs)
-- [ ] T020 [P] [US3] Create `crates/alvs-stt` identically (name `alvs-stt`) (crates/alvs-stt/src/lib.rs)
-- [ ] T021 [P] [US3] Create `crates/alvs-testkit` identically (name `alvs-testkit`) (crates/alvs-testkit/src/lib.rs)
-- [ ] T022 [US3] Run `cargo build --workspace --locked` → exit 0; commit the generated `Cargo.lock` at the repository root (docs/00 §0.8; card acceptance `--locked` requires it) (Cargo.lock)
-- [ ] T023 [US3] Run `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `cargo test --workspace --locked` → all exit 0 on the empty crates (tools/verify.ps1 activates these gates the moment Cargo.toml exists — plan research D7) (Cargo.toml)
+- [x] T010 [US3] Create root `Cargo.toml`: workspace manifest with `members = ["crates/*"]` (the `app/src-tauri` member is added in T026), `resolver = "3"` (the resolver that edition-2024 member crates imply; without an explicit resolver cargo warns "virtual workspace defaulting to resolver 1" on every build), SPDX header comment, no `[package]` (Cargo.toml)
+- [x] T011 [P] [US3] Create `crates/alvs-core`: `Cargo.toml` (SPDX header comment; `name = "alvs-core"`, `edition = "2024"`, `license = "AGPL-3.0-or-later"`) and `src/lib.rs` with the SPDX header and a one-line crate doc comment (`//!`) (crates/alvs-core/src/lib.rs)
+- [x] T012 [P] [US3] Create `crates/alvs-model` identically (name `alvs-model`) (crates/alvs-model/src/lib.rs)
+- [x] T013 [P] [US3] Create `crates/alvs-formats` identically (name `alvs-formats`) (crates/alvs-formats/src/lib.rs)
+- [x] T014 [P] [US3] Create `crates/alvs-media` identically (name `alvs-media`) (crates/alvs-media/src/lib.rs)
+- [x] T015 [P] [US3] Create `crates/alvs-render` identically (name `alvs-render`) (crates/alvs-render/src/lib.rs)
+- [x] T016 [P] [US3] Create `crates/alvs-audio` identically (name `alvs-audio`) (crates/alvs-audio/src/lib.rs)
+- [x] T017 [P] [US3] Create `crates/alvs-engine` identically (name `alvs-engine`) (crates/alvs-engine/src/lib.rs)
+- [x] T018 [P] [US3] Create `crates/alvs-store` identically (name `alvs-store`) (crates/alvs-store/src/lib.rs)
+- [x] T019 [P] [US3] Create `crates/alvs-jobs` identically (name `alvs-jobs`) (crates/alvs-jobs/src/lib.rs)
+- [x] T020 [P] [US3] Create `crates/alvs-stt` identically (name `alvs-stt`) (crates/alvs-stt/src/lib.rs)
+- [x] T021 [P] [US3] Create `crates/alvs-testkit` identically (name `alvs-testkit`) (crates/alvs-testkit/src/lib.rs)
+- [x] T022 [US3] Run `cargo build --workspace --locked` → exit 0; commit the generated `Cargo.lock` at the repository root (docs/00 §0.8; card acceptance `--locked` requires it) (Cargo.lock)
+- [x] T023 [US3] Run `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `cargo test --workspace --locked` → all exit 0 on the empty crates (tools/verify.ps1 activates these gates the moment Cargo.toml exists — plan research D7) (Cargo.toml)
 
 **Checkpoint**: Workspace + eleven crates build, lint, and test green under the pinned toolchain.
 
