@@ -76,7 +76,9 @@ def main() -> int:
         first = next((l for l in lines if l.strip()), "").rstrip("\r")
         short = sha[:9]
         is_merge = len(parents.split()) > 1
-        if GITHUB_MERGE.match(first) or GITHUB_TEST_MERGE.match(first):
+        # GitHub-generated merge commits are exempt from both checks, but only
+        # when they really are merge commits — the subject alone is not proof.
+        if is_merge and (GITHUB_MERGE.match(first) or GITHUB_TEST_MERGE.match(first)):
             continue
         if only in (None, "conventional") and not is_merge:
             if not (MERGE_OR_REVERT.match(first) or CONVENTIONAL.match(first)):
