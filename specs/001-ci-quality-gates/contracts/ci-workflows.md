@@ -20,7 +20,7 @@ The workflows' externally observable contract: what triggers them, which check n
 | `commits` | ubuntu-latest | Every commit in range is a Conventional Commit (10 §10.4.5) | checkout `fetch-depth: 0`; `python3 tools/git/check_commits.py origin/main..HEAD --only conventional` |
 | `dco` | ubuntu-latest | Every commit carries `Signed-off-by:` matching the author email | checkout `fetch-depth: 0`; `python3 tools/git/check_commits.py origin/main..HEAD --only dco` |
 | `rust-lint` | windows-2025 | Format, clippy `-D warnings` (locked), dependency policy, crate rules, no placeholders — on the pinned toolchain | `rustup show`; `cargo fmt --all -- --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; install `cargo-deny`; `cargo deny check`; `python tools/check_deps.py`; `python tools/check_placeholders.py` |
-| `rust-test` | windows-2025 | All workspace tests pass under nextest (WARP forced via step-level `env:`); coverage artifact published — zero-test baseline is expected until crates gain tests | install `cargo-nextest` + `cargo-llvm-cov`; `rustup component add llvm-tools-preview`; `cargo llvm-cov nextest --workspace --locked --lcov --output-path lcov.info` (env `ALVS_FORCE_WARP: 1`); upload `lcov.info` |
+| `rust-test` | windows-2025 | All workspace tests pass under nextest (WARP forced via step-level `env:`); coverage artifact published — zero-test baseline is expected until crates gain tests | `rustup show`; install `cargo-nextest` + `cargo-llvm-cov`; `rustup component add llvm-tools-preview`; `cargo llvm-cov nextest --workspace --locked --lcov --output-path lcov.info` (env `ALVS_FORCE_WARP: 1`); upload `lcov.info` |
 | `ui` | windows-2025 | Frozen pnpm install; skeleton UI type-correctness build; every npm license allowlisted | pnpm setup (12.16.1); `pnpm install --frozen-lockfile`; `pnpm -C app build`; `python tools/check_npm_licenses.py` |
 | `build` | windows-2025 | The application crate builds debug, locked | `cargo build -p afterleads-video-spirits --locked` |
 | `e2e-smoke` | windows-2025 | Explicitly a no-op reporting success until WP-05 (card) | one explanatory step, exit 0 |
@@ -47,5 +47,5 @@ Deferred steps and their owners: bindings drift (WP-02), vcpkg cache + golden sm
 ## Cross-cutting guarantees
 
 - Every `uses:` is pinned to a full commit SHA (05 §5.6 rule 5; SC-005) — the six pinned actions of research.md D1; no other third-party actions.
-- Workflow files use LF, two-space indent, no trailing whitespace (docs/02 §2.14 standards apply to repository files).
+- Workflow files use LF, two-space indent, no trailing whitespace, and carry no SPDX header: docs/02 §2.14 enumerates header-bearing source kinds (Rust, TS/TSX, CSS, WGSL, PowerShell, Python, sh) — YAML is not among them, and CI configuration follows the repository's headerless-config precedent (`.gitattributes`, `.github/pull_request_template.md`); the license-bearing artifacts of this package are the Python tools and `deny.toml`.
 - A red job names its failing step; deliberately failing commits map: format/lint/placeholder → `rust-lint`; missing sign-off → `dco` (card acceptance, SC-002).
