@@ -54,7 +54,7 @@ Implement the product's data heart exactly as the WP-02 card specifies: `alvs-co
 ```text
 specs/002-core-model/
 ├── plan.md              # This file
-├── research.md          # Phase 0 — D1..D16 (versions verified 2026-11-02)
+├── research.md          # Phase 0 — D1..D17 (versions verified 2026-11-02)
 ├── data-model.md        # Phase 1 — entity→module map, validation, state transitions
 ├── quickstart.md        # Phase 1 — validation guide per acceptance item
 ├── contracts/
@@ -97,7 +97,7 @@ No constitution violations; no entries.
 
 ## Phase 0 — Research
 
-See [research.md](research.md) — D1..D16 with citations; **zero NEEDS CLARIFICATION**; dependency versions and the schemars/ts-rs API anchors verified against crates.io and docs.rs on 2026-11-02 (G-10); drop-frame per SMPTE ST 12-1 (D5); the deterministic undo-budget design (D9) and the patch dirty-range policy (D10) are the two design decisions the reviewer should scrutinize hardest.
+See [research.md](research.md) — D1..D17 with citations; **zero NEEDS CLARIFICATION**; dependency versions and the schemars/ts-rs API anchors verified against crates.io and docs.rs on 2026-11-02 (G-10); drop-frame per SMPTE ST 12-1 (D5); the deterministic undo-budget design (D9) and the patch dirty-range policy (D10) are the two design decisions the reviewer should scrutinize hardest.
 
 ## Phase 1 — Design
 

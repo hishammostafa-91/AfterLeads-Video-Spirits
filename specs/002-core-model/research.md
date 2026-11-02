@@ -17,7 +17,7 @@ No NEEDS CLARIFICATION markers remain. Every externally sourced fact below was v
 | thiserror | 2.x | 2.0.21 |
 | proptest (dev) | 1.x | 1.12.0 |
 
-- **Rationale**: all rows are the sanctioned Data/Core/Tests baseline (G-11; no ADR needed); full-version constraints plus the committed lockfile give reproducible builds. API anchors verified on docs.rs: schemars 1.2 exposes `schema_for!` + `JsonSchema` derive; ts-rs 12 exposes `TS::export_to`/bindings export (exact call verified at implementation against the vendored source per the anti-hallucination rule).
+- **Rationale**: all rows are the sanctioned Data/Core/Tests baseline (G-11; no ADR needed); full-version constraints plus the committed lockfile give reproducible builds. API anchors verified on docs.rs: schemars 1.2 exposes `schema_for!` + `JsonSchema` derive; ts-rs 12's export API is `TS::export`/`TS::export_all`/`TS::export_to_string` + the `#[ts(export_to = "…")]` attribute and `TS_RS_EXPORT_DIR` (details in D15; exact calls verified against the vendored source per the anti-hallucination rule).
 - **Not used** (with reasons): `arc-swap` — the undo history needs plain `Arc<Project>` roots; arc-swap is the engine-side swap container (ADR-009's "thread-safe sharing with the engine") and enters with the engine work packages; `insta` — JSON fixtures under version control cover the migration/schema snapshot needs; `tracing` — logging setup is a WP-03 deliverable, not in the WP-02 card. `uuid` carries the `v7` feature (03 §3.2.2).
 
 ## D2 — Crate dependency graphs (check_deps.py-compliant, 02 §2.4)
