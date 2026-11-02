@@ -24,7 +24,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 - [ ] T001 Run `pwsh -File tools/setup/Test-DevEnvironment.ps1` and confirm every check prints PASS (zero FAIL, zero WARN); save the full table as pull-request evidence (tools/setup/Test-DevEnvironment.ps1)
 - [ ] T002 Confirm hooks are active in this clone: `git config --get core.hooksPath` prints `.githooks`, and `pwsh -File tools/git/Install-Hooks.ps1` reports already-installed (docs/10 §10.4.12) (tools/git/Install-Hooks.ps1)
-- [ ] T003 Record Spec Kit evidence: `git diff .specify/memory/constitution.md` is empty, `.opencode/commands/speckit.*.md` files exist and are committed (commit `311a773`), and no `specify extension add git` was used (docs/06 §6.11) (.specify/memory/constitution.md)
+- [ ] T003 Capture (one-time) Spec Kit evidence for the pull-request evidence pack: `git diff .specify/memory/constitution.md` is empty, `.opencode/commands/speckit.*.md` files exist and are committed (commit `311a773`), and no `specify extension add git` was used (docs/06 §6.11) (.specify/memory/constitution.md)
 
 ---
 
@@ -36,7 +36,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 - [ ] T004 [P] Create `rust-toolchain.toml` at the repository root: channel `1.99.1`, components `rustfmt` and `clippy` (card; docs/00 §0.8) (rust-toolchain.toml)
 - [ ] T005 [P] Create `.cargo/config.toml` with `[target.x86_64-pc-windows-msvc] rustflags = ["-C", "target-feature=+crt-static", "-C", "control-flow-guard"]` verbatim from the card (.cargo/config.toml)
-- [ ] T006 [P] Create root `package.json` (private workspace root, name `afterleads-video-spirits`, no scripts that duplicate app tooling) and `pnpm-workspace.yaml` with `packages: ["app"]` (docs/02 §2.13) (package.json, pnpm-workspace.yaml)
+- [ ] T006 [P] Create root `package.json` (private workspace root, name `afterleads-video-spirits` — an implementation assumption matching the lowercase identity pattern; docs/00 §0.5 pins only the Cargo package name — and no scripts that duplicate app tooling) and `pnpm-workspace.yaml` with `packages: ["app"]` (docs/02 §2.13) (package.json, pnpm-workspace.yaml)
 - [ ] T007 Verify the pinned toolchain resolves: `cargo --version` reports 1.99.1 (rustup auto-installs from `rust-toolchain.toml` on first use); `rustup component list --toolchain 1.99.1` shows `rustfmt` and `clippy` installed (rust-toolchain.toml)
 
 **Checkpoint**: Root manifests in place — user-story implementation can begin.
@@ -65,7 +65,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Final verification of FR-003: `git diff .specify/memory/constitution.md` empty; all `.opencode/commands/speckit.*.md` present; `.specify/scripts/powershell/` present; reference commit `311a773` as evidence (specs/000-bootstrap/spec.md §FR-003)
+- [ ] T009 [US2] Final US2 sign-off — re-run the FR-003 checks captured in T003 (constitution diff empty, speckit commands and `.specify/scripts/powershell/` present, commit `311a773`) to confirm nothing regressed during later phases; reference T003's captured evidence instead of duplicating it (specs/000-bootstrap/spec.md §FR-003)
 
 **Checkpoint**: US2 confirmed done; no new artifacts.
 
@@ -79,7 +79,7 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 3
 
-- [ ] T010 [US3] Create root `Cargo.toml`: workspace manifest with `members = ["crates/*"]` (the `app/src-tauri` member is added in T026), SPDX header comment, no `[package]` (Cargo.toml)
+- [ ] T010 [US3] Create root `Cargo.toml`: workspace manifest with `members = ["crates/*"]` (the `app/src-tauri` member is added in T026), `resolver = "3"` (the resolver that edition-2024 member crates imply; without an explicit resolver cargo warns "virtual workspace defaulting to resolver 1" on every build), SPDX header comment, no `[package]` (Cargo.toml)
 - [ ] T011 [P] [US3] Create `crates/alvs-core`: `Cargo.toml` (SPDX header comment; `name = "alvs-core"`, `edition = "2024"`, `license = "AGPL-3.0-or-later"`) and `src/lib.rs` with the SPDX header and a one-line crate doc comment (`//!`) (crates/alvs-core/src/lib.rs)
 - [ ] T012 [P] [US3] Create `crates/alvs-model` identically (name `alvs-model`) (crates/alvs-model/src/lib.rs)
 - [ ] T013 [P] [US3] Create `crates/alvs-formats` identically (name `alvs-formats`) (crates/alvs-formats/src/lib.rs)
@@ -108,12 +108,12 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Scaffold with `pnpm create tauri-app@latest` into `app/` (React, TypeScript, pnpm per card Steps 4); adjust the package names: npm package `afterleads-video-spirits`, Cargo package `afterleads-video-spirits` in `app/src-tauri/Cargo.toml` (docs/00 §0.5 "Cargo package of the app") (app/package.json)
+- [ ] T024 [US4] Scaffold with `pnpm create tauri-app@latest` into `app/` (React, TypeScript, pnpm per card Steps 4); adjust the package names: npm package `afterleads-video-spirits` (same implementation assumption as T006), Cargo package `afterleads-video-spirits` in `app/src-tauri/Cargo.toml` (docs/00 §0.5 "Cargo package of the app") (app/package.json)
 - [ ] T025 [US4] Set identity in `app/src-tauri/tauri.conf.json`: `productName` `AfterLeads-Video-Spirits`, `identifier` `com.afterleads.videospirits`, main window `title` `AfterLeads-Video-Spirits` — exact constants, never shortened (docs/00 §0.5; G-20) (app/src-tauri/tauri.conf.json)
 - [ ] T026 [US4] Add `"app/src-tauri"` to the root `Cargo.toml` workspace members so the final manifest reads `members = ["crates/*", "app/src-tauri"]` (card) (Cargo.toml)
-- [ ] T027 [US4] Remove template demo code and demo assets from `app/src/` and `app/public/`; leave a minimal empty-window app (card Steps 4; G-12) (app/src/App.tsx)
+- [ ] T027 [US4] Remove template demo code and demo assets from `app/src/` and `app/public/`; keep only `app/index.html`, `app/src/main.tsx`, one empty root component (`App` rendering an empty container), and base styling — no demo components, logos, icons, or sample assets remain (card Steps 4; G-12) (app/src/App.tsx)
 - [ ] T028 [US4] Add the SPDX header pair (`SPDX-License-Identifier: AGPL-3.0-or-later`, `Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>`) as comments to every scaffold source file: `.rs`, `.ts`, `.tsx`, `.css` (docs/02 §2.14) (app/src/main.tsx)
-- [ ] T029 [US4] Pin dependencies to docs/00 §0.8: TypeScript `6.0.x`, React `19.3.x`, Vite `8.3.x`, `@vitejs/plugin-react` `6.x`, `@tauri-apps/api` and `@tauri-apps/cli` `2.12.4`, `tauri` crate `2.12.5`; run `pnpm install` at the repository root and commit the generated root `pnpm-lock.yaml` (docs/00 §0.8; card; plan research D6) (app/package.json, pnpm-lock.yaml)
+- [ ] T029 [US4] Pin dependencies to docs/00 §0.8: TypeScript `6.0.x`, React `19.3.x`, Vite `8.3.x`, `@vitejs/plugin-react` `6.x`, `@tauri-apps/api` and `@tauri-apps/cli` `2.12.4`, `tauri` crate `2.12.5`; run `pnpm install` at the repository root and commit the generated root `pnpm-lock.yaml`, then run `cargo build --workspace --locked` and commit the updated root `Cargo.lock` (the workspace gained the app member and Tauri dependencies in T026–T029; the `--locked` gates in T032 fail on a stale lockfile) (app/package.json, pnpm-lock.yaml, Cargo.lock)
 - [ ] T030 [US4] Run `pnpm -C app build` → exit 0 (card acceptance) (app/package.json)
 - [ ] T031 [US4] Run `pnpm -C app tauri dev` → an empty window opens titled exactly `AfterLeads-Video-Spirits`; capture a screenshot for the pull request (SC-003; docs/00 §0.5) (app/src-tauri/tauri.conf.json)
 
