@@ -7,7 +7,7 @@ Dependencies: docs/10-execution.md §10.8. Baseline: documentation set 1.0.1 (ba
 |---|---|---|---|---|---|---|
 | WP-00 | Workstation and repository bootstrap | done | `chore/000-bootstrap` | #1 | 2026-11-02 | — |
 | WP-01 | CI and quality gates | done | `ci/001-ci-quality-gates` | #3 | 2026-11-02 | — |
-| WP-02 | Core types and project model | todo | `feat/002-core-model` | — | — | — |
+| WP-02 | Core types and project model | in-progress | `feat/002-core-model` | — | 2026-11-02 | specify |
 | WP-03 | Storage and application services | todo | `feat/003-storage-services` | — | — | — |
 | WP-04 | Design system and UI foundation | todo | `feat/004-design-system` | — | — | — |
 | WP-05 | Application shell | todo | `feat/005-app-shell` | — | — | — |
