@@ -13,7 +13,7 @@ python tools/git/check_commits.py <rev-range> --only dco
 | Behavior | Contract |
 |---|---|
 | `--only conventional` | checks only the first-line Conventional Commits format (types/scopes of 10 §10.4.5); merge commits are exempt (10 §10.4.13 "merge commits allowed") |
-| `--only dco` | checks only the DCO rule: `Signed-off-by:` present and matching the author email |
+| `--only dco` | checks only the DCO rule: `Signed-off-by:` present and matching the author email; GitHub-generated merge subjects ("Merge pull request #N …", "Merge \<sha\> into \<sha\>") are exempt **only for real merge commits** (parent count corroborates the subject) |
 | no flag | both rules — the existing contract; sole current caller: `tools/verify.ps1` (`.githooks/commit-msg` implements its own bash copy of the same rules and does not call this tool) |
 | callers | `commits` job (`--only conventional`), `dco` job (`--only dco`), `verify.ps1` gate (no flag) |
 
@@ -25,8 +25,8 @@ python tools/check_deps.py
 
 Enforces docs/02 §2.4 (VER-09) over the workspace manifests, no arguments:
 
-1. Crate dependencies only from the component's CMP row; `app/src-tauri` per CMP-12; no cycles.
-2. Exclusive usage: `ffmpeg-next`→`alvs-media`; `wgpu`→`alvs-render`; `cpal`→`alvs-audio`; `rusqlite`→`alvs-store`; `whisper-rs`→`alvs-stt`; `tauri`, `webview2-com`→`app/src-tauri` only.
+1. Crate dependencies only from the component's CMP row (regular, build, and target-specific sections form the build graph; dev-dependencies are test-scoped and exempt from row checks); `app/src-tauri` per CMP-12 (CMP-01..CMP-10); no cycles.
+2. Exclusive usage across **all** dependency sections (regular, dev, build, target-specific — a crate "uses" a crate wherever it names it): `ffmpeg-next`→`alvs-media`; `wgpu`→`alvs-render`; `cpal`→`alvs-audio`; `rusqlite`→`alvs-store`; `whisper-rs`→`alvs-stt`; `tauri`, `webview2-com`→`app/src-tauri` only. CMP-11: `alvs-testkit` is a dev-dependency only, in every manifest including the app crate.
 3. UI (`app/src`) imports Rust types only via `app/src/ipc/bindings/` (structural check now; full import-graph enforcement lands with real UI, WP-04+).
 4. `#![deny(missing_docs)]` present in `alvs-core`, `alvs-model`, `alvs-formats`.
 
@@ -38,7 +38,7 @@ Output: `check_deps: <rule violated>: <detail>` per finding; `check_deps: all de
 python tools/check_placeholders.py
 ```
 
-Scans first-party source trees (`crates/`, `app/src`, `app/src-tauri/`, `tools/`, `.githooks/`, `tests/` when present; `app/src/ipc/bindings/` excluded as generated) for the unfinished-work markers of docs/06 §6.13 rule 4: the placeholder macros, `TODO`/`FIXME` marker comments, mocked production paths, commented-out code. Per that rule's explicit exemption, **test code and the mock backend are exempt** — structurally: `tests/` trees, test-pattern files (`*_test.rs`, `*.test.ts(x)`), `#[cfg(test)]` regions, and the mock-backend module (WP-04/05) are out of scope. Self-matching is avoided by construction (markers assembled at runtime).
+Scans first-party source trees (`crates/`, `app/src`, `app/src-tauri/`, `tools/`, `.githooks/`, `tests/` when present; `app/src/ipc/bindings/` excluded as generated) for the unfinished-work markers of docs/06 §6.13 rule 4: the placeholder macros, `TODO`/`FIXME` marker comments, mocked production paths, commented-out code. Per that rule's explicit exemption, **test code and the mock backend produce no findings** — structurally: `tests/` trees, test-pattern files (`*_test.rs`, `*.test.ts(x)`), `#[cfg(test)]` regions, and the mock-backend module (WP-04/05) are exempt. Self-matching is avoided by construction (markers assembled at runtime).
 
 Output: `check_placeholders: <file>:<line>: <marker kind>` per finding; `check_placeholders: no unfinished-work markers` when green.
 
@@ -48,7 +48,7 @@ Output: `check_placeholders: <file>:<line>: <marker kind>` per finding; `check_p
 python tools/check_npm_licenses.py
 ```
 
-Runs `pnpm -C app licenses list --json --prod` (requires an installed store — run after `pnpm install --frozen-lockfile`; in CI: `ui` job; locally: on demand, not a `verify.ps1` gate per 08 §8.4) and verifies every package license against the 05 §5.6 allowlist (shared with `deny.toml`, data-model.md).
+Runs `pnpm -C app licenses list --json --prod` (requires an installed store — run after `pnpm install --frozen-lockfile`; in CI: `ui` job; locally: on demand, not a `verify.ps1` gate per 08 §8.4) and verifies every package's license expression against the 05 §5.6 allowlist (shared with `deny.toml`, data-model.md). Expressions are parsed as SPDX (recursive descent): `OR` = any, `AND` = all, `WITH` joins an id and its exception into one unit, parentheses group, identifiers match case-insensitively; unparseable expressions fail closed.
 
 Output: `check_npm_licenses: <package>: <license> not allowlisted` per finding; `check_npm_licenses: all npm licenses allowlisted` when green.
 
