@@ -55,6 +55,11 @@ G-09 evidence for the WP-01 pull request. Each entry names the task, command, an
 - **T013** — `rust-lint` job wired into `ci.yml` (six jobs now: build, docs, e2e-smoke, rust-lint, rust-test, ui) with gate steps reporting independently (`if: always()`, research D3), and the npm-license step appended to `ui`.
 - **T016** — `pwsh -File tools/verify.ps1` → **exit 0** with the new gates active: `dependency-policy`, `crate-rules`, `placeholders` = **PASS** (8 PASS total; bindings-drift + four UI gates SKIPPED by design until WP-02/04/05). **T-SEC-001 baseline recorded**: `cargo deny check` → `advisories ok, bans ok, licenses ok, sources ok` (exit 0) and `check_npm_licenses` → all allowlisted (exit 0), against the committed `Cargo.lock`/`pnpm-lock.yaml` (09 §9.10; NFR-SEC-01).
 
+## wp-finish window (PR #3, 2026-11-02)
+
+- **SC-001 — CI green on the WP-01 PR**: first run [41519268766](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/41519268766) (tree `b6adb13`): **all eight checks PASS** — `build` 2m21s, `commits` 10s, `dco` 6s, `docs` 6s, `e2e-smoke` 8s, `rust-lint` 3m7s (every gate step green), `rust-test` 4m10s (lcov artifact uploaded), `ui` 42s. Annotations on the ubuntu jobs are GitHub's informational `ubuntu-latest` → 26.04 migration notices, not failures.
+- **T-QA-002 methodology**: a re-run via the API was not possible (the fine-grained PAT lacks *Actions: write* — `gh run rerun` returns "Resource not accessible"), so the warm-cache run is the one triggered by pushing the next commit (evidence/checkbox updates): it restores the cargo and pnpm caches saved by run 41519268766, giving exactly the "warm caches" condition NFR-MNT-02 defines. Duration recorded below from that run's timestamps.
+
 ## Reviewer findings and dispositions (2026-11-02, reviewer session on `origin/main...HEAD`)
 
 Verdict was APPROVE with zero CRITICAL/HIGH findings; the owner directed all five (F1–F5) to be resolved.
