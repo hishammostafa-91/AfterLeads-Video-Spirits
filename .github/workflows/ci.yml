@@ -34,6 +34,27 @@ jobs:
           name: coverage-lcov
           path: lcov.info
 
+  rust-lint:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup show
+      # Gate steps report independently (if: always()) so one run shows every
+      # failing gate — required by the WP-01 failure-demonstration evidence.
+      - run: cargo fmt --all -- --check
+        if: always()
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+        if: always()
+      - uses: taiki-e/install-action@1919c4a95903d2c33e4a221102edca87309fc14b # v2.89.0
+        with:
+          tool: cargo-deny
+      - run: cargo deny check
+        if: always()
+      - run: python tools/check_deps.py
+        if: always()
+      - run: python tools/check_placeholders.py
+        if: always()
+
   ui:
     runs-on: windows-2025
     steps:
@@ -43,6 +64,7 @@ jobs:
           version: 12.16.1
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C app build
+      - run: python tools/check_npm_licenses.py
 
   build:
     runs-on: windows-2025
