@@ -58,7 +58,7 @@ vcpkg caching: binary cache directory `${{ runner.temp }}/vcpkg-bincache` restor
 
 ### 8.3.2 Nightly CI (OPS-05) — `.github/workflows/nightly.yml`
 
-Schedule daily (02:17 UTC) plus manual dispatch.
+Schedule daily (02:17 UTC) plus manual dispatch. The weekly cadence of the docs-links job is expressed as a second schedule entry (Sundays 02:27 UTC); each job is guarded on the schedule entry that fired, and manual dispatch runs both.
 
 | Job | Purpose |
 |---|---|
