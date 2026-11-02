@@ -78,6 +78,7 @@ jobs:
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
         if: always()
       - uses: taiki-e/install-action@1919c4a95903d2c33e4a221102edca87309fc14b # v2.89.0
+        if: always() # a later gate step always runs and needs the tool (demo finding, T023)
         with:
           tool: cargo-deny
       - run: cargo deny check
