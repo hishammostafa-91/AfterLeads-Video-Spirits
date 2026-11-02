@@ -16,7 +16,7 @@ Stand up the automated verification backbone exactly as the WP-01 card specifies
 
 **Storage**: N/A — configuration and tooling only (docs/03 not in the card's Read line).
 
-**Testing**: acceptance is gate-based (card): CI green on the PR; four deliberately failing commits fail the right jobs; T-SEC-001 and T-QA-002 baselines recorded (09 §9.10). See [quickstart.md](quickstart.md).
+**Testing**: acceptance is gate-based (card): CI green on the PR; four deliberately failing commits fail the right jobs; T-SEC-001 and T-QA-002 baselines recorded (09 §9.10). Zero-test baseline is explicit: the workspace has no tests yet, so `rust-test` reports `0 passed` with an empty lcov artifact — the pipeline is the deliverable, not the numbers (research.md D6). See [quickstart.md](quickstart.md).
 
 **Target Platform**: GitHub-hosted runners — `ubuntu-latest` (docs/commits/dco) and `windows-2025` (Rust/UI/build/e2e jobs; image verified current, research.md D1). Product platform unchanged: Windows 11 x64.
 

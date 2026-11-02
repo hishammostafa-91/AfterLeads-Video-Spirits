@@ -17,10 +17,10 @@ The workflows' externally observable contract: what triggers them, which check n
 | Check | Runner | Guarantees when green | Steps (skeleton scope) |
 |---|---|---|---|
 | `docs` | ubuntu-latest | Documentation consistency VER-01..VER-10 pass | `python3 tools/docs/check_docs.py` |
-| `commits` | ubuntu-latest | Every commit in range is a Conventional Commit (10 §10.4.5) | `python3 tools/git/check_commits.py origin/main..HEAD --only conventional` |
-| `dco` | ubuntu-latest | Every commit carries `Signed-off-by:` matching the author email | `python3 tools/git/check_commits.py origin/main..HEAD --only dco` |
+| `commits` | ubuntu-latest | Every commit in range is a Conventional Commit (10 §10.4.5) | checkout `fetch-depth: 0`; `python3 tools/git/check_commits.py origin/main..HEAD --only conventional` |
+| `dco` | ubuntu-latest | Every commit carries `Signed-off-by:` matching the author email | checkout `fetch-depth: 0`; `python3 tools/git/check_commits.py origin/main..HEAD --only dco` |
 | `rust-lint` | windows-2025 | Format, clippy `-D warnings` (locked), dependency policy, crate rules, no placeholders — on the pinned toolchain | `rustup show`; `cargo fmt --all -- --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; install `cargo-deny`; `cargo deny check`; `python tools/check_deps.py`; `python tools/check_placeholders.py` |
-| `rust-test` | windows-2025 | All workspace tests pass under nextest (WARP forced); coverage artifact published | install `cargo-nextest` + `cargo-llvm-cov`; `rustup component add llvm-tools-preview`; `ALVS_FORCE_WARP=1 cargo llvm-cov nextest --workspace --locked --lcov --output-path lcov.info`; upload `lcov.info` |
+| `rust-test` | windows-2025 | All workspace tests pass under nextest (WARP forced via step-level `env:`); coverage artifact published — zero-test baseline is expected until crates gain tests | install `cargo-nextest` + `cargo-llvm-cov`; `rustup component add llvm-tools-preview`; `cargo llvm-cov nextest --workspace --locked --lcov --output-path lcov.info` (env `ALVS_FORCE_WARP: 1`); upload `lcov.info` |
 | `ui` | windows-2025 | Frozen pnpm install; skeleton UI type-correctness build; every npm license allowlisted | pnpm setup (12.16.1); `pnpm install --frozen-lockfile`; `pnpm -C app build`; `python tools/check_npm_licenses.py` |
 | `build` | windows-2025 | The application crate builds debug, locked | `cargo build -p afterleads-video-spirits --locked` |
 | `e2e-smoke` | windows-2025 | Explicitly a no-op reporting success until WP-05 (card) | one explanatory step, exit 0 |
@@ -31,9 +31,9 @@ Deferred steps and their owners: bindings drift (WP-02), vcpkg cache + golden sm
 
 | Aspect | Contract |
 |---|---|
-| Triggers | `schedule: 17 2 * * *` (daily) and `27 2 * * 0` (weekly); `workflow_dispatch` |
+| Triggers | `schedule: 17 2 * * *` (daily) and `27 2 * * 0` (weekly Sunday); `workflow_dispatch`. Per-job guards select the cadence: `dependency-audit` on the daily entry (or dispatch), `docs-links` on the weekly entry (or dispatch) — `github.event.schedule` holds the cron string that fired. The second schedule entry is documented in docs/08 §8.3.2 (G-19 note in this work package) |
 | Permissions | `contents: read` |
-| Jobs now | `dependency-audit`: `cargo deny check advisories` + `pnpm audit --prod` (failures surface nightly; NFR-SEC-01 holds them to 0 high/critical at release). `docs-links`: external link check via pinned `lycheeverse/lychee-action` over `docs/`; `continue-on-error: true` (informational, 08 §8.3.2) |
+| Jobs now | `dependency-audit` (windows-2025): checkout (pinned); `rustup show`; install `cargo-deny` (install-action, pinned); `cargo deny check advisories`; `pnpm/action-setup` (pinned, 12.16.1); `pnpm install --frozen-lockfile`; `pnpm audit --prod` — failures surface nightly; NFR-SEC-01 holds them to 0 high/critical at release. `docs-links` (ubuntu-latest): checkout (pinned); pinned `lycheeverse/lychee-action` over `docs/`; `continue-on-error: true` (informational, 08 §8.3.2) |
 | Jobs later (out of scope) | full test suite, full E2E, fuzz, benchmarks — added by their owning WPs (card) |
 
 ## `dependabot.yml`

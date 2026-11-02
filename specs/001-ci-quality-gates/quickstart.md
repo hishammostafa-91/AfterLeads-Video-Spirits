@@ -20,7 +20,7 @@ pnpm install --frozen-lockfile   # if the store is cold
 python tools/check_npm_licenses.py
 ```
 
-Expected: `cargo deny check` reports advisories/sources/licenses/bans checks passing (0 advisories against the committed `Cargo.lock`; every license on the 05 §5.6 allowlist; no banned HTTP-client crate present); `check_npm_licenses.py` reports all npm licenses allowlisted.
+Expected: `cargo deny check` reports advisories/sources/licenses/bans checks passing (0 advisories against the committed `Cargo.lock`; every license on the 05 §5.6 allowlist; the only HTTP-client crates present — `reqwest`/`hyper` — satisfied via the sanctioned tauri-wrapped allowances, every other banned crate absent); `check_npm_licenses.py` reports all npm licenses allowlisted.
 
 Evidence: both outputs — this is the T-SEC-001 baseline (09 §9.10; NFR-SEC-01).
 
@@ -41,17 +41,17 @@ Evidence: the PR checks section / run URL.
 
 ## 5. Deliberately failing commits fail the right jobs (FR-019 second half, SC-002)
 
-Procedure (research.md D17): from `main`, branch `ci/001-demo-failures`; add four commits — (a) a rustfmt violation, (b) code that trips clippy `-D warnings`, (c) an unfinished marker caught by `tools/check_placeholders.py`, (d) a commit made without `-s`; push, open a **draft** PR, let one CI run finish.
+Procedure (research.md D17; G-04 stacking approved by the owner 2026-11-02): branch `ci/001-demo-failures` **from the tip of `ci/001-ci-quality-gates`** (the branch must contain `ci.yml` or the draft PR runs zero checks); add four commits — (a) a rustfmt violation, (b) code that trips clippy `-D warnings`, (c) an unfinished marker caught by `tools/check_placeholders.py`, (d) a commit made without `-s` — all with Conventional-Commit first lines; push, open a **draft** PR whose body states it is stacked on `ci/001-ci-quality-gates` for evidence only, never to be merged; let one CI run finish.
 
-Expected: `rust-lint` red with exactly the three failing steps; `dco` red; every other check reports its own result.
+Expected: `rust-lint` red with exactly the three failing steps; `dco` red; `commits` stays green (all first lines conventional); every other check reports its own result.
 
 Evidence: failing-step links recorded in `evidence.md` and the PR body; close the draft PR; leave the branch for the owner (G-18).
 
 ## 6. T-QA-002 baseline (FR-020, SC-003)
 
-Re-run the WP-01 PR checks (close+reopen the PR, or push an empty-state retrigger per D17) after caches are warm from the first run, and read the total duration from the run summary.
+After the first completed CI run on the WP-01 PR (which warms the caches), use **Re-run all jobs** on that run and read the total duration from the re-run's summary.
 
-Expected: ≤ 25 minutes wall clock (NFR-MNT-02). Evidence: the run URL and duration recorded in `evidence.md` (state that caches were warm).
+Expected: ≤ 25 minutes wall clock with warm caches (NFR-MNT-02). Evidence: the re-run URL and duration recorded in `evidence.md` (state that caches were warm from the first run).
 
 ## 7. Nightly jobs run on demand (FR-011)
 

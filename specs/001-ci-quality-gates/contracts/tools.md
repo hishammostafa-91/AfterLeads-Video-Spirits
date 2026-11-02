@@ -38,7 +38,7 @@ Output: `check_deps: <rule violated>: <detail>` per finding; `check_deps: all de
 python tools/check_placeholders.py
 ```
 
-Scans first-party source trees (`crates/`, `app/src`, `app/src-tauri/`, `tools/`, `.githooks/`, `tests/` when present; `app/src/ipc/bindings/` excluded as generated) for the unfinished-work markers of docs/06 §6.13 rule 4: the placeholder macros, `TODO`/`FIXME` marker comments, commented-out code, fake production paths. Self-matching is avoided by construction (markers assembled at runtime).
+Scans first-party source trees (`crates/`, `app/src`, `app/src-tauri/`, `tools/`, `.githooks/`, `tests/` when present; `app/src/ipc/bindings/` excluded as generated) for the unfinished-work markers of docs/06 §6.13 rule 4: the placeholder macros, `TODO`/`FIXME` marker comments, mocked production paths, commented-out code. Per that rule's explicit exemption, **test code and the mock backend are exempt** — structurally: `tests/` trees, test-pattern files (`*_test.rs`, `*.test.ts(x)`), `#[cfg(test)]` regions, and the mock-backend module (WP-04/05) are out of scope. Self-matching is avoided by construction (markers assembled at runtime).
 
 Output: `check_placeholders: <file>:<line>: <marker kind>` per finding; `check_placeholders: no unfinished-work markers` when green.
 
