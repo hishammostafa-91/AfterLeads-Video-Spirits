@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# Cargo workspace (docs/02-architecture.md §2.13; WP-00 card).
+[workspace]
+members = ["crates/*", "app/src-tauri"]
+resolver = "3"
+
+# Release profile for the application crate (moved from app/src-tauri/Cargo.toml;
+# workspace members may not define profiles). Sizing guidance:
+# https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

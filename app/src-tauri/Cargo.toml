@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+[package]
+name = "afterleads-video-spirits"
+version = "0.1.0"
+description = "AfterLeads-Video-Spirits app backend (CMP-12, docs/02 §2.4)"
+authors = ["AfterLeads"]
+edition = "2024"
+license = "AGPL-3.0-or-later"
+
+[lib]
+# The `_lib` suffix keeps the lib name distinct from the bin name on Windows
+# (https://github.com/rust-lang/cargo/issues/8519).
+name = "afterleads_video_spirits_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
