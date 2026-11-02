@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Document set | AfterLeads-Video-Spirits implementation documentation |
-| Set version | 1.0.2 |
+| Set version | 1.0.3 |
 | Baseline date | 2026-11-01 |
 | Status | Approved baseline for implementation (v1.0 scope) |
 | Owner | AfterLeads (afterleadseg@gmail.com) |

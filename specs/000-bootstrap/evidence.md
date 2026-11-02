@@ -58,3 +58,18 @@ Every acceptance item of the card, with the command run and its summarized resul
 ## Exclusions honored (card "Not included")
 
 No CI workflows (WP-01), no FFmpeg (WP-06), no real UI (WP-04/05). G-19 check (T037): the only behavior-affecting change beyond the card — the VER-06/VER-08 scope — was committed together with its canonical documentation in `c05c787`; no other documentation requires an update for this package.
+
+## Reviewer findings and dispositions (2026-11-02, reviewer session on `origin/main...HEAD`)
+
+Verdict was APPROVE with six LOW findings; the owner directed all of them to be resolved.
+
+| ID | Finding | Disposition |
+|---|---|---|
+| F1 | docs/11 recorded only VER-06/VER-08 exemptions while the shared file collectors also scope VER-01, VER-07, VER-10 away from vendor files | **Fixed**: shared note added under the checks table in docs/11 naming exactly VER-01, VER-06, VER-07, VER-08, VER-10; `check_docs.py` `is_vendored` docstring updated to match; docs set version bumped to 1.0.3 (§0.11 patch) |
+| F2 | Transient red docs gate between Spec Kit init (`311a773`) and the scope fix (`c05c787`) — "tests pass at every commit" | **Recorded** (per reviewer: no action): inherent to the baseline conflict, branch never pushed, no CI yet. Lesson: run the docs gate immediately after committing vendor-generated files |
+| F3 | Gate-tool fix `c05c787` mixed with whole-file formatter churn | **Recorded** (per reviewer: process note): the branch is local and the reformat is semantics-neutral (py_compile + green run verified); splitting it now would require history surgery for a cosmetic gain. Rule adopted: formatting-only changes get their own `style`/`chore` commit |
+| F4 | Template `serde`/`serde_json` retained but unused in `app/src-tauri` | **Fixed**: both dependencies removed; workspace rebuilt and lockfile re-verified (`cargo build --workspace --locked` exit 0) |
+| F5 | docs/02 §2.4 rule 4 requires `#![deny(missing_docs)]` on `alvs-core`, `alvs-model`, `alvs-formats` | **Fixed**: attribute added to all three crates; fmt/clippy/test green |
+| F6 | Default create-tauri-app icons kept (third-party template assets) | **Tracked**: required for the bundler to build; to be replaced by the product icon (assets per 02 §2.13) or recorded in the notices manifest by the tooling that lands in WP-01/WP-28 |
+
+Re-verification after the fixes: `python tools/docs/check_docs.py` exit 0; `cargo build --workspace --locked` exit 0; `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo test --workspace --locked` all exit 0; `pwsh -File tools/verify.ps1` exit 0.
