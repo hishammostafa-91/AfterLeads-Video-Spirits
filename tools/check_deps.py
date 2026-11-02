@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
-"""Enforce the dependency rules of docs/02-architecture.md SS2.4 (VER-09, WP-01).
+"""Enforce the dependency rules of docs/02-architecture.md §2.4 (VER-09, WP-01).
 
-Rules (checked by this tool in CI, per docs/02 SS2.4):
+Rules (checked by this tool in CI, per docs/02 §2.4):
   1. Crates depend only on the crates listed in their CMP row. No cycles.
+     The app crate (CMP-12) may depend on CMP-01..CMP-10; alvs-testkit
+     (CMP-11, dev-dependency only) is banned as a regular dependency
+     everywhere, the app crate included.
   2. Exclusive crate usage: ffmpeg-next only alvs-media; wgpu only alvs-render;
      cpal only alvs-audio; rusqlite only alvs-store; whisper-rs only alvs-stt;
      tauri and webview2-com only the app crate (CMP-12).
   3. UI code never imports Rust types except via app/src/ipc/bindings/.
   4. #![deny(missing_docs)] on alvs-core, alvs-model, alvs-formats.
 
-Also enforces the CMP-11 note: alvs-testkit is a dev-dependency only.
+Section scope: rule 2 exclusivity and the CMP-11 testkit ban cover ALL
+dependency sections (regular, dev, build, and target-specific) — a crate
+"uses" wgpu wherever it names it. Row membership (rule 1) covers the build
+graph (regular, build, and target-specific dependencies); dev-dependencies
+are test-scoped and exempt from row checks.
 
 Usage: python tools/check_deps.py    Exit codes: 0 pass, 1 findings, 2 error.
 """
@@ -25,7 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# CMP rows (docs/02 SS2.4): crate name -> allowed internal crate dependencies.
+# CMP rows (docs/02 §2.4): crate name -> allowed internal crate dependencies.
 INTERNAL_ALLOWED: dict[str, set[str]] = {
     "alvs-core": set(),
     "alvs-model": {"alvs-core"},
@@ -80,47 +87,82 @@ def dep_names(section: object) -> list[str]:
     return [name for name, _ in section.items()]
 
 
+def dep_sections(data: dict) -> dict[str, set[str]]:
+    """Dependency names per section kind, target-specific tables folded in."""
+    sections: dict[str, set[str]] = {
+        "dependencies": set(),
+        "dev-dependencies": set(),
+        "build-dependencies": set(),
+    }
+    for kind in sections:
+        sections[kind] |= set(dep_names(data.get(kind)))
+    for target in (data.get("target") or {}).values():
+        if not isinstance(target, dict):
+            continue
+        for kind in sections:
+            sections[kind] |= set(dep_names(target.get(kind)))
+    return sections
+
+
+def build_graph_names(sections: dict[str, set[str]]) -> set[str]:
+    """Names in the build graph: regular + build + target-specific regular deps."""
+    return sections["dependencies"] | sections["build-dependencies"]
+
+
 def check_manifests(problems: list[str]) -> dict[str, set[str]]:
-    """Rules 1 and 2 + CMP-11; returns the internal dependency graph."""
+    """Rules 1 and 2 + CMP-11 across all manifests; returns the build-graph edges."""
     graph: dict[str, set[str]] = {}
+    allowed_internal_app = set(INTERNAL_ALLOWED) - {"alvs-testkit"}  # CMP-12 row
     crates = sorted(p.parent.name for p in CRATES_DIR.glob("*/Cargo.toml"))
-    expected = set(INTERNAL_ALLOWED) | {"alvs-testkit"}
+    expected = set(INTERNAL_ALLOWED)
     for name in crates:
         if name not in expected:
             problems.append(
-                f"rule 1: unexpected crate {name!r} under crates/ (not in docs/02 SS2.4)"
+                f"rule 1: unexpected crate {name!r} under crates/ (not in docs/02 §2.4)"
             )
-    for name in expected:
+    for name in sorted(expected):
         mf = CRATES_DIR / name / "Cargo.toml"
         if not mf.exists():
-            problems.append(f"rule 1: crate {name!r} from docs/02 SS2.4 is missing")
+            problems.append(f"rule 1: crate {name!r} from docs/02 §2.4 is missing")
             continue
         data = manifest(mf)
         pkg = data.get("package", {}).get("name", name)
-        deps = dep_names(data.get("dependencies"))
-        internal = {d for d in deps if d in INTERNAL_ALLOWED}
-        graph[pkg] = internal
-        for d in sorted(internal - INTERNAL_ALLOWED[name]):
-            problems.append(f"rule 1: {name} depends on {d} (not in its CMP row)")
-        if "alvs-testkit" in deps:
-            problems.append(
-                f"CMP-11: alvs-testkit is a dev-dependency only, found in [dependencies] of {name}"
-            )
-        for excl, allowed in EXCLUSIVE.items():
-            if excl in deps and name not in allowed:
+        sections = dep_sections(data)
+        graph[pkg] = {d for d in sections["dependencies"] if d in INTERNAL_ALLOWED}
+        for d in sorted(build_graph_names(sections) - set(INTERNAL_ALLOWED[name])):
+            if d in INTERNAL_ALLOWED:
+                problems.append(f"rule 1: {name} depends on {d} (not in its CMP row)")
+        for kind, names in sorted(sections.items()):
+            if "alvs-testkit" in names and kind != "dev-dependencies":
                 problems.append(
-                    f"rule 2: {excl} may only be used by {'/'.join(sorted(allowed))}, found in {name}"
+                    f"CMP-11: alvs-testkit is a dev-dependency only, found in [{kind}] of {name}"
                 )
-    if (APP_DIR / "Cargo.toml").exists():
-        data = manifest(APP_DIR / "Cargo.toml")
+            for excl, allowed in EXCLUSIVE.items():
+                if excl in names and name not in allowed:
+                    problems.append(
+                        f"rule 2: {excl} may only be used by {'/'.join(sorted(allowed))}, found in [{kind}] of {name}"
+                    )
+    app_mf = APP_DIR / "Cargo.toml"
+    if app_mf.exists():
+        data = manifest(app_mf)
         pkg = data.get("package", {}).get("name", APP_CRATE)
-        deps = dep_names(data.get("dependencies"))
-        graph[pkg] = {d for d in deps if d in INTERNAL_ALLOWED}
-        for excl, allowed in EXCLUSIVE.items():
-            if excl in deps and pkg not in allowed:
+        sections = dep_sections(data)
+        graph[pkg] = {d for d in sections["dependencies"] if d in INTERNAL_ALLOWED}
+        for d in sorted(build_graph_names(sections) - allowed_internal_app):
+            if d in INTERNAL_ALLOWED:
                 problems.append(
-                    f"rule 2: {excl} may only be used by {'/'.join(sorted(allowed))}, found in {pkg}"
+                    f"rule 1: {pkg} depends on {d} (CMP-12 allows CMP-01..CMP-10 only)"
                 )
+        for kind, names in sorted(sections.items()):
+            if "alvs-testkit" in names and kind != "dev-dependencies":
+                problems.append(
+                    f"CMP-11: alvs-testkit is a dev-dependency only, found in [{kind}] of {pkg}"
+                )
+            for excl, allowed in EXCLUSIVE.items():
+                if excl in names and pkg not in allowed:
+                    problems.append(
+                        f"rule 2: {excl} may only be used by {'/'.join(sorted(allowed))}, found in [{kind}] of {pkg}"
+                    )
     return graph
 
 
