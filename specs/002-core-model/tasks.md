@@ -110,10 +110,10 @@ Monorepo per docs/02 §2.13: `crates/alvs-core` and `crates/alvs-model` (both in
 
 **Independent Test**: T-PRJ-007 green; bindings regenerate byte-identical; drift gates active.
 
-- [ ] T026 [P] [US5] Create `crates/alvs-model/src/migrate.rs`: `MigrationStep` registry, forward-only driver `v(n) → v(n+1)` over `serde_json::Value` with validation of the result, `MigrationOutcome` (Migrated / ReadOnlyNewer → E1004 with unknown fields kept / backup contract for WP-03), E1005 on step failure; shipped registry empty (schemaVersion = 1; research D12) (crates/alvs-model/src/migrate.rs)
-- [ ] T027 [US5] Migration proofs under `crates/alvs-model/tests/fixtures/migrations/`: v1 input/output pairs round-trip through the driver; **cfg(test)-registered synthetic steps** exercise step-running, backup-signal, and E1005 paths (research D12/F5); **T-PRJ-007 suite**: migrations, newer-version read-only, malicious limits (03 §3.9.6) (crates/alvs-model/tests/)
-- [ ] T028 [P] [US5] Create `crates/alvs-model/src/dto.rs`: the TS-exporting DTO surface (types deriving `Serialize, Deserialize, TS`; flicks fields `#[ts(type = "number")]` on struct fields; `extra` included via `serde-json-impl` → `T & { [key: string]: JsonValue }`, research D16) with the `export_bindings` test writing `app/src/ipc/bindings/` via `TS::export_all`/`TS_RS_EXPORT_DIR` (research D15; exact calls verified against the vendored ts-rs source); commit the generated bindings (04 §4.2; 03 §3.2.6) (crates/alvs-model/src/dto.rs)
-- [ ] T029 [US5] Add the CI bindings-drift step to `.github/workflows/ci.yml` `rust-lint` (per WP-01's contract assignment — research D15): `cargo test -p alvs-model export_bindings --locked` then `git diff --exit-code -- app/src/ipc/bindings`, reporting independently (`if: always()`); locally confirm `pwsh -File tools/verify.ps1` now shows `bindings-drift` **PASS** (target presence activation) (tools/verify.ps1)
+- [ ] T025 [P] [US5] Create `crates/alvs-model/src/migrate.rs`: `MigrationStep` registry, forward-only driver `v(n) → v(n+1)` over `serde_json::Value` with validation of the result, `MigrationOutcome` (Migrated / ReadOnlyNewer → E1004 with unknown fields kept / backup contract for WP-03), E1005 on step failure; shipped registry empty (schemaVersion = 1; research D12) (crates/alvs-model/src/migrate.rs)
+- [ ] T026 [US5] Migration proofs under `crates/alvs-model/tests/fixtures/migrations/`: v1 input/output pairs round-trip through the driver; **cfg(test)-registered synthetic steps** exercise step-running, backup-signal, and E1005 paths (research D12/F5); **T-PRJ-007 suite**: migrations, newer-version read-only, malicious limits (03 §3.9.6) (crates/alvs-model/tests/)
+- [ ] T027 [P] [US5] Create `crates/alvs-model/src/dto.rs`: the TS-exporting DTO surface (types deriving `Serialize, Deserialize, TS`; flicks fields `#[ts(type = "number")]` on struct fields; `extra` included via `serde-json-impl` → `T & { [key: string]: JsonValue }`, research D16) with the `export_bindings` test writing `app/src/ipc/bindings/` via `TS::export_all`/`TS_RS_EXPORT_DIR` (research D15; exact calls verified against the vendored ts-rs source); commit the generated bindings (04 §4.2; 03 §3.2.6) (crates/alvs-model/src/dto.rs)
+- [ ] T028 [US5] Add the CI bindings-drift step to `.github/workflows/ci.yml` `rust-lint` (per WP-01's contract assignment — research D15): `cargo test -p alvs-model export_bindings --locked` then `git diff --exit-code -- app/src/ipc/bindings`, reporting independently (`if: always()`); locally confirm `pwsh -File tools/verify.ps1` now shows `bindings-drift` **PASS** (target presence activation) (tools/verify.ps1)
 
 **Checkpoint**: SC-004 complete; drift gates live locally and in CI.
 
@@ -121,9 +121,9 @@ Monorepo per docs/02 §2.13: `crates/alvs-core` and `crates/alvs-model` (both in
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T030 Measure coverage per quickstart §7: `cargo llvm-cov nextest -p alvs-core --locked --no-tests=pass --summary-only` and `-p alvs-model` → both ≥ 80.0% line coverage (card acceptance; NFR-MNT-01); record the numbers (research D14 defers standing CI enforcement)
-- [ ] T031 Verify `cli`-free per quickstart §8: `cargo metadata --no-deps` shows no `[[bin]]` targets in either crate and no CLI dependency (FR-018); run the full quickstart §1–§8 and fix anything it catches at the source (specs/002-core-model/quickstart.md)
-- [ ] T032 Assemble the pull-request evidence per G-09 in `specs/002-core-model/evidence.md`: T001 before-state, test-suite results by T-ID (T-PLY-005, T-PRJ-005/006/007), proptest duration, coverage numbers, bindings drift proof; update STATUS.md WP-02 next step → `finish` (state stays `in-progress` until merge) (specs/002-core-model/evidence.md)
+- [ ] T029 Measure coverage per quickstart §7: `cargo llvm-cov nextest -p alvs-core --locked --no-tests=pass --summary-only` and `-p alvs-model` → both ≥ 80.0% line coverage (card acceptance; NFR-MNT-01); record the numbers (research D14 defers standing CI enforcement)
+- [ ] T030 Verify `cli`-free per quickstart §8: `cargo metadata --no-deps` shows no `[[bin]]` targets in either crate and no CLI dependency (FR-018); run the full quickstart §1–§8 and fix anything it catches at the source (specs/002-core-model/quickstart.md)
+- [ ] T031 Assemble the pull-request evidence per G-09 in `specs/002-core-model/evidence.md`: T001 before-state, test-suite results by T-ID (T-PLY-005, T-PRJ-005/006/007), proptest duration, coverage numbers, bindings drift proof; update STATUS.md WP-02 next step → `finish` (state stays `in-progress` until merge) (specs/002-core-model/evidence.md)
 
 ---
 
@@ -134,17 +134,17 @@ Monorepo per docs/02 §2.13: `crates/alvs-core` and `crates/alvs-model` (both in
 - **Setup (Phase 1)**: T001 first; T002 and T003 parallel after (or with) it.
 - **Foundational (Phase 2)**: depends on T002 (deps) and T003 (lints govern all new code).
 - **US1 (Phase 3)**: T007 parallel with Phase 2; T008→T009 sequential (same file).
-- **US2 (Phase 4)**: depends on Phase 2 + T008 (Flicks/Rational/Id in types); T010–T014 are five parallel module groups; T015/T016 after them.
+- **US2 (Phase 4)**: depends on Phase 2 (Id/errors) + T007/T008 (Rational/Flicks used by the type set); T010–T014 are five parallel module groups; T015/T016 after them.
 - **US3 (Phase 5)**: depends on US2's types.
 - **US4 (Phase 6)**: depends on US2 + US3 (+ Phase 2 errors); T019→T020→T021 sequential (one file); T022/T023 after T019 (need ops + roots); T024 last in the story.
-- **US5 (Phase 7)**: T026 parallel-izable after US2 (migrations walk the JSON value); T027 after T026; T028 after US2's types (and benefits from T009's conventions); T029 after T028.
+- **US5 (Phase 7)**: T025 parallel-izable after US2 (migrations walk the JSON value); T026 after T025; T027 after US2's types (and benefits from T009's conventions); T028 after T027.
 - **Polish (Phase 8)**: after everything.
 
 ### Parallel Opportunities
 
 - Phase 1: T002 ∥ T003 · Phase 2: T004 ∥ T005 ∥ T006 (and ∥ T007).
 - Phase 4: T010 ∥ T011 ∥ T012 ∥ T013 ∥ T014 (five disjoint module groups).
-- Phase 7: T026 ∥ T028 (disjoint files), then T027 and T029.
+- Phase 7: T025 ∥ T027 (disjoint files), then T026 and T028.
 
 ---
 
