@@ -6,7 +6,7 @@
 
 ## Summary
 
-Implement the product's data heart exactly as the WP-02 card specifies: `alvs-core` gains exact time (flicks with the literal 03 §3.3.1 rate table, rationals, drop-frame timecode per REQ-PLY-005), UUID v7 IDs, the SEC-04 path policy as a decision type, and the error model (per-crate `thiserror` enums mapping to 12 §12.13 codes + the 04 §4.9 envelope). `alvs-model` gains every 03 §3.4 type with `extra` maps and 03 §3.2 serialization, full 03 §3.5 validation incl. malicious-size limits, the `EditOp` enum with application for the card's categories (project/sequence/track/media/bin/marker/caption-track + batch), ADR-009 undo/redo with Arc roots, a deterministic 512 MB estimated-size budget over the ≥ 200-step guarantee, `EntityPatch` diffing, JSON Schema generation, the forward-only migrations framework with v1 fixtures, and committed ts-rs bindings (activating the WP-01 drift gate). No persistence (WP-03), no clip-editing semantics (WP-12), no UI.
+Implement the product's data heart exactly as the WP-02 card specifies: `alvs-core` gains exact time (flicks with the literal 03 §3.3.1 rate table, rationals, drop-frame timecode per REQ-PLY-005), UUID v7 IDs, the SEC-04 path policy as a decision type, and the error model (per-crate `thiserror` enums mapping to 12 §12.13 codes + the 04 §4.9 envelope). `alvs-model` gains every 03 §3.4 type with `extra` maps (included in the TS surface via ts-rs's `serde-json-impl` feature — owner decision) and 03 §3.2 serialization, full 03 §3.5 validation incl. malicious-size limits, the `EditOp` enum with application for the card's categories (project/sequence/track/media/bin/marker/caption-track + batch), ADR-009 undo/redo with Arc roots, a deterministic 512 MB estimated-size budget over the ≥ 200-step guarantee, `EntityPatch` diffing, JSON Schema generation, the forward-only migrations framework with v1 fixtures, and committed ts-rs bindings — **plus the CI bindings-drift step that WP-01's contract assigned to this package** (rust-lint: export test + `git diff --exit-code`) and the §2.11 clippy lint posture (`[workspace.lints]` unwrap_used/expect_used). No persistence (WP-03), no clip-editing semantics (WP-12), no UI.
 
 ## Technical Context
 
@@ -24,9 +24,9 @@ Implement the product's data heart exactly as the WP-02 card specifies: `alvs-co
 
 **Performance Goals**: deterministic budgets, not runtime speed: undo ≥ 200 steps / ≤ 1,000 / 512 MB estimated; flicks arithmetic is exact integer math by construction. NFR-PERF targets attach to playback/render, not this package.
 
-**Constraints**: every type/rule/invariant cites 03 §3.2–3.5; EditOp per 04 §4.4 with the card's category scoping (spec FR-009/FR-010); errors per 02 §2.11 + 12 §12.13; envelope per 04 §4.9; DTOs/bindings per 04 §4.2 + 03 §3.2.6; no `unwrap`/`expect` outside tests (02 §2.11); no new dependencies beyond the baseline rows (G-11); `cli`-free (card); AGPL headers and LF per 02 §2.14 (existing files already conform).
+**Constraints**: every type/rule/invariant cites 03 §3.2–3.5; EditOp per 04 §4.4 with the card's category scoping (spec FR-009/FR-010; `batch` included as a canonical composite of those categories — interpretation recorded in research D8); errors per 02 §2.11 + 12 §12.13 incl. the **lint posture (workspace lints `unwrap_used`/`expect_used` warn; `-D warnings` denies — research D17)**; envelope per 04 §4.9; DTOs/bindings per 04 §4.2 + 03 §3.2.6 with `extra` included in the TS surface (`serde-json-impl`, research D2/D16) and the **CI drift step added to `rust-lint` as WP-01's contract assigns (research D15)**; no `unwrap`/`expect` outside tests (02 §2.11); no new dependencies beyond the baseline rows (G-11); `cli`-free (card); AGPL headers and LF per 02 §2.14.
 
-**Scale/Scope**: ~16 modules across two crates; the largest surface is the 03 §3.4 type set (~13 entity groups) and the validation rule set (15 groups); ~9 EditOp categories applied.
+**Scale/Scope**: 24 modules across two crates (5 core + 19 model, research D3); the largest surface is the 03 §3.4 type set (~13 entity groups) and the validation rule set (15 groups); ~9 EditOp categories applied plus two repository-infrastructure touches assigned to this package: the CI bindings-drift step (`.github/workflows/ci.yml` `rust-lint`) and the workspace lint table (root `Cargo.toml`).
 
 ## Constitution Check
 
@@ -83,7 +83,8 @@ crates/alvs-model/src/
 └── schema.rs      # JSON Schema generation (ADR-008)
 crates/alvs-model/tests/fixtures/migrations/   # v1 input/output pairs
 app/src/ipc/bindings/                          # committed generated TS types
-Cargo.toml Cargo.lock                           # dependency additions (baseline rows)
+.github/workflows/ci.yml                       # + bindings-drift steps in rust-lint (WP-01 contract assigns to WP-02)
+Cargo.toml Cargo.lock                          # dependency additions (baseline rows) + [workspace.lints] (02 §2.11)
 ```
 
 **Structure Decision**: entity-per-module mirroring 03 §3.4's sections with behavior modules for the card's deliverables (research D3); fixtures under the crate's `tests/` per Cargo convention; bindings land in the canonical UI path (04 §4.2) so the WP-01 drift gate activates by target presence.

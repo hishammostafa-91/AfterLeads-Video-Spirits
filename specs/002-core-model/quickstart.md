@@ -32,9 +32,9 @@ Included in §2. Expected: fixture pairs round-trip through the migration driver
 cargo nextest run -p alvs-model --locked proptest
 ```
 
-Expected: 10,000 random sequences × 50 ops green (invariants hold after every applied step; rejections are documented codes). The nightly 1,000,000-scale runs when the nightly full-matrix job exists (env-tunable `ALVS_PROPTEST_CASES`; research D13).
+Expected: 10,000 random sequences × 50 ops green (invariants hold after every applied step; rejections are documented codes). **Record the measured duration in the PR evidence** against the ≤ 25-minute CI budget (research D13/F10); the `ALVS_PROPTEST_CASES` knob exists to raise the scale for the future nightly run, never to lower the CI scale (G-08). The nightly 1,000,000-scale runs when the nightly full-matrix job exists.
 
-## 6. TypeScript bindings + drift gate (SC-006, FR-015)
+## 6. TypeScript bindings + drift gates (SC-006, FR-015)
 
 ```powershell
 cargo test -p alvs-model export_bindings --locked
@@ -42,7 +42,7 @@ git status --porcelain   # committed bindings unchanged
 pwsh -File tools/verify.ps1   # bindings-drift now PASS (activates on target presence)
 ```
 
-Expected: bindings regenerate byte-identical into `app/src/ipc/bindings/`; every flicks field typed `number` (03 §3.2.6).
+Expected: bindings regenerate byte-identical into `app/src/ipc/bindings/`; every flicks field typed `number` (03 §3.2.6); `extra` maps present as index signatures (research D16). The **CI drift step** (added to `rust-lint` by this package, per WP-01's contract — research D15) runs the same export test + `git diff --exit-code` and must be green on the PR.
 
 ## 7. Coverage ≥ 80% (SC-006, NFR-MNT-01)
 
@@ -53,14 +53,15 @@ cargo llvm-cov nextest -p alvs-model --locked --no-tests=pass --summary-only
 
 Expected: line coverage ≥ 80.0% for both crates; numbers recorded in `specs/002-core-model/evidence.md` (enforcement threshold is a quality-gates follow-up, research D14).
 
-## 8. Gates
+## 8. Gates and `cli`-free (FR-018)
 
 ```powershell
 pwsh -File tools/verify.ps1
 python tools/docs/check_docs.py
+cargo metadata --no-deps --format-version 1  # then confirm: no [[bin]] targets in alvs-core / alvs-model
 ```
 
-Expected: all available gates PASS (`bindings-drift` newly active per §6; UI gates still SKIPPED until WP-04/05).
+Expected: all available gates PASS (`bindings-drift` newly active per §6; UI gates still SKIPPED until WP-04/05); neither crate declares a binary target or CLI dependency — `cli`-free per the card.
 
 ## References
 
