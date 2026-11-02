@@ -11,6 +11,7 @@ Exit codes: 0 pass, 1 findings, 2 environment error (contracts/tools.md).
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -43,39 +44,62 @@ ALLOWED = frozenset(
         "CC-BY-4.0",
     ]
 )
+ALLOWED_UPPER = frozenset(a.upper() for a in ALLOWED)
 
 
 def expression_ok(expr: str) -> bool:
-    """Evaluate a simple SPDX expression against the allowlist (OR = any,
-    AND = all; identifiers compared exactly; parentheses tolerated)."""
-    text = expr.strip()
-    if not text:
+    """Evaluate an SPDX license expression against the allowlist:
+    OR = any, AND = all, WITH joins an id and its exception into one unit,
+    parentheses group; identifiers match case-insensitively. Unparseable or
+    empty expressions are not satisfied (fail closed)."""
+    tokens = _tokenize(expr)
+    if not tokens:
         return False
-    for part in _split_top(text, " AND "):
-        alts = _split_top(part, " OR ")
-        if not any(alt.strip("() ") in ALLOWED for alt in alts):
-            return False
-    return True
+    ok, rest = _parse_or(tokens)
+    return ok and not rest
 
 
-def _split_top(text: str, sep: str) -> list[str]:
-    """Split on sep at parenthesis depth 0."""
-    parts, depth, start = [], 0, 0
-    i = 0
-    while i <= len(text) - len(sep):
-        chunk = text[i : i + len(sep)]
-        if text[i] == "(":
-            depth += 1
-        elif text[i] == ")":
-            depth -= 1
-        if depth == 0 and chunk == sep:
-            parts.append(text[start:i])
-            start = i + len(sep)
-            i = start
-            continue
-        i += 1
-    parts.append(text[start:])
-    return parts
+def _tokenize(expr: str) -> list[str]:
+    tokens = re.findall(r"\(|\)|[A-Za-z0-9][A-Za-z0-9.+-]*", expr)
+    normalized = []
+    for tok in tokens:
+        upper = tok.upper()
+        normalized.append(upper if upper in ("AND", "OR", "WITH") else tok)
+    return normalized
+
+
+def _parse_or(tokens: list[str]) -> tuple[bool, list[str]]:
+    ok, rest = _parse_and(tokens)
+    while rest and rest[0] == "OR":
+        rhs, rest = _parse_and(rest[1:])
+        ok = ok or rhs
+    return ok, rest
+
+
+def _parse_and(tokens: list[str]) -> tuple[bool, list[str]]:
+    ok, rest = _parse_unit(tokens)
+    while rest and rest[0] == "AND":
+        rhs, rest = _parse_unit(rest[1:])
+        ok = ok and rhs
+    return ok, rest
+
+
+def _parse_unit(tokens: list[str]) -> tuple[bool, list[str]]:
+    if not tokens:
+        return False, tokens
+    if tokens[0] == "(":
+        ok, rest = _parse_or(tokens[1:])
+        if not rest or rest[0] != ")":
+            return False, tokens
+        return ok, rest[1:]
+    ident = tokens[0]
+    rest = tokens[1:]
+    if rest and rest[0] == "WITH":
+        if len(rest) < 2:
+            return False, tokens
+        ident = f"{ident} WITH {rest[1]}"
+        rest = rest[2:]
+    return ident.upper() in ALLOWED_UPPER, rest
 
 
 def pnpm_command() -> list[str] | None:
