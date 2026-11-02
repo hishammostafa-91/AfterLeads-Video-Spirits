@@ -38,7 +38,7 @@ Validation: any `uses:` without a full SHA is a defect (SC-005).
 |---|---|---|
 | allow | exactly the 05 §5.6 allowlist (24 SPDX ids incl. `OFL-1.1`, `CC-BY-4.0`) | 05 §5.6; research.md D12 |
 | deny | the 05 §5.6 denied set — enforced structurally: anything not in `allow` fails | 05 §5.6; research.md D12 |
-| bans | HTTP-client crates denied with cargo-deny wrapper allowances for the sanctioned chain: `reqwest` wrapped by `tauri`, `hyper` wrapped by `reqwest` (owner decision F1, 2026-11-02; ADR-023 "the updater plugin uses its own client"; SEC-10 "no *other* crate"); denied unconditionally: `ureq`, `isahc`, `surf`, `attohttpc`, `minreq`, `curl`, `curl-sys`; from WP-21, `ureq` gains `wrappers = ["alvs-stt"]` | card; 05 §5.7 SEC-10; research.md D12 |
+| bans | HTTP-client crates denied with cargo-deny wrapper allowances for the sanctioned chain: `reqwest` wrapped by `tauri`, `hyper` wrapped by `reqwest` and `hyper-util` (per-direct-parent-edge semantics; owner decision F1, 2026-11-02; ADR-023 "the updater plugin uses its own client"; SEC-10 "no *other* crate"); denied unconditionally: `ureq`, `isahc`, `surf`, `attohttpc`, `minreq`, `curl`, `curl-sys`; from WP-21, `ureq` gains `wrappers = ["alvs-stt"]` | card; 05 §5.7 SEC-10; research.md D12 |
 | sources | registries: crates.io only; unknown registries and git sources denied | 05 §5.6 rule 3; research.md D12 |
 | advisories | RustSec advisories deny (PR + nightly audit) | 05 §5.6 rule 3; 08 §8.3.2 |
 
