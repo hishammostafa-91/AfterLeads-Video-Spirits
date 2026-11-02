@@ -108,14 +108,14 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Scaffold with `pnpm create tauri-app@latest` into `app/` (React, TypeScript, pnpm per card Steps 4); adjust the package names: npm package `afterleads-video-spirits` (same implementation assumption as T006), Cargo package `afterleads-video-spirits` in `app/src-tauri/Cargo.toml` (docs/00 §0.5 "Cargo package of the app") (app/package.json)
-- [ ] T025 [US4] Set identity in `app/src-tauri/tauri.conf.json`: `productName` `AfterLeads-Video-Spirits`, `identifier` `com.afterleads.videospirits`, main window `title` `AfterLeads-Video-Spirits` — exact constants, never shortened (docs/00 §0.5; G-20) (app/src-tauri/tauri.conf.json)
-- [ ] T026 [US4] Add `"app/src-tauri"` to the root `Cargo.toml` workspace members so the final manifest reads `members = ["crates/*", "app/src-tauri"]` (card) (Cargo.toml)
-- [ ] T027 [US4] Remove template demo code and demo assets from `app/src/` and `app/public/`; keep only `app/index.html`, `app/src/main.tsx`, one empty root component (`App` rendering an empty container), and base styling — no demo components, logos, icons, or sample assets remain (card Steps 4; G-12) (app/src/App.tsx)
-- [ ] T028 [US4] Add the SPDX header pair (`SPDX-License-Identifier: AGPL-3.0-or-later`, `Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>`) as comments to every scaffold source file: `.rs`, `.ts`, `.tsx`, `.css` (docs/02 §2.14) (app/src/main.tsx)
-- [ ] T029 [US4] Pin dependencies to docs/00 §0.8: TypeScript `6.0.x`, React `19.3.x`, Vite `8.3.x`, `@vitejs/plugin-react` `6.x`, `@tauri-apps/api` and `@tauri-apps/cli` `2.12.4`, `tauri` crate `2.12.5`; run `pnpm install` at the repository root and commit the generated root `pnpm-lock.yaml`, then run `cargo build --workspace --locked` and commit the updated root `Cargo.lock` (the workspace gained the app member and Tauri dependencies in T026–T029; the `--locked` gates in T032 fail on a stale lockfile) (app/package.json, pnpm-lock.yaml, Cargo.lock)
-- [ ] T030 [US4] Run `pnpm -C app build` → exit 0 (card acceptance) (app/package.json)
-- [ ] T031 [US4] Run `pnpm -C app tauri dev` → an empty window opens titled exactly `AfterLeads-Video-Spirits`; capture a screenshot for the pull request (SC-003; docs/00 §0.5) (app/src-tauri/tauri.conf.json)
+- [x] T024 [US4] Scaffold with `pnpm create tauri-app@latest` into `app/` (React, TypeScript, pnpm per card Steps 4); adjust the package names: npm package `afterleads-video-spirits` (same implementation assumption as T006), Cargo package `afterleads-video-spirits` in `app/src-tauri/Cargo.toml` (docs/00 §0.5 "Cargo package of the app") (app/package.json)
+- [x] T025 [US4] Set identity in `app/src-tauri/tauri.conf.json`: `productName` `AfterLeads-Video-Spirits`, `identifier` `com.afterleads.videospirits`, main window `title` `AfterLeads-Video-Spirits` — exact constants, never shortened (docs/00 §0.5; G-20) (app/src-tauri/tauri.conf.json)
+- [x] T026 [US4] Add `"app/src-tauri"` to the root `Cargo.toml` workspace members so the final manifest reads `members = ["crates/*", "app/src-tauri"]` (card) (Cargo.toml)
+- [x] T027 [US4] Remove template demo code and demo assets from `app/src/` and `app/public/`; keep only `app/index.html`, `app/src/main.tsx`, one empty root component (`App` rendering an empty container), and base styling — no demo components, logos, icons, or sample assets remain (card Steps 4; G-12) (app/src/App.tsx)
+- [x] T028 [US4] Add the SPDX header pair (`SPDX-License-Identifier: AGPL-3.0-or-later`, `Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>`) as comments to every scaffold source file: `.rs`, `.ts`, `.tsx`, `.css` (docs/02 §2.14) (app/src/main.tsx)
+- [x] T029 [US4] Pin dependencies to docs/00 §0.8: TypeScript `6.0.x`, React `19.3.x`, Vite `8.3.x`, `@vitejs/plugin-react` `6.x`, `@tauri-apps/api` and `@tauri-apps/cli` `2.12.4`, `tauri` crate `2.12.5`; run `pnpm install` at the repository root and commit the generated root `pnpm-lock.yaml`, then run `cargo build --workspace --locked` and commit the updated root `Cargo.lock` (the workspace gained the app member and Tauri dependencies in T026–T029; the `--locked` gates in T032 fail on a stale lockfile) (app/package.json, pnpm-lock.yaml, Cargo.lock)
+- [x] T030 [US4] Run `pnpm -C app build` → exit 0 (card acceptance) (app/package.json)
+- [x] T031 [US4] Run `pnpm -C app tauri dev` → an empty window opens titled exactly `AfterLeads-Video-Spirits`; capture a screenshot for the pull request (SC-003; docs/00 §0.5) (app/src-tauri/tauri.conf.json)
 
 **Checkpoint**: The app scaffold builds and opens with the exact identity; workspace manifest matches the card.
 
@@ -131,8 +131,8 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 ### Implementation for User Story 5
 
-- [ ] T032 [US5] Run `pwsh -File tools/verify.ps1` → exit 0; confirm the table shows `docs`, `commits`, `rust-format`, `rust-lint`, `rust-test` = PASS and every other gate SKIPPED with the script's own reasons; never edit the script (G-08; plan research D7) (tools/verify.ps1)
-- [ ] T033 [US5] Run `python tools/docs/check_docs.py` → exit 0 (card acceptance) (tools/docs/check_docs.py)
+- [x] T032 [US5] Run `pwsh -File tools/verify.ps1` → exit 0; confirm the table shows `docs`, `commits`, `rust-format`, `rust-lint`, `rust-test` = PASS and every other gate SKIPPED with the script's own reasons; never edit the script (G-08; plan research D7) (tools/verify.ps1)
+- [x] T033 [US5] Run `python tools/docs/check_docs.py` → exit 0 (card acceptance) (tools/docs/check_docs.py)
 
 **Checkpoint**: The skeleton is gate-green; all card acceptance gates demonstrated.
 
@@ -142,10 +142,10 @@ Monorepo per docs/02 §2.13: Rust workspace at the repository root (`crates/*`, 
 
 **Purpose**: Final validation and the evidence pack.
 
-- [ ] T034 Run the full quickstart.md validation (Scenarios A–F) against the finished skeleton; fix anything it catches at the source (specs/000-bootstrap/quickstart.md)
-- [ ] T035 Update the STATUS.md row for WP-00: state stays `in-progress` until merge; set branch `chore/000-bootstrap`, today's date, next step `finish` (docs/10 §10.10; STATUS.md)
-- [ ] T036 Assemble the pull-request evidence per G-09: commands and outputs for T001, T008, T022, T023, T030, T031, T032, T033, and the window screenshot; reference the WP-00 card (specs/000-bootstrap/)
-- [ ] T037 Confirm no canonical-doc update is required (G-19): the skeleton implements what docs/02 §2.13–2.14 already specify; if any discrepancy surfaced, stop and report instead of editing docs unilaterally (docs/02-architecture.md)
+- [x] T034 Run the full quickstart.md validation (Scenarios A–F) against the finished skeleton; fix anything it catches at the source (specs/000-bootstrap/quickstart.md)
+- [x] T035 Update the STATUS.md row for WP-00: state stays `in-progress` until merge; set branch `chore/000-bootstrap`, today's date, next step `finish` (docs/10 §10.10; STATUS.md)
+- [x] T036 Assemble the pull-request evidence per G-09: commands and outputs for T001, T008, T022, T023, T030, T031, T032, T033, and the window screenshot; reference the WP-00 card (specs/000-bootstrap/)
+- [x] T037 Confirm no canonical-doc update is required (G-19): the skeleton implements what docs/02 §2.13–2.14 already specify; if any discrepancy surfaced, stop and report instead of editing docs unilaterally (docs/02-architecture.md)
 
 ---
 
