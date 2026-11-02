@@ -3,10 +3,16 @@
 # Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
 """Check commit messages in a range: Conventional Commits first line and DCO sign-off.
 
-Usage: python tools/git/check_commits.py origin/main..HEAD
+Usage:
+  python tools/git/check_commits.py <rev-range>                     # both checks
+  python tools/git/check_commits.py <rev-range> --only conventional
+  python tools/git/check_commits.py <rev-range> --only dco
+
 Rules: docs/10-execution.md §10.4.4–§10.4.5. Merge commits created by GitHub
 ("Merge pull request …") are exempt from both checks; other merge commits need a sign-off.
+The --only modes back the CI jobs `commits` and `dco` (WP-01 contracts/tools.md).
 """
+
 from __future__ import annotations
 
 import re
@@ -15,16 +21,22 @@ import sys
 
 TYPES = "feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|i18n"
 CONVENTIONAL = re.compile(rf"^({TYPES})(\([a-z0-9-]+\))?!?: .{{1,100}}$")
-MERGE_OR_REVERT = re.compile(r'^(Merge (branch|pull request|remote-tracking branch) |Revert ")')
+MERGE_OR_REVERT = re.compile(
+    r'^(Merge (branch|pull request|remote-tracking branch) |Revert ")'
+)
 GITHUB_MERGE = re.compile(r"^Merge pull request #\d+ ")
 SIGNOFF = re.compile(r"^Signed-off-by: .+ <([^>]+@[^>]+)>\s*$", re.M)
+MODES = ("conventional", "dco")
 
 
 def commits(rev_range: str) -> list[tuple[str, str, str, str]]:
     fmt = "%H%x1f%ae%x1f%P%x1f%B%x1e"
     out = subprocess.run(
         ["git", "log", "--format=" + fmt, rev_range],
-        check=True, capture_output=True, text=True, encoding="utf-8",
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
     ).stdout
     result = []
     for record in out.split("\x1e"):
@@ -37,14 +49,23 @@ def commits(rev_range: str) -> list[tuple[str, str, str, str]]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    only: str | None = None
+    if len(args) == 3 and args[1] == "--only":
+        if args[2] not in MODES:
+            print(f"check_commits: --only must be one of {MODES}, got {args[2]!r}")
+            return 2
+        only = args[2]
+    elif len(args) != 1:
         print(__doc__)
         return 2
     problems: list[str] = []
     try:
-        entries = commits(sys.argv[1])
+        entries = commits(args[0])
     except subprocess.CalledProcessError as exc:
-        print(f"check_commits: git log failed for range {sys.argv[1]!r}: {exc.stderr.strip()}")
+        print(
+            f"check_commits: git log failed for range {args[0]!r}: {exc.stderr.strip()}"
+        )
         return 2
     for sha, email, parents, body in entries:
         lines = [l for l in body.splitlines() if not l.startswith("#")]
@@ -53,19 +74,26 @@ def main() -> int:
         is_merge = len(parents.split()) > 1
         if GITHUB_MERGE.match(first):
             continue
-        if not (MERGE_OR_REVERT.match(first) or CONVENTIONAL.match(first)):
-            problems.append(f"{short}: first line is not a Conventional Commit: {first!r}")
-        signers = [m.group(1).lower() for m in SIGNOFF.finditer("\n".join(lines))]
-        if not signers:
-            problems.append(f"{short}: missing 'Signed-off-by' (use git commit -s)")
-        elif not is_merge and email.lower() not in signers:
-            problems.append(f"{short}: sign-off does not match the author email {email}")
+        if only in (None, "conventional"):
+            if not (MERGE_OR_REVERT.match(first) or CONVENTIONAL.match(first)):
+                problems.append(
+                    f"{short}: first line is not a Conventional Commit: {first!r}"
+                )
+        if only in (None, "dco"):
+            signers = [m.group(1).lower() for m in SIGNOFF.finditer("\n".join(lines))]
+            if not signers:
+                problems.append(f"{short}: missing 'Signed-off-by' (use git commit -s)")
+            elif not is_merge and email.lower() not in signers:
+                problems.append(
+                    f"{short}: sign-off does not match the author email {email}"
+                )
+    mode = f" ({only} only)" if only else ""
     if problems:
-        print("check_commits: problems found")
+        print(f"check_commits: problems found{mode}")
         for p in problems:
             print("  - " + p)
         return 1
-    print("check_commits: all commits OK")
+    print(f"check_commits: all commits OK{mode}")
     return 0
 
 
