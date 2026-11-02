@@ -1,7 +1,7 @@
 # STATUS — Work-package ledger
 
 Protocol: docs/10-execution.md §10.10. States: `todo`, `in-progress`, `in-review`, `blocked`, `done`.
-Dependencies: docs/10-execution.md §10.8. Baseline: documentation set 1.0.0 (2026-11-01).
+Dependencies: docs/10-execution.md §10.8. Baseline: documentation set 1.0.1 (baseline date 2026-11-01).
 
 | WP | Title | State | Branch | PR | Updated | Next step / question |
 |---|---|---|---|---|---|---|

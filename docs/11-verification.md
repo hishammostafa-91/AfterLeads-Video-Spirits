@@ -80,5 +80,6 @@ Facts that appear in more than one document. Each row names the canonical source
 | Date | Document set version | Result | By |
 |---|---|---|---|
 | 2026-11-01 | 1.0.0 | `check_docs.py`: all automated checks pass (VER-01..VER-08, VER-10, VER-11, VER-14); manual cross-checks 11.2–11.4 reviewed | Documentation baseline |
+| 2026-11-02 | 1.0.1 | Setup order fixed (10 §10.2.2: Git and PowerShell 7 first, clone before running repository scripts); `main` bootstrap moved to GitHub before cloning (10 §10.4.14); OPS-02 required checks staged after WP-01 (08 §8.2); `uv tool update-shell` added so `specify` is on PATH (06 §6.11, 10 §10.2.2); `check_docs.py`: all automated checks pass | Documentation patch |
 
 Each documentation pull request appends a row.

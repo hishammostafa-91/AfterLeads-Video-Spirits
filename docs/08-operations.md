@@ -21,7 +21,7 @@ Every service used here is free for public open-source repositories (OD-05): Git
 
 ## 8.2 Repository settings (OPS-02)
 
-The owner applies these settings once (WP-01 provides a checklist; agents may not change settings, G-18):
+The owner applies these settings in two stages (agents may not change settings, G-18): everything except the required status checks at the one-time bootstrap (10 §10.4.14), then the required status checks after WP-01 merges, because a required check whose CI job does not exist yet blocks every pull request (the WP-01 pull request lists the checks):
 
 | Area | Setting |
 |---|---|

@@ -7,7 +7,7 @@ Depends on: every other document; the cards below list exactly which sections to
 
 ## 10.1 How to use this document
 
-- **Owner:** set up the workstation (10.2), bootstrap `main` once (10.4.14), then for each work package start a session, run the commands in 06 §6.11, approve plans, review and merge pull requests.
+- **Owner:** set up the workstation (10.2, which includes the one-time `main` bootstrap of 10.4.14), then for each work package start a session, run the commands in 06 §6.11, approve plans, review and merge pull requests.
 - **Agent:** follow `AGENTS.md`; for the active work package read its card (10.7) and only the listed sections; never start a package whose dependencies (10.8) are not `done` in STATUS.md.
 
 All commands are PowerShell 7 (`pwsh`), run from the repository root unless stated.
@@ -38,21 +38,24 @@ Windows 11 x64 22H2 or newer, administrator rights for installation, 60 GB free 
 
 ### 10.2.2 Steps
 
-1. Open **PowerShell 7 as administrator** once and allow local scripts and long paths:
+Keep this order: the repository scripts need Git and PowerShell 7, and they run from the clone.
+
+1. Open **Windows PowerShell** (preinstalled) and install Git, PowerShell 7, and the GitHub CLI. Then close the window; every later step uses **PowerShell 7** (`pwsh`).
+
+```powershell
+winget install --id Git.Git --exact --source winget --accept-package-agreements --accept-source-agreements
+winget install --id Microsoft.PowerShell --exact --source winget --accept-package-agreements --accept-source-agreements
+winget install --id GitHub.cli --exact --source winget --accept-package-agreements --accept-source-agreements
+```
+
+2. Open **PowerShell 7 as administrator** once and allow local scripts and long paths:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -Value 1 -PropertyType DWORD -Force
 ```
 
-2. Install tools (the script installs missing tools with winget and prints what it did; re-run safely):
-
-```powershell
-pwsh -File tools/setup/Install-DevTools.ps1
-```
-
-3. In the Visual Studio Installer, make sure the Build Tools have the workload **Desktop development with C++** with **MSVC v143** and the **Windows 11 SDK** (the script requests them; verify visually once).
-4. Configure git identity and safe defaults:
+3. Configure git identity and safe defaults:
 
 ```powershell
 git config --global user.name "AfterLeads"
@@ -65,15 +68,28 @@ git config --global merge.ff false
 git config --global fetch.prune true
 ```
 
-5. Clone and install the repository hooks:
+4. Sign in to GitHub with `gh auth login`: choose GitHub.com, HTTPS, yes to authenticating Git with your GitHub credentials, and the web browser login.
+5. Only while the repository has no `main` branch: do the one-time bootstrap in 10.4.14 now, before cloning.
+6. Clone into a short path such as `C:\dev` (vcpkg, Cargo, and pnpm create deep folder trees) and install the repository hooks. `git status` must print `## main...origin/main`.
 
 ```powershell
+New-Item -ItemType Directory -Force -Path C:\dev | Out-Null
+Set-Location C:\dev
 git clone https://github.com/hishammostafa-91/AfterLeads-Video-Spirits.git
-Set-Location AfterLeads-Video-Spirits
+Set-Location C:\dev\AfterLeads-Video-Spirits
+git status --short --branch
 pwsh -File tools/git/Install-Hooks.ps1
 ```
 
-6. vcpkg (once; the pinned baseline commit is set in `vcpkg-configuration.json` from WP-06):
+7. Install the remaining tools from **PowerShell 7 as administrator** in the repository folder. The script installs missing tools with winget, prints what it did, and is safe to re-run. Run it, open a **new** PowerShell 7 window (PATH changes), and run it again to install the pinned cargo tools. If `cargo --version` reports that no default toolchain is configured, run `rustup default stable` and run the script once more.
+
+```powershell
+Set-Location C:\dev\AfterLeads-Video-Spirits
+pwsh -File tools/setup/Install-DevTools.ps1
+```
+
+8. In the Visual Studio Installer, make sure the Build Tools have the workload **Desktop development with C++** with **MSVC v143** and the **Windows 11 SDK** (the script requests them; verify visually once).
+9. vcpkg (once; the pinned baseline commit is set in `vcpkg-configuration.json` from WP-06):
 
 ```powershell
 git clone https://github.com/microsoft/vcpkg.git "$env:USERPROFILE\vcpkg"
@@ -81,22 +97,24 @@ git clone https://github.com/microsoft/vcpkg.git "$env:USERPROFILE\vcpkg"
 [Environment]::SetEnvironmentVariable("VCPKG_ROOT", "$env:USERPROFILE\vcpkg", "User")
 ```
 
-7. GitHub CLI login (browser flow): `gh auth login`.
-8. OpenCode 2 and Spec Kit:
+10. OpenCode 2 and Spec Kit (`uv tool update-shell` puts the folder of uv-installed tools on PATH):
 
 ```powershell
 npm install -g @opencode/cli
-opencode --version
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v1.2.5
-specify version
+uv tool update-shell
 ```
 
-9. Start OpenCode in the repository (`opencode`), run `/connect` to choose any model provider, then `/status`.
-10. Verify everything:
+11. Open a new PowerShell 7 window and verify everything; fix every `FAIL` before starting work:
 
 ```powershell
+Set-Location C:\dev\AfterLeads-Video-Spirits
+opencode --version
+specify version
 pwsh -File tools/setup/Test-DevEnvironment.ps1
 ```
+
+12. Start OpenCode in the repository (`opencode`), run `/connect` to choose any model provider, then `/status`. The first work package is WP-00 (10.7), started with `/wp-start WP-00`.
 
 ---
 
@@ -207,14 +225,18 @@ Creates `../AfterLeads-Video-Spirits.worktrees/feat-017-titles-generators` on a 
 
 ### 10.4.14 Bootstrap exception (one time)
 
-The baseline documentation arrives on a single bootstrap branch while the repository has no `main`. The owner, once:
+The baseline documentation arrives on a single baseline branch while the repository has no `main`. The owner creates `main` from that branch once, on GitHub, before cloning (10.2.2 step 5). A local `git push` to `main` is rejected by the pre-push hook by design, so use the GitHub CLI:
 
 ```powershell
-git fetch origin
-git push origin origin/<bootstrap-branch>:refs/heads/main
+$repo = 'hishammostafa-91/AfterLeads-Video-Spirits'
+$sha = gh api "repos/$repo/git/ref/heads/<baseline-branch>" --jq '.object.sha'
+gh api --method POST "repos/$repo/git/refs" -f ref=refs/heads/main -f "sha=$sha"
+gh repo edit $repo --default-branch main
 ```
 
-Then on GitHub: set `main` as the default branch, apply OPS-02, delete the bootstrap branch. This is the only time `main` changes without a pull request.
+The same on the website: the repository's Branches page → **New branch** named `main` with the baseline branch as the source, then Settings → General → Default branch → `main`.
+
+Then apply OPS-02 (08 §8.2) except the required status checks: they name CI jobs that exist only after WP-01, and requiring them earlier blocks every pull request. The WP-01 pull request lists the checks for the owner to add after it merges. Finally delete the baseline branch on GitHub. This is the only time `main` changes without a pull request.
 
 ---
 
@@ -260,7 +282,7 @@ Each card lists: branch, dependencies, requirements implemented, required readin
 - **Read:** 00 (all); 02 §2.13–2.14; 06 §6.8–6.11; 10 §10.2–10.4
 - **Deliverables:** verified workstation; active hooks; Spec Kit initialized (`.specify/`, `.opencode/commands/speckit.*.md`); Cargo workspace (`Cargo.toml` with members `crates/*` and `app/src-tauri`, `rust-toolchain.toml` = `1.99.1` with `rustfmt`, `clippy`; `.cargo/config.toml` with `rustflags = ["-C", "target-feature=+crt-static", "-C", "control-flow-guard"]` for `x86_64-pc-windows-msvc`); empty crates `alvs-core` … `alvs-testkit` with SPDX headers and `lib.rs` docs; Tauri 2 app scaffold in `app/` (React + TypeScript template) adjusted to 00 §0.5 (product name, identifier, window title); root `package.json` + `pnpm-workspace.yaml`; TypeScript pinned to `6.0.x`; `tools/verify.ps1` passing on the skeleton; STATUS.md WP-00 `done` after merge.
 - **Steps:**
-  1. Run 10.2 steps 1–10; fix anything `Test-DevEnvironment.ps1` reports.
+  1. Complete every step of 10.2.2; fix anything `Test-DevEnvironment.ps1` reports.
   2. `/wp-start WP-00`; run `specify init --here --force --integration opencode --script ps --non-interactive`; confirm the constitution file is unchanged (`git diff .specify/memory/constitution.md` empty).
   3. Create the Cargo workspace and crates; `cargo build --workspace` must pass.
   4. Scaffold the app with `pnpm create tauri-app@latest` (React, TypeScript, pnpm) into `app/`; set `productName` "AfterLeads-Video-Spirits", `identifier` "com.afterleads.videospirits", window title "AfterLeads-Video-Spirits"; pin dependencies to the 00 §0.8 baselines; remove template demo code and assets; add SPDX headers.

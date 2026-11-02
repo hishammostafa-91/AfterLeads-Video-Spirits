@@ -135,10 +135,12 @@ Spec Kit adds `/speckit.constitution`, `/speckit.specify`, `/speckit.clarify`, `
 
 ```powershell
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v1.2.5
-specify version
+uv tool update-shell
 ```
 
-**Initialize (once, in WP-00, on the bootstrap branch):**
+Open a new PowerShell 7 window (PATH change), then check with `specify version`.
+
+**Initialize (once, in WP-00, on its branch `chore/000-bootstrap`):**
 
 ```powershell
 specify init --here --force --integration opencode --script ps --non-interactive

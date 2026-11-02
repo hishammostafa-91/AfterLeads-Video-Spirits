@@ -30,7 +30,7 @@ Windows 11 x64 (22H2 or newer), a CPU with AVX2, 8 GB RAM (16 GB recommended), a
 
 ## Building from source
 
-Follow [docs/10-execution.md §10.2](docs/10-execution.md#102-windows-11-workstation-setup). In short: install the tools with `tools/setup/Install-DevTools.ps1`, verify with `tools/setup/Test-DevEnvironment.ps1`, then follow the work packages.
+Follow [docs/10-execution.md §10.2](docs/10-execution.md#102-windows-11-workstation-setup). In short: install Git and PowerShell 7 with winget, clone the repository, install the hooks with `tools/git/Install-Hooks.ps1`, install the remaining tools with `tools/setup/Install-DevTools.ps1`, verify with `tools/setup/Test-DevEnvironment.ps1`, then follow the work packages.
 
 ## Contributing
 
