@@ -28,7 +28,7 @@ Bootstrap the repository skeleton exactly as the WP-00 card (docs/10 §10.7) spe
 
 **Constraints**: repository layout and crate list per docs/02 §2.13; coding standards and SPDX headers per docs/02 §2.14; pinned versions per docs/00 §0.8; identity constants per docs/00 §0.5; Spec Kit integration per docs/06 §6.11; no dependencies beyond the 00 §0.8 baseline (G-11); no IPC (04) and no data (03) surface; `verify.ps1` gates must never be weakened (G-08).
 
-**Scale/Scope**: 11 empty crates (`alvs-core`…`alvs-testkit`), 1 app scaffold (`app/`), 4 root manifests (`Cargo.toml`, `rust-toolchain.toml`, `.cargo/config.toml`, `package.json` + `pnpm-workspace.yaml`), zero product features.
+**Scale/Scope**: 11 empty crates (`alvs-core`…`alvs-testkit`), 1 app scaffold (`app/`), 5 root manifests (`Cargo.toml`, `rust-toolchain.toml`, `.cargo/config.toml`, `package.json`, `pnpm-workspace.yaml`) plus the two generated lockfiles (`Cargo.lock`, `pnpm-lock.yaml` — committed, 00 §0.8), zero product features.
 
 ## Constitution Check
 
@@ -70,10 +70,12 @@ Scoped to what WP-00 creates, per docs/02 §2.13 (existing baseline files omitte
 
 ```text
 Cargo.toml                     # workspace: members crates/* and app/src-tauri (card)
+Cargo.lock                     # committed: --locked acceptance requires it (00 §0.8)
 rust-toolchain.toml            # 1.99.1 + rustfmt + clippy (card; 00 §0.8)
 .cargo/config.toml             # rustflags crt-static + control-flow-guard for x86_64-pc-windows-msvc (card)
 package.json                   # root workspace package (card; 02 §2.13)
 pnpm-workspace.yaml            # packages: app (card; 02 §2.13)
+pnpm-lock.yaml                 # committed: exact versions are locked by lockfiles (00 §0.8)
 crates/
 ├── alvs-core/    alvs-model/    alvs-formats/  alvs-media/   alvs-render/
 │                 # each: Cargo.toml + src/lib.rs (SPDX header + crate docs, empty lib)
@@ -85,7 +87,7 @@ app/                           # create-tauri-app scaffold (React + TypeScript, 
 └── src-tauri/                 # crate in workspace; tauri.conf.json identity per 00 §0.5
 ```
 
-**Structure Decision**: the single-repository layout of docs/02 §2.13 — one Cargo workspace at the root whose members are `crates/*` and `app/src-tauri`, plus one pnpm workspace containing `app`. This is not a choice to make; it is the canonical layout (G-01), and the card states the workspace membership explicitly.
+**Structure Decision**: the single-repository layout of docs/02 §2.13 — one Cargo workspace at the root whose members are `crates/*` and `app/src-tauri`, plus one pnpm workspace containing `app`. This is not a choice to make; it is the canonical layout (G-01), and the card states the workspace membership explicitly. **Lockfiles are committed**: `Cargo.lock` (required by the card's `--locked` acceptance commands; `tools/verify.ps1` also runs clippy and tests with `--locked`) and `pnpm-lock.yaml` (docs/00 §0.8: exact versions are locked by `Cargo.lock`, `pnpm-lock.yaml`, `rust-toolchain.toml`; docs/02 §2.13 lists both at the root).
 
 ## Complexity Tracking
 

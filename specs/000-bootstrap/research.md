@@ -36,9 +36,11 @@ No NEEDS CLARIFICATION markers remain. Every decision below is derived from a ca
 
 ## D6 — pnpm workspace and TypeScript pin
 
-- **Decision**: root `package.json` + `pnpm-workspace.yaml` with `app` as the workspace package (docs/02 §2.13); TypeScript pinned to 6.0.x (card; docs/00 §0.8 line for the UI toolchain).
+- **Decision**: root `package.json` + `pnpm-workspace.yaml` with `app` as the workspace package (docs/02 §2.13); TypeScript pinned to 6.0.x (card; docs/00 §0.8).
 - **Rationale**: card deliverable; the workspace file is the canonical mechanism for `pnpm -C app …` commands used throughout the docs.
 - **Verified environment**: pnpm 12.16.1 active (baseline 12.x — docs/00 §0.8), Node 26.13.0 LTS active; `Test-DevEnvironment.ps1` all PASS on 2026-11-02.
+- **Scaffold pin list (docs/00 §0.8 UI rows, verified)**: TypeScript **6.0.x** (7.x unsupported by `typescript-eslint` peer `<6.1.0` — the docs state the reason); React **19.3.x**, Vite **8.3.x**, `@vitejs/plugin-react` **6.x**; Tauri **2.12.x** (crate 2.12.5, `@tauri-apps/api`/`cli` 2.12.4). The scaffold step pins these at implementation time; deviations need an ADR (G-11).
+- **Lockfiles**: `Cargo.lock` and `pnpm-lock.yaml` are generated during the build/scaffold steps and **committed** — docs/00 §0.8 locks exact versions by these files, and the card's acceptance commands run with `--locked` (which fails without `Cargo.lock`).
 - **Alternatives considered**: npm workspaces — rejected: canonical baseline is pnpm (docs/00 §0.8; docs/10 §10.2 tool table).
 
 ## D7 — verify.ps1 gate activation map (verified by reading the script)
