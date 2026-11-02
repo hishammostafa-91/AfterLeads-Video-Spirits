@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+# Rust toolchain pin (docs/00-index.md §0.8; WP-00 card).
+[toolchain]
+channel = "1.99.1"
+components = ["rustfmt", "clippy"]
