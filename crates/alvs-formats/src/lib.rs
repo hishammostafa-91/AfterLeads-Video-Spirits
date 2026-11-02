@@ -3,3 +3,5 @@
 #![deny(missing_docs)]
 //! Parsers and writers: SRT, WebVTT, ASS/SSA, `.cube` LUT, EDL, marker CSV and
 //! chapter text, and text-encoding detection (CMP-03, docs/02 §2.4).
+
+// FIXME: demo marker for the WP-01 failure demonstration (T023).
