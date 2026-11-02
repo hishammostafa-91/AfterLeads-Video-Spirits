@@ -55,6 +55,8 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -Value 1 -PropertyType DWORD -Force
 ```
 
+Close this window. Every step except step 7 uses a normal (not elevated) PowerShell 7 window: files created from an elevated window belong to the Administrators group, and git then refuses the repository ("detected dubious ownership").
+
 3. Configure git identity and safe defaults:
 
 ```powershell
@@ -81,7 +83,7 @@ git status --short --branch
 pwsh -File tools/git/Install-Hooks.ps1
 ```
 
-7. Install the remaining tools from **PowerShell 7 as administrator** in the repository folder. The script installs missing tools with winget, prints what it did, and is safe to re-run. Run it, open a **new** PowerShell 7 window (PATH changes), and run it again to install the pinned cargo tools. If `cargo --version` reports that no default toolchain is configured, run `rustup default stable` and run the script once more.
+7. Install the remaining tools from **PowerShell 7 as administrator** in the repository folder (the script writes nothing into the repository). It installs missing tools with winget, prints what it did, and is safe to re-run. Run it, open a **new** PowerShell 7 window as administrator (PATH changes), and run it again to install the pinned cargo tools. If `cargo --version` reports that no default toolchain is configured, run `rustup default stable` and run the script once more.
 
 ```powershell
 Set-Location C:\dev\AfterLeads-Video-Spirits
@@ -89,7 +91,7 @@ pwsh -File tools/setup/Install-DevTools.ps1
 ```
 
 8. In the Visual Studio Installer, make sure the Build Tools have the workload **Desktop development with C++** with **MSVC v143** and the **Windows 11 SDK** (the script requests them; verify visually once).
-9. vcpkg (once; the pinned baseline commit is set in `vcpkg-configuration.json` from WP-06):
+9. Back in a normal PowerShell 7 window, vcpkg (once; the pinned baseline commit is set in `vcpkg-configuration.json` from WP-06):
 
 ```powershell
 git clone https://github.com/microsoft/vcpkg.git "$env:USERPROFILE\vcpkg"
