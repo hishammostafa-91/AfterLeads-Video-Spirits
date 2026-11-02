@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
-"""Detect unfinished-work markers of docs/06-ai-automation.md SS6.13 rule 4
-(WP-01 card; docs/08-operations.md SS8.4 gate).
+"""Detect unfinished-work markers of docs/06-ai-automation.md §6.13 rule 4
+(WP-01 card; docs/08-operations.md §8.4 gate).
 
 Markers: the placeholder macros, marker comments, mocked production paths,
-commented-out code. Test code and the mock backend are exempt (SS6.13).
-Marker strings are assembled at runtime so this tool never matches itself.
+commented-out code. Test code and the mock backend are exempt (§6.13) —
+files under tests/, test-pattern files, #[cfg(test)] regions, and the
+mock-backend module produce no findings. Marker strings are assembled at
+runtime so this tool never matches itself.
 
 Usage: python tools/check_placeholders.py   Exit codes: 0 pass, 1 findings, 2 error.
 """
@@ -20,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 # Runtime-assembled markers (never written as literals here); the set is
-# exactly docs/06 SS6.13 rule 4: the placeholder macros and marker comments.
+# exactly docs/06 §6.13 rule 4: the placeholder macros and marker comments.
 MACRO_MARKERS = tuple(m + "!(" for m in ("to" + "do", "un" + "implemented"))
 COMMENT_MARKERS = ("TO" + "DO", "FIX" + "ME")
 
@@ -33,7 +35,7 @@ CODEISH = re.compile(
 STMT_END = re.compile(r";\s*$")
 
 # First-party trees (data-model/contract scope); generated and test areas excluded.
-SCAN_DIRS = ("crates", "app/src", "app/src-tauri", "tools", ".githooks")
+SCAN_DIRS = ("crates", "app/src", "app/src-tauri", "tools", ".githooks", "tests")
 EXCLUDE_PARTS = {
     "node_modules",
     "target",
