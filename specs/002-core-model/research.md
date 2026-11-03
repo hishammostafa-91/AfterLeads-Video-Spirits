@@ -113,3 +113,13 @@ No NEEDS CLARIFICATION markers remain. Every externally sourced fact below was v
 - **Decision**: WP-02 adds the §2.11 lint posture to the workspace: `[workspace.lints]` in the root `Cargo.toml` with `clippy.unwrap_used = "warn"` and `clippy.expect_used = "warn"`, wired into the member crates via `[lints] workspace = true` (and into every later crate as it gains code). CI and `tools/verify.ps1` already run clippy with `-D warnings`, which escalates these warnings to failures — exactly §2.11's "set to warn and denies new warnings". Test code remains free to use `unwrap` (lints scope or `#[cfg(test)]` allowlist at the statement level only, never file-wide).
 - **Rationale**: 02 §2.11 is canonical and in the card's Read line; the reviewer verified no lint config exists in the repo today (a gap WP-02 owns as the first real-code package; owner chose to enforce now). `#![deny(missing_docs)]` (02 §2.4 rule 4) already rides the same crates.
 - **Alternatives**: leaving §2.11 prose-only — rejected by the owner; statement-level `expect("invariant: …")` documentation exceptions remain per §2.11.
+
+## D18 — Amendment: `alvs-core` carries `schemars` and `ts-rs` (review F-18, 2026-11-03)
+
+- **Decision (amends D2)**: `alvs-core` depends on `schemars` and `ts-rs` (both 00 §0.8 baseline rows, the same pinned versions `alvs-model` uses) because `alvs-core::rational::Rational` derives `JsonSchema` and `TS` — it is a serialized DTO type (04 §4.2) appearing inside `SequenceFormat` and `Clip` on the wire. D2's original crate graph listed these only under `alvs-model`; the review (F-18) flagged the divergence between the approved plan text and the manifests.
+- **License/scope**: unchanged — baseline rows only (G-11); no new dependency decisions.
+
+## D19 — Amendment: nested persisted structs also carry `extra` maps (review F-06, 2026-11-03)
+
+- **Decision (extends D16)**: 03 §3.2.3 rule 3 is a blanket rule — "every persisted object keeps unknown fields" — so the nested value structs (Transform, Crop, Intrinsic, AudioClipSettings, GeneratorParams, Derived, TimelineScroll, SourceViewer, Keyframe, CaptionStyle, CaptionBox, TitleLayer, TitleStroke, TitleBox, TitleAnimation) carry `#[serde(flatten)] extra` like the entities. `AnimatableValue` itself is untagged and cannot retain unknown keys at the variant level; its `Keyframe` members can and do. The review's round-trip gap (unknown nested fields silently dropped) is closed and tested at transform/keyframe/audio/caption-style/title-animation levels.
+- **Verification**: flatten inside a struct nested in an untagged enum variant compiles and round-trips (the `K { k: Vec<Keyframe> }` shape); the regenerated bindings show the `JsonValue` index signatures on every amended type.
