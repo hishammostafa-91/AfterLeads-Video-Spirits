@@ -698,7 +698,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             caption_track_id,
         } => {
             let Some(sequence) = project.sequences.iter_mut().find(|s| s.id == *sequence_id) else {
-                return Rejected(missing("sequence", caption_track_id));
+                return Rejected(missing("sequence", sequence_id));
             };
             let had = sequence.caption_tracks.len();
             sequence
