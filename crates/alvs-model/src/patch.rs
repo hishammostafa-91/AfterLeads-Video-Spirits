@@ -209,11 +209,14 @@ pub fn diff(old: &Arc<Project>, new: &Arc<Project>, revision: u64) -> EntityPatc
         }
         for track in &prev.tracks {
             if !sequence.tracks.iter().any(|n| n.id == track.id) {
+                // The whole track is gone; its clips leave with it (pushed
+                // once here, not again by the per-clip loop below).
                 patch.remove.tracks.push(track.id.clone());
                 dirty_sequences.push(sequence.id.clone());
                 for clip in &track.items {
                     patch.remove.clips.push(clip.id.clone());
                 }
+                continue;
             }
             for clip in &track.items {
                 let still = sequence

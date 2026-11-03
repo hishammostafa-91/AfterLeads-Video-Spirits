@@ -76,6 +76,22 @@ pub fn migrate(value: &mut Value, steps: &[MigrationStep]) -> Result<MigrationOu
             obj.insert("schemaVersion".to_string(), Value::Number(current.into()));
         }
     }
+    // 03 §3.9.6: "run migrations …, validate, and open." The migrated value
+    // must deserialize as a `Project` and satisfy every 03 §3.5 rule before
+    // the caller opens it; a step that produces an invalid document fails
+    // with E1005 naming the first problem.
+    let migrated: crate::project::Project =
+        serde_json::from_value(value.clone()).map_err(|e| AppError::MigrationFailed {
+            detail: format!("migrated value does not parse as a project: {e}"),
+        })?;
+    if let Some(first) = crate::validate::validate(&migrated).first() {
+        return Err(AppError::MigrationFailed {
+            detail: format!(
+                "migrated value violates an invariant at {}: {}",
+                first.path, first.detail
+            ),
+        });
+    }
     Ok(MigrationOutcome::Migrated {
         from: found,
         to: current,
@@ -241,5 +257,44 @@ mod tests {
             "v1 fixture must deserialize: {:?}",
             project.err()
         );
+    }
+
+    #[test]
+    fn invalid_migrated_results_fail_with_e1005() {
+        // A step whose output no longer parses as a Project fails E1005.
+        let mut value = v1_project();
+        value["schemaVersion"] = json!(0);
+        let unparseable = [MigrationStep {
+            from: 0,
+            to: 1,
+            run: |v: &mut Value| {
+                v["name"] = json!(42); // `name` must be a string
+                Ok(())
+            },
+        }];
+        match migrate(&mut value, &unparseable) {
+            Err(AppError::MigrationFailed { detail }) => {
+                assert!(detail.contains("does not parse as a project"), "{detail}");
+            }
+            other => panic!("expected MigrationFailed, got {other:?}"),
+        }
+
+        // A step producing a rule violation fails E1005 with the issue.
+        let mut value = v1_project();
+        value["schemaVersion"] = json!(0);
+        let invalid = [MigrationStep {
+            from: 0,
+            to: 1,
+            run: |v: &mut Value| {
+                v["sequences"][0]["format"]["width"] = json!(10_881); // odd, out of range
+                Ok(())
+            },
+        }];
+        match migrate(&mut value, &invalid) {
+            Err(AppError::MigrationFailed { detail }) => {
+                assert!(detail.contains("violates an invariant"), "{detail}");
+            }
+            other => panic!("expected MigrationFailed, got {other:?}"),
+        }
     }
 }

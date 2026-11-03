@@ -668,7 +668,7 @@ fn update_sequence_fps_snaps_clips_and_reports_e1104() {
             },
         },
     );
-    assert_eq!(result.adjusted_items, vec![clip_id]);
+    assert_eq!(result.adjusted, vec![clip_id]);
     assert!(result.warnings.iter().any(|(code, _)| code == "E1104"));
     let clip = &m.root().sequences[0].tracks[0].items[0];
     assert_eq!(clip.start, 2 * FPF_25);
@@ -693,7 +693,7 @@ fn update_sequence_same_fps_still_replaces_the_format() {
             },
         },
     );
-    assert!(result.adjusted_items.is_empty());
+    assert!(result.adjusted.is_empty());
     assert_eq!(m.root().sequences[0].format.width, 1280);
     assert_eq!(m.root().sequences[0].format.height, 720);
 }
@@ -1159,7 +1159,7 @@ fn batch_is_atomic_and_a_single_undo_step() {
     );
     assert_eq!(m.root().name, "B");
     // One undo step returns to the pre-batch state.
-    assert!(m.undo());
+    assert!(m.undo().is_some());
     assert_eq!(m.root().name, "Test");
 
     // A failing inner op rejects the whole batch and leaves the model unchanged.
@@ -1183,7 +1183,7 @@ fn batch_is_atomic_and_a_single_undo_step() {
 #[test]
 fn undo_redo_and_step_on_a_fresh_model_are_noops() {
     let mut m = empty_model();
-    assert!(!m.undo());
-    assert!(!m.redo());
+    assert!(m.undo().is_none());
+    assert!(m.redo().is_none());
     assert!(!m.step(0));
 }

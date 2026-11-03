@@ -8,6 +8,7 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 use crate::caption::new_caption_track;
 use crate::marker::Marker;
@@ -323,21 +324,98 @@ fn marker_from_input(input: &MarkerInput) -> Marker {
     }
 }
 
-/// The result of applying one op: the entity patch plus warnings such as
-/// adjusted items (E1104) — carried as data; the caller renders envelopes.
+/// The result of applying one op (04 §4.4; contracts/crate-apis.md `edit`
+/// row): the entity patch computed by structural diffing of the consecutive
+/// roots, plus non-fatal warnings such as adjusted items (E1104 data) —
+/// carried as data; the caller renders envelopes.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct EditResult {
-    /// Items moved by a frame-rate change (E1104 data).
-    pub adjusted_items: Vec<String>,
+    /// The entity patch from the prior root to the new root (filled by
+    /// `Model::apply` / `Model::undo` / `Model::redo`).
+    pub patch: crate::patch::EntityPatch,
     /// Non-fatal warnings (code + detail).
     pub warnings: Vec<(String, String)>,
+    /// Items moved by a frame-rate change (E1104 data).
+    pub adjusted: Vec<String>,
+}
+
+/// The intrinsic parameter groups a `ParamTarget` can address (04 §4.4).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub enum ParamIntrinsic {
+    /// The intrinsic transform block.
+    Transform,
+    /// The intrinsic crop block.
+    Crop,
+    /// The intrinsic opacity.
+    Opacity,
+    /// The audio clip object.
+    Audio,
+}
+
+/// Where a parameter op applies (04 §4.4): one of the intrinsic blocks of a
+/// clip, an effect/mask/title-layer instance of a clip or track, a
+/// transition, or the master-bus effect of a sequence. The clip-editing and
+/// parameter ops that consume it arrive with WP-12/WP-14 (FR-010).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[serde(untagged, rename_all_fields = "camelCase")]
+#[ts(export)]
+pub enum ParamTarget {
+    /// An intrinsic block of a clip.
+    ClipIntrinsic {
+        /// The clip.
+        clip_id: String,
+        /// Which intrinsic block.
+        intrinsic: ParamIntrinsic,
+    },
+    /// An effect instance on a clip.
+    ClipEffect {
+        /// The clip.
+        clip_id: String,
+        /// The effect instance.
+        effect_instance_id: String,
+    },
+    /// A mask of a clip.
+    ClipMask {
+        /// The clip.
+        clip_id: String,
+        /// The mask.
+        mask_id: String,
+    },
+    /// A title layer of a clip.
+    ClipTitleLayer {
+        /// The clip.
+        clip_id: String,
+        /// The title layer.
+        title_layer_id: String,
+    },
+    /// An effect instance on a track.
+    TrackEffect {
+        /// The track.
+        track_id: String,
+        /// The effect instance.
+        effect_instance_id: String,
+    },
+    /// A transition's parameters.
+    Transition {
+        /// The transition.
+        transition_id: String,
+    },
+    /// A master-bus effect of a sequence.
+    SequenceMaster {
+        /// The sequence.
+        sequence_id: String,
+        /// The master effect instance.
+        master_effect_instance_id: String,
+    },
 }
 
 /// The outcome of an application attempt.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ApplyOutcome {
     /// The op applied; the model changed.
-    Applied(EditResult),
+    Applied(Box<EditResult>),
     /// The op was rejected with the given error; the model is unchanged
     /// (rollback, E0002 per 03 §3.5 when an invariant would break).
     Rejected(alvs_core::error::AppError),
@@ -356,7 +434,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                 }
                 project.media.push(item);
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::RemoveMedia {
             media_ids,
@@ -386,7 +464,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                     }
                 }
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateMedia { media_id, changes } => {
             let Some(media) = project.media.iter_mut().find(|m| m.id == *media_id) else {
@@ -404,7 +482,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if let Some(bin) = &changes.bin_id {
                 media.bin_id = Some(bin.clone());
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::CreateBin { name, parent_id } => {
             project.bins.push(crate::bin::Bin {
@@ -415,14 +493,14 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                 expanded: true,
                 extra: BTreeMap::new(),
             });
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateBin { bin_id, name } => {
             let Some(bin) = project.bins.iter_mut().find(|b| b.id == *bin_id) else {
                 return Rejected(missing("bin", bin_id));
             };
             bin.name = name.clone();
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::DeleteBin { bin_id } => {
             let Some(bin) = project.bins.iter().find(|b| b.id == *bin_id) else {
@@ -450,7 +528,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                     };
                 }
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::CreateSequence {
             name,
@@ -467,7 +545,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                     Some(_) => sqp02_fallback_with_preset_clear(),
                 });
             project.sequences.push(new_sequence(name, fmt));
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::DuplicateSequence { sequence_id, name } => {
             let Some(source) = project.sequences.iter().find(|s| s.id == *sequence_id) else {
@@ -477,7 +555,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             copy.id = alvs_core::id::new_id();
             copy.name = name.clone();
             project.sequences.push(copy);
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::DeleteSequence { sequence_id } => {
             if project.sequences.len() <= 1 {
@@ -500,7 +578,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if project.ui.active_sequence_id.as_deref() == Some(sequence_id.as_str()) {
                 project.ui.active_sequence_id = project.sequences.first().map(|s| s.id.clone());
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateSequence {
             sequence_id,
@@ -538,7 +616,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             let track = crate::track::new_track(*kind, name.as_deref().unwrap_or(&default_name));
             let at = index.unwrap_or(sequence.tracks.len());
             sequence.tracks.insert(at.min(sequence.tracks.len()), track);
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::RemoveTrack {
             sequence_id,
@@ -552,7 +630,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if sequence.tracks.len() == had {
                 return Rejected(missing("track", track_id));
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::MoveTrack {
             sequence_id,
@@ -569,7 +647,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             sequence
                 .tracks
                 .insert((*index).min(sequence.tracks.len()), track);
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateTrack {
             sequence_id,
@@ -609,7 +687,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if let Some(targeted) = changes.targeted {
                 track.targeted = targeted;
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::AddMarkers {
             sequence_id,
@@ -621,7 +699,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             for input in markers {
                 sequence.markers.push(marker_from_input(input));
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateMarker {
             sequence_id,
@@ -637,7 +715,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             };
             marker.name = name.clone();
             marker.note = note.clone();
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::RemoveMarkers {
             sequence_id,
@@ -654,7 +732,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
                     &marker_ids.first().cloned().unwrap_or_default(),
                 ));
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::AddCaptionTrack {
             sequence_id,
@@ -667,7 +745,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             sequence
                 .caption_tracks
                 .push(new_caption_track(name, language));
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::UpdateCaptionTrack {
             sequence_id,
@@ -691,7 +769,7 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if let Some(enabled) = enabled {
                 track.enabled = *enabled;
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::RemoveCaptionTrack {
             sequence_id,
@@ -707,11 +785,11 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             if sequence.caption_tracks.len() == had {
                 return Rejected(missing("captionTrack", caption_track_id));
             }
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::RenameProject { name } => {
             project.name = name.clone();
-            Applied(EditResult::default())
+            Applied(Box::default())
         }
         EditOp::Batch { ops, label_key: _ } => {
             // All-or-nothing: any rejection leaves the project untouched
@@ -720,13 +798,13 @@ pub fn apply_op(project: &mut Project, op: &EditOp) -> ApplyOutcome {
             for inner in ops {
                 match apply_op(project, inner) {
                     Applied(inner_result) => {
-                        result.adjusted_items.extend(inner_result.adjusted_items);
+                        result.adjusted.extend(inner_result.adjusted);
                         result.warnings.extend(inner_result.warnings);
                     }
                     Rejected(err) => return Rejected(err),
                 }
             }
-            Applied(result)
+            Applied(Box::new(result))
         }
     }
 }
@@ -766,12 +844,12 @@ fn apply_update_sequence(
                     }
                 }
                 if !adjusted.is_empty() {
-                    result.adjusted_items = adjusted;
+                    result.adjusted = adjusted;
                     result.warnings.push((
                         "E1104".into(),
                         format!(
                             "{} items moved to match the new frame rate",
-                            result.adjusted_items.len()
+                            result.adjusted.len()
                         ),
                     ));
                 }
@@ -787,7 +865,7 @@ fn apply_update_sequence(
     if let Some(out_point) = &changes.out_point {
         sequence.out_point = *out_point;
     }
-    Applied(result)
+    Applied(Box::new(result))
 }
 
 /// Snap a flicks value from the old grid to the nearest new-grid position.
@@ -815,6 +893,68 @@ fn sqp02_fallback_with_preset_clear() -> SequenceFormat {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn param_target_serializes_per_doc_shapes() {
+        // Clip intrinsic (04 §4.4): { clipId, intrinsic }.
+        let json = serde_json::json!({ "clipId": "c1", "intrinsic": "transform" });
+        let target: ParamTarget = serde_json::from_value(json).unwrap_or(ParamTarget::Transition {
+            transition_id: String::new(),
+        });
+        assert!(
+            matches!(target, ParamTarget::ClipIntrinsic { ref clip_id, intrinsic: ParamIntrinsic::Transform } if clip_id == "c1")
+        );
+        // Round-trip keeps the doc shape.
+        assert_eq!(
+            serde_json::to_value(&target).unwrap_or(serde_json::Value::Null),
+            serde_json::json!({ "clipId": "c1", "intrinsic": "transform" })
+        );
+
+        // Clip effect instance: { clipId, effectInstanceId }.
+        let json = serde_json::json!({ "clipId": "c1", "effectInstanceId": "e1" });
+        let target: ParamTarget = serde_json::from_value(json).unwrap_or(ParamTarget::Transition {
+            transition_id: String::new(),
+        });
+        assert!(matches!(target, ParamTarget::ClipEffect { .. }));
+
+        // Track effect, mask, title layer, transition, and sequence master.
+        let json = serde_json::json!({ "trackId": "t1", "effectInstanceId": "e1" });
+        assert!(matches!(
+            serde_json::from_value::<ParamTarget>(json).unwrap_or(ParamTarget::Transition {
+                transition_id: String::new()
+            }),
+            ParamTarget::TrackEffect { .. }
+        ));
+        let json = serde_json::json!({ "clipId": "c1", "maskId": "m1" });
+        assert!(matches!(
+            serde_json::from_value::<ParamTarget>(json).unwrap_or(ParamTarget::Transition {
+                transition_id: String::new()
+            }),
+            ParamTarget::ClipMask { .. }
+        ));
+        let json = serde_json::json!({ "clipId": "c1", "titleLayerId": "l1" });
+        assert!(matches!(
+            serde_json::from_value::<ParamTarget>(json).unwrap_or(ParamTarget::Transition {
+                transition_id: String::new()
+            }),
+            ParamTarget::ClipTitleLayer { .. }
+        ));
+        let json = serde_json::json!({ "transitionId": "t1" });
+        assert!(matches!(
+            serde_json::from_value::<ParamTarget>(json).unwrap_or(ParamTarget::ClipMask {
+                clip_id: String::new(),
+                mask_id: String::new()
+            }),
+            ParamTarget::Transition { .. }
+        ));
+        let json = serde_json::json!({ "sequenceId": "s1", "masterEffectInstanceId": "e1" });
+        assert!(matches!(
+            serde_json::from_value::<ParamTarget>(json).unwrap_or(ParamTarget::Transition {
+                transition_id: String::new()
+            }),
+            ParamTarget::SequenceMaster { .. }
+        ));
+    }
 
     #[test]
     fn serde_tag_is_op_with_camel_case_variants() {

@@ -217,11 +217,14 @@ impl Model {
     /// Apply an op: clone-on-write through `Arc::make_mut`, validate after
     /// (debug/tests per 03 §3.5), and roll back with E0002 on violation.
     /// Undo/redo are exact inverses because roots are immutable snapshots.
+    /// The returned `EditResult` carries the `EntityPatch` from the prior
+    /// root to the new root (04 §4.4; FR-012).
     pub fn apply(&mut self, op: &crate::edit::EditOp) -> Result<EditResult, AppError> {
         let before = self.root.clone();
         let root = Arc::make_mut(&mut self.root);
         match apply_op(root, op) {
-            ApplyOutcome::Applied(mut result) => {
+            ApplyOutcome::Applied(boxed) => {
+                let mut result = *boxed;
                 // 03 §3.5: validate after every EditOp in debug builds and
                 // tests; a violated rule rolls the edit back with E0002.
                 if cfg!(any(test, debug_assertions)) {
@@ -246,11 +249,14 @@ impl Model {
                 // restores the state that preceded the edit); a new edit
                 // invalidates the redo stack.
                 self.history.clear_redo();
-                self.history.push(before);
-                if !result.adjusted_items.is_empty() {
+                self.history.push(before.clone());
+                // The patch is the structural diff of the consecutive roots
+                // at the new revision (04 §4.4).
+                result.patch = crate::patch::diff(&before, &self.root, self.revision);
+                if !result.adjusted.is_empty() {
                     result.warnings.push((
                         "E1104".into(),
-                        format!("{} items adjusted", result.adjusted_items.len()),
+                        format!("{} items adjusted", result.adjusted.len()),
                     ));
                 }
                 Ok(result)
@@ -262,43 +268,61 @@ impl Model {
         }
     }
 
-    /// Undo the last edit; exact inverse by snapshot equality.
-    pub fn undo(&mut self) -> bool {
+    /// Undo the last edit; exact inverse by snapshot equality. Returns the
+    /// transition's `EditResult` (patch of old root → restored root), or
+    /// `None` when there is nothing to undo (contract `history` row).
+    pub fn undo(&mut self) -> Option<EditResult> {
+        let before = self.root.clone();
+        let ui = self.root().ui.clone();
         let current = self.root.clone();
-        match self.history.undo(current) {
-            Some(previous) => {
-                self.root = previous;
-                self.revision += 1;
-                true
-            }
-            None => false,
-        }
+        let previous = self.history.undo(current)?;
+        self.root = previous;
+        self.preserve_ui(ui);
+        self.revision += 1;
+        Some(EditResult {
+            patch: crate::patch::diff(&before, &self.root, self.revision),
+            warnings: Vec::new(),
+            adjusted: Vec::new(),
+        })
     }
 
-    /// Redo the last undone edit.
-    pub fn redo(&mut self) -> bool {
+    /// Redo the last undone edit. Returns the transition's `EditResult`
+    /// (patch of old root → restored root), or `None` when there is nothing
+    /// to redo.
+    pub fn redo(&mut self) -> Option<EditResult> {
+        let before = self.root.clone();
+        let ui = self.root().ui.clone();
         let current = self.root.clone();
-        match self.history.redo(current) {
-            Some(next) => {
-                self.root = next;
-                self.revision += 1;
-                true
-            }
-            None => false,
-        }
+        let next = self.history.redo(current)?;
+        self.root = next;
+        self.preserve_ui(ui);
+        self.revision += 1;
+        Some(EditResult {
+            patch: crate::patch::diff(&before, &self.root, self.revision),
+            warnings: Vec::new(),
+            adjusted: Vec::new(),
+        })
     }
 
     /// Jump to undo step `i` (History panel; REQ-PRJ-007).
     pub fn step(&mut self, i: usize) -> bool {
+        let ui = self.root().ui.clone();
         let current = self.root.clone();
         match self.history.step(i, current) {
             Some((_, target)) => {
                 self.root = target;
+                self.preserve_ui(ui);
                 self.revision += 1;
                 true
             }
             None => false,
         }
+    }
+
+    /// View state is never part of undo history (03 §3.4.11): carry the
+    /// current root's `ui` into a restored root.
+    fn preserve_ui(&mut self, ui: crate::project::ViewState) {
+        Arc::make_mut(&mut self.root).ui = ui;
     }
 }
 
@@ -326,13 +350,137 @@ mod tests {
         }
         assert_eq!(m.history().steps().len(), 50);
         for _ in 0..50 {
-            assert!(m.undo());
+            assert!(m.undo().is_some());
         }
         assert_eq!(*m.root(), *start);
+        assert!(m.undo().is_none());
         for _ in 0..50 {
-            assert!(m.redo());
+            assert!(m.redo().is_some());
         }
         assert_eq!(m.root().name, "v49");
+        assert!(m.redo().is_none());
+    }
+
+    #[test]
+    fn undo_redo_are_exact_inverses_at_200_and_1000_scale() {
+        // SC-003 / contract guarantee 1: every intermediate root is
+        // reproduced exactly over the guaranteed 200 and the cap 1,000 steps.
+        for n in [200usize, 1000] {
+            let mut m = model();
+            let start = m.root();
+            for i in 0..n {
+                let _ = m.apply(&EditOp::RenameProject {
+                    name: format!("v{i}"),
+                });
+            }
+            assert!(m.history().steps().len() <= MAX_STEPS);
+            for _ in 0..n {
+                assert!(m.undo().is_some(), "{n}-step undo stopped early");
+            }
+            assert_eq!(*m.root(), *start, "{n}-step undo drifted");
+            assert!(m.undo().is_none());
+            for _ in 0..n {
+                assert!(m.redo().is_some(), "{n}-step redo stopped early");
+            }
+            assert_eq!(m.root().name, format!("v{}", n - 1));
+            assert!(m.redo().is_none());
+        }
+    }
+
+    #[test]
+    fn step_jump_then_redo_walks_forward_in_order() {
+        let mut m = model();
+        for i in 0..10 {
+            let _ = m.apply(&EditOp::RenameProject {
+                name: format!("v{i}"),
+            });
+        }
+        assert!(m.step(4));
+        assert_eq!(m.root().name, "v3");
+        // First redo returns to where the user jumped from (v9), then the
+        // forward states v4..v8 follow in chronological order.
+        let mut seen = vec![m.root().name.clone()];
+        while let Some(result) = m.redo() {
+            seen.push(m.root().name.clone());
+            assert_eq!(result.patch.revision, m.revision());
+        }
+        assert_eq!(seen, vec!["v3", "v9", "v4", "v5", "v6", "v7", "v8"]);
+    }
+
+    #[test]
+    fn view_state_is_never_part_of_undo_history() {
+        // 03 §3.4.11: `ui` is saved with the project but never undone. The
+        // only op that touches it is deleteSequence switching activeSequence.
+        let mut first =
+            crate::sequence::new_sequence("Main", crate::sequence::sqp02_fallback_format());
+        first.format.auto_match_pending = false;
+        let first_id = first.id.clone();
+        let mut project = crate::project::new_project("T", first);
+        project.sequences.push(crate::sequence::new_sequence(
+            "S2",
+            crate::sequence::sqp02_fallback_format(),
+        ));
+        project.ui.active_sequence_id = Some(first_id.clone());
+        let mut m = Model::new(project);
+
+        let _ = m.apply(&EditOp::DeleteSequence {
+            sequence_id: first_id,
+        });
+        let survivor = m.root().sequences[0].id.clone();
+        assert_eq!(
+            m.root().ui.active_sequence_id.as_deref(),
+            Some(survivor.as_str())
+        );
+
+        // Undo restores the document but keeps the current view state.
+        let ui_before_undo = m.root().ui.clone();
+        let undone = m.undo();
+        assert!(undone.is_some());
+        assert_eq!(
+            m.root().sequences.len(),
+            2,
+            "undo restores the deleted sequence"
+        );
+        assert_eq!(
+            m.root().ui,
+            ui_before_undo,
+            "undo must not restore the view state"
+        );
+        assert_eq!(
+            m.root().ui.active_sequence_id.as_deref(),
+            Some(survivor.as_str()),
+            "the live view keeps pointing at the surviving sequence"
+        );
+
+        // Redo keeps the view state as well.
+        let ui_before_redo = m.root().ui.clone();
+        assert!(m.redo().is_some());
+        assert_eq!(m.root().ui, ui_before_redo);
+    }
+
+    #[test]
+    fn apply_returns_the_transition_patch() {
+        let mut m = model();
+        let seq_id = m.root().sequences[0].id.clone();
+        let result = m.apply(&EditOp::AddTrack {
+            sequence_id: seq_id.clone(),
+            kind: crate::track::TrackKind::Video,
+            index: None,
+            name: Some("V2".into()),
+        });
+        match result {
+            Ok(r) => {
+                assert_eq!(r.patch.revision, m.revision());
+                assert!(r.patch.upsert.tracks.iter().any(|t| t.name == "V2"));
+                assert!(
+                    r.patch
+                        .dirty_ranges
+                        .iter()
+                        .any(|d| d.sequence_id == seq_id && d.start == 0)
+                );
+            }
+            Err(e) => panic!("expected apply to succeed, got {e:?}"),
+        }
     }
 
     #[test]
@@ -428,9 +576,9 @@ mod tests {
         }
         assert!(m.step(4));
         assert_eq!(m.root().name, "v3"); // step 4 is the 5th root pushed (v3)
-        assert!(m.undo());
+        assert!(m.undo().is_some());
         assert_eq!(m.root().name, "v2");
-        assert!(m.redo());
+        assert!(m.redo().is_some());
         assert_eq!(m.root().name, "v3");
     }
 }

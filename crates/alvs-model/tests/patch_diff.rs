@@ -457,3 +457,253 @@ fn transition_upsert_and_clip_remove_diff_directly() {
     assert!(patch.remove.clips.contains(&c2));
     assert!(patch.dirty_ranges.iter().any(|r| r.start == 0 && r.end > 0));
 }
+
+#[test]
+fn rich_patch_application_equivalence() {
+    // US4/AC4: applying a multi-kind EntityPatch to a normalized copy of the
+    // prior state reproduces the new root's entities exactly. One batch op
+    // produces upserts and removes across many kinds at once.
+    use std::collections::BTreeMap;
+
+    let mut project = hand_project();
+    let media = media_item(id::new_id());
+    project.sequences[0].tracks[0].items[0].clip_type = ClipType::Media;
+    project.sequences[0].tracks[0].items[0].media_id = Some(media.id.clone());
+    project.sequences[0].tracks[0].items[0].stream_index = Some(0);
+    project.media.push(media);
+    let mut m = Model::new(project);
+    let sequence_id = m.root().sequences[0].id.clone();
+    let old_track_id = m.root().sequences[0].tracks[0].id.clone();
+    let before = m.root();
+
+    ok(
+        &mut m,
+        &EditOp::Batch {
+            ops: vec![
+                EditOp::CreateBin {
+                    name: "Kept".into(),
+                    parent_id: None,
+                },
+                EditOp::AddMedia {
+                    items: vec![media_item(id::new_id())],
+                    bin_id: None,
+                },
+                EditOp::AddTrack {
+                    sequence_id: sequence_id.clone(),
+                    kind: TrackKind::Video,
+                    index: None,
+                    name: Some("V9".into()),
+                },
+                EditOp::AddMarkers {
+                    sequence_id: sequence_id.clone(),
+                    markers: vec![alvs_model::edit::MarkerInput {
+                        t: 100,
+                        duration: 0,
+                        name: "point".into(),
+                        color: "CLR-03".into(),
+                        note: String::new(),
+                        chapter: false,
+                    }],
+                },
+                EditOp::AddCaptionTrack {
+                    sequence_id: sequence_id.clone(),
+                    name: "CC".into(),
+                    language: "en".into(),
+                },
+                EditOp::RemoveTrack {
+                    sequence_id: sequence_id.clone(),
+                    track_id: old_track_id,
+                },
+            ],
+            label_key: "history.batch.equivalence".into(),
+        },
+    );
+
+    let after = m.root();
+    let patch = diff(&before, &after, m.revision());
+    // The batch touched many kinds at once.
+    assert!(patch.upsert.bins.len() == 1);
+    assert!(patch.upsert.media.len() == 1);
+    assert!(patch.upsert.tracks.iter().any(|t| t.name == "V9"));
+    assert!(patch.upsert.markers.len() == 1);
+    assert!(patch.upsert.caption_tracks.len() == 1);
+    assert!(patch.remove.tracks.len() == 1);
+    assert!(patch.remove.clips.len() == 2);
+
+    // Normalized copy of the prior state: entity maps keyed by id.
+    fn keyed<T, F>(items: &[T], id_of: F) -> BTreeMap<String, T>
+    where
+        T: Clone,
+        F: Fn(&T) -> &str,
+    {
+        items
+            .iter()
+            .map(|x| (id_of(x).to_string(), x.clone()))
+            .collect()
+    }
+    let mut media_map = keyed(&before.media, |x: &alvs_model::media::MediaItem| {
+        x.id.as_str()
+    });
+    let mut bin_map = keyed(&before.bins, |x: &alvs_model::bin::Bin| x.id.as_str());
+    let mut asset_map = keyed(&before.assets, |x: &alvs_model::asset::Asset| x.id.as_str());
+    let mut sequence_map = keyed(&before.sequences, |x: &alvs_model::sequence::Sequence| {
+        x.id.as_str()
+    });
+    let mut track_map: BTreeMap<String, alvs_model::track::Track> = BTreeMap::new();
+    let mut clip_map: BTreeMap<String, Clip> = BTreeMap::new();
+    let mut transition_map: BTreeMap<String, alvs_model::transition::Transition> = BTreeMap::new();
+    let mut marker_map: BTreeMap<String, alvs_model::marker::Marker> = BTreeMap::new();
+    let mut caption_track_map: BTreeMap<String, alvs_model::caption::CaptionTrack> =
+        BTreeMap::new();
+    let mut caption_map: BTreeMap<String, alvs_model::caption::CaptionItem> = BTreeMap::new();
+    for s in &before.sequences {
+        for t in &s.tracks {
+            track_map.insert(t.id.clone(), t.clone());
+            for c in &t.items {
+                clip_map.insert(c.id.clone(), c.clone());
+            }
+            for tr in &t.transitions {
+                transition_map.insert(tr.id.clone(), tr.clone());
+            }
+        }
+        for mk in &s.markers {
+            marker_map.insert(mk.id.clone(), mk.clone());
+        }
+        for ct in &s.caption_tracks {
+            caption_track_map.insert(ct.id.clone(), ct.clone());
+            for item in &ct.items {
+                caption_map.insert(item.id.clone(), item.clone());
+            }
+        }
+    }
+
+    // Apply the patch to the normalized copy.
+    for x in &patch.upsert.media {
+        media_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.media {
+        media_map.remove(x);
+    }
+    for x in &patch.upsert.bins {
+        bin_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.bins {
+        bin_map.remove(x);
+    }
+    for x in &patch.upsert.assets {
+        asset_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.assets {
+        asset_map.remove(x);
+    }
+    for x in &patch.upsert.sequences {
+        sequence_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.sequences {
+        sequence_map.remove(x);
+    }
+    for x in &patch.upsert.tracks {
+        track_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.tracks {
+        track_map.remove(x);
+    }
+    for x in &patch.upsert.clips {
+        clip_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.clips {
+        clip_map.remove(x);
+    }
+    for x in &patch.upsert.transitions {
+        transition_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.transitions {
+        transition_map.remove(x);
+    }
+    for x in &patch.upsert.markers {
+        marker_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.markers {
+        marker_map.remove(x);
+    }
+    for x in &patch.upsert.caption_tracks {
+        caption_track_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.caption_tracks {
+        caption_track_map.remove(x);
+    }
+    for x in &patch.upsert.captions {
+        caption_map.insert(x.id.clone(), x.clone());
+    }
+    for x in &patch.remove.captions {
+        caption_map.remove(x);
+    }
+
+    // The normalized copy now equals the new root, kind by kind.
+    assert_eq!(
+        media_map,
+        keyed(&after.media, |x: &alvs_model::media::MediaItem| x
+            .id
+            .as_str())
+    );
+    assert_eq!(
+        bin_map,
+        keyed(&after.bins, |x: &alvs_model::bin::Bin| x.id.as_str())
+    );
+    assert_eq!(
+        asset_map,
+        keyed(&after.assets, |x: &alvs_model::asset::Asset| x.id.as_str())
+    );
+    assert_eq!(
+        sequence_map,
+        keyed(&after.sequences, |x: &alvs_model::sequence::Sequence| x
+            .id
+            .as_str())
+    );
+    let new_tracks: BTreeMap<String, alvs_model::track::Track> = after
+        .sequences
+        .iter()
+        .flat_map(|s| s.tracks.iter().cloned())
+        .map(|t| (t.id.clone(), t))
+        .collect();
+    assert_eq!(track_map, new_tracks);
+    let new_clips: BTreeMap<String, Clip> = after
+        .sequences
+        .iter()
+        .flat_map(|s| s.tracks.iter().flat_map(|t| t.items.iter().cloned()))
+        .map(|c| (c.id.clone(), c))
+        .collect();
+    assert_eq!(clip_map, new_clips);
+    let new_transitions: BTreeMap<String, alvs_model::transition::Transition> = after
+        .sequences
+        .iter()
+        .flat_map(|s| s.tracks.iter().flat_map(|t| t.transitions.iter().cloned()))
+        .map(|t| (t.id.clone(), t))
+        .collect();
+    assert_eq!(transition_map, new_transitions);
+    let new_markers: BTreeMap<String, alvs_model::marker::Marker> = after
+        .sequences
+        .iter()
+        .flat_map(|s| s.markers.iter().cloned())
+        .map(|x| (x.id.clone(), x))
+        .collect();
+    assert_eq!(marker_map, new_markers);
+    let new_caption_tracks: BTreeMap<String, alvs_model::caption::CaptionTrack> = after
+        .sequences
+        .iter()
+        .flat_map(|s| s.caption_tracks.iter().cloned())
+        .map(|x| (x.id.clone(), x))
+        .collect();
+    assert_eq!(caption_track_map, new_caption_tracks);
+    let new_captions: BTreeMap<String, alvs_model::caption::CaptionItem> = after
+        .sequences
+        .iter()
+        .flat_map(|s| {
+            s.caption_tracks
+                .iter()
+                .flat_map(|t| t.items.iter().cloned())
+        })
+        .map(|x| (x.id.clone(), x))
+        .collect();
+    assert_eq!(caption_map, new_captions);
+}

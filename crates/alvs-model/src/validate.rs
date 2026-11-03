@@ -19,6 +19,7 @@ use alvs_core::id;
 use alvs_core::time;
 
 use crate::effect::{AnimatableValue, EffectInstance};
+use crate::media::{MediaItem, MediaKind};
 use crate::project::Project;
 use crate::sequence::Sequence;
 use crate::track::{Clip, Track, TrackKind};
@@ -61,6 +62,26 @@ pub mod limits {
     pub const CAPTIONS_PER_TRACK: usize = 20_000;
     /// Maximum nesting depth of sequences.
     pub const NESTING_DEPTH: usize = 8;
+    /// Maximum project-file size in bytes (03 §3.5.15; 05 THR-02).
+    pub const FILE_MAX_BYTES: u64 = 256 * 1024 * 1024;
+}
+
+/// Rule 15's file-size half (03 §3.5.15): the loader (WP-03) calls this on
+/// the raw document length before parsing — an O(1) first pass that rejects
+/// an oversized file without any traversal.
+pub fn check_file_size(len_bytes: u64) -> Option<Issue> {
+    if len_bytes > limits::FILE_MAX_BYTES {
+        Some(Issue::new(
+            ErrorCode::E1003,
+            "project",
+            format!(
+                "project file is {len_bytes} bytes, exceeding the {} byte limit",
+                limits::FILE_MAX_BYTES
+            ),
+        ))
+    } else {
+        None
+    }
 }
 
 /// Validate a project against every rule of 03 §3.5. Size limits run first
@@ -71,8 +92,10 @@ pub fn validate(project: &Project) -> Vec<Issue> {
     check_ids(project, &mut issues);
     check_references(project, &mut issues);
     check_nesting(project, &mut issues);
+    let media: HashMap<&str, &MediaItem> =
+        project.media.iter().map(|m| (m.id.as_str(), m)).collect();
     for sequence in &project.sequences {
-        check_sequence(sequence, &mut issues);
+        check_sequence(sequence, &media, &mut issues);
     }
     check_link_groups(project, &mut issues);
     issues
@@ -192,6 +215,9 @@ fn check_ids(project: &Project, issues: &mut Vec<Issue>) {
         record("sequences", &sequence.id, issues);
         for track in &sequence.tracks {
             record("tracks", &track.id, issues);
+            for effect in &track.effects {
+                record("trackEffects", &effect.id, issues);
+            }
             for clip in &track.items {
                 record("clips", &clip.id, issues);
                 for effect in &clip.effects {
@@ -199,6 +225,9 @@ fn check_ids(project: &Project, issues: &mut Vec<Issue>) {
                 }
                 for mask in &clip.masks {
                     record("masks", &mask.id, issues);
+                }
+                for marker in &clip.markers {
+                    record("clipMarkers", &marker.id, issues);
                 }
             }
             for transition in &track.transitions {
@@ -413,7 +442,7 @@ fn check_nesting(project: &Project, issues: &mut Vec<Issue>) {
 }
 
 /// Rules 4–8, 10, 12, 13 for one sequence (with rule 9 via clip effects).
-fn check_sequence(sequence: &Sequence, issues: &mut Vec<Issue>) {
+fn check_sequence(sequence: &Sequence, media: &HashMap<&str, &MediaItem>, issues: &mut Vec<Issue>) {
     let path = format!("sequences/{}", sequence.id);
     check_format(sequence, &path, issues);
 
@@ -421,7 +450,7 @@ fn check_sequence(sequence: &Sequence, issues: &mut Vec<Issue>) {
     if let Some(fpf) = frame {
         for track in &sequence.tracks {
             let tpath = format!("{path}/tracks/{}", track.id);
-            check_track_rules(track, &tpath, fpf, issues);
+            check_track_rules(track, &tpath, fpf, media, issues);
         }
     } else {
         issues.push(Issue::new(
@@ -525,7 +554,13 @@ fn check_format(sequence: &Sequence, path: &str, issues: &mut Vec<Issue>) {
 }
 
 /// Rules 4–8, 10 for the tracks of one sequence, plus rule 9 via effects.
-fn check_track_rules(track: &Track, path: &str, fpf: i64, issues: &mut Vec<Issue>) {
+fn check_track_rules(
+    track: &Track,
+    path: &str,
+    fpf: i64,
+    media: &HashMap<&str, &MediaItem>,
+    issues: &mut Vec<Issue>,
+) {
     // Rule 4: sorted by start, no overlap.
     for pair in track.items.windows(2) {
         let (a, b) = (&pair[0], &pair[1]);
@@ -543,7 +578,7 @@ fn check_track_rules(track: &Track, path: &str, fpf: i64, issues: &mut Vec<Issue
     // Rules 5–7 per clip.
     for clip in &track.items {
         let cpath = format!("{path}/items/{}", clip.id);
-        check_clip_timing(clip, &cpath, fpf, issues);
+        check_clip_timing(clip, &cpath, fpf, media, issues);
         check_keyframes(clip, &cpath, issues);
     }
     // Rule 8: transitions join adjacent clips, one per edit point, handle bounds.
@@ -554,6 +589,7 @@ fn check_track_rules(track: &Track, path: &str, fpf: i64, issues: &mut Vec<Issue
         }
         m
     };
+    let mut transitions_per_edit: BTreeMap<i64, usize> = BTreeMap::new();
     for transition in &track.transitions {
         let tpath = format!("{path}/transitions/{}", transition.id);
         // Adjacency: from-clip end == to-clip start (rule 8 wording).
@@ -577,23 +613,95 @@ fn check_track_rules(track: &Track, path: &str, fpf: i64, issues: &mut Vec<Issue
                 "transition duration must be > 0",
             ));
         }
-        // Handle bounds per alignment (03 §3.4.10): A needs d/2 (center),
-        // d (start), 0 (end); B the mirrored amounts. Handles are bounded by
-        // the media: A's handle after its out point ≤ duration − sourceIn
-        // headroom is a media property; the structural bound uses the clips'
-        // own extents (minimum defensible check without probe knowledge).
+        // One transition per edit point (03 §3.5.8).
+        let count = transitions_per_edit.entry(edit).or_default();
+        *count += 1;
+        if *count > 1 {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                tpath.clone(),
+                format!("{} transitions share the edit point at {edit}", *count),
+            ));
+        }
+        // Handle bounds per alignment (03 §3.4.10): during the transition
+        // clip A continues past its out point and B starts before its in
+        // point using source handles. Required: A d/2 (center) / d (start) /
+        // 0 (end); B mirrored (d/2 rounds up so an odd d still fits).
+        // Handles exist only for media clips whose media resolves; images
+        // are unlimited (03 §3.5.7) and title/generator/sequence clips
+        // generate their frames, so they are unconstrained.
         let d = transition.duration;
+        let half = (d + 1) / 2;
         let (a_need, b_need) = match transition.alignment {
-            crate::transition::TransitionAlignment::Center => (d / 2, d / 2),
+            crate::transition::TransitionAlignment::Center => (half, half),
             crate::transition::TransitionAlignment::Start => (d, 0),
             crate::transition::TransitionAlignment::End => (0, d),
         };
-        let _ = (a_need, b_need); // media handle depth is enforced by the engine (WP-09+)
+        let from_window = media_window(from, media);
+        let to_window = media_window(to, media);
+        if let (Some(a), Some(b)) = (from_window, to_window)
+            && (i128::from(a_need) > a.after || i128::from(b_need) > b.before)
+        {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                tpath.clone(),
+                format!(
+                    "transition duration {d} exceeds the available source handles \
+                     (A needs {a_need} of {}, B needs {b_need} of {})",
+                    a.after.max(0),
+                    b.before.max(0)
+                ),
+            ));
+        }
     }
 }
 
+/// The source-media window of a media clip for rule 7 and rule 8 handle
+/// checks: how much source material exists before the in point
+/// (`before = sourceIn`) and after the out point (`after`), plus the media
+/// duration in flicks. Exact `i128` arithmetic (cross-multiplied by the
+/// speed denominator). `None` for non-media clips, images (unlimited,
+/// 03 §3.5.7), or unresolved media (rule 2 reports those).
+struct MediaWindow {
+    /// Source flicks available before the in point.
+    before: i128,
+    /// Source flicks available after the out point (may be negative when
+    /// rule 7 is already violated).
+    after: i128,
+    /// Media duration in flicks.
+    duration: i64,
+}
+
+fn media_window(clip: &Clip, media: &HashMap<&str, &MediaItem>) -> Option<MediaWindow> {
+    if clip.clip_type != crate::track::ClipType::Media {
+        return None;
+    }
+    let media_id = clip.media_id.as_deref()?;
+    let item = media.get(media_id)?;
+    if item.kind == MediaKind::Image {
+        return None; // unlimited (03 §3.5.7)
+    }
+    let speed = clip.speed;
+    // sourceIn + duration × speed ≤ media duration, exactly:
+    // (sourceIn·den + duration·num) ≤ mediaDuration·den.
+    let used =
+        clip.source_in as i128 * speed.den as i128 + clip.duration as i128 * speed.num as i128;
+    let total = item.probe.duration_flicks as i128 * speed.den as i128;
+    Some(MediaWindow {
+        before: clip.source_in as i128,
+        after: total - used,
+        duration: item.probe.duration_flicks,
+    })
+}
+
 /// Rules 5–7 for one clip.
-fn check_clip_timing(clip: &Clip, path: &str, fpf: i64, issues: &mut Vec<Issue>) {
+fn check_clip_timing(
+    clip: &Clip,
+    path: &str,
+    fpf: i64,
+    media: &HashMap<&str, &MediaItem>,
+    issues: &mut Vec<Issue>,
+) {
     // Rule 6.
     if clip.duration <= 0 {
         issues.push(Issue::new(ErrorCode::E1003, path, "duration must be > 0"));
@@ -615,14 +723,39 @@ fn check_clip_timing(clip: &Clip, path: &str, fpf: i64, issues: &mut Vec<Issue>)
             format!("start/duration not multiples of the frame grid ({grid} flicks)"),
         ));
     }
-    // Rule 7 (media part; media bounds are checked with probe data by the
-    // engine — the structural half here: sourceIn ≥ 0).
+    // Rule 7: media clips stay inside their source (03 §3.5.7). The window
+    // is None for non-media clips, images (unlimited), and unresolved media
+    // (rule 2 reports the dangling reference).
     if clip.clip_type == crate::track::ClipType::Media && clip.source_in < 0 {
         issues.push(Issue::new(
             ErrorCode::E1003,
             path,
             "sourceIn must be ≥ 0 for media clips",
         ));
+    }
+    if let Some(window) = media_window(clip, media) {
+        if window.after < 0 {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path,
+                format!(
+                    "sourceIn + duration × speed exceeds the media duration ({})",
+                    window.duration
+                ),
+            ));
+        }
+        if let Some(freeze) = clip.freeze_at
+            && !(0..=window.duration).contains(&freeze)
+        {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path,
+                format!(
+                    "freezeAt {freeze} must be within the media duration ({})",
+                    window.duration
+                ),
+            ));
+        }
     }
 }
 
@@ -1254,7 +1387,10 @@ mod tests {
         effect.mask_ids = vec![mask.id.clone()];
         c1.effects = vec![effect];
         c1.masks = vec![mask];
-        let c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        let mut c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        // B starts 3 frames into its source, giving the centered transition
+        // its head handle (03 §3.4.10).
+        c2.source_in = 3 * FPF;
         project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
         project.sequences[0].tracks[0]
             .transitions
@@ -1480,7 +1616,8 @@ mod tests {
         let media = media_item(&id::new_id(), 60 * 705_600_000);
         project.media.push(media.clone());
         let c1 = media_clip(&media.id, 0, 3 * FPF);
-        let c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        let mut c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        c2.source_in = 3 * FPF; // head handle for the centered transition
         project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
         project.sequences[0].tracks[0]
             .transitions
@@ -1846,6 +1983,218 @@ mod tests {
             issues
                 .iter()
                 .any(|i| i.detail.contains("captions exceed the limit"))
+        );
+    }
+
+    #[test]
+    fn rule15_file_size_limit_rejects_without_traversal() {
+        // Over the limit: rejected as an O(1) first pass (03 §3.5.15).
+        let issue = check_file_size(limits::FILE_MAX_BYTES + 1).unwrap_or(Issue::new(
+            ErrorCode::E0001,
+            "",
+            "",
+        ));
+        assert!(issue.detail.contains("exceeding the 268435456 byte limit"));
+        // At the limit and below: allowed.
+        assert!(check_file_size(limits::FILE_MAX_BYTES).is_none());
+        assert!(check_file_size(0).is_none());
+    }
+
+    #[test]
+    fn rule7_source_span_and_freeze_at_bounds() {
+        // Media of 10 frames: a clip consuming exactly all of it is valid.
+        let mut project = valid_project();
+        let media = media_item(&id::new_id(), 10 * FPF);
+        project.media.push(media.clone());
+        let clip = media_clip(&media.id, 0, 10 * FPF);
+        project.sequences[0].tracks[0].items[0] = clip;
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("media duration"))
+        );
+
+        // An overrun by 2 frames is rejected (03 §3.5.7): one clip whose
+        // source span exceeds the media duration.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let c = media_clip(&media.id, 0, 12 * FPF);
+        project.sequences[0].tracks[0].items[0] = c;
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("exceeds the media duration"))
+        );
+
+        // Speed consumes source proportionally: 6 frames at 2× = 12 > 10.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let mut c = media_clip(&media.id, 0, 6 * FPF);
+        c.speed = Rational::new(2, 1).unwrap_or(Rational { num: 2, den: 1 });
+        project.sequences[0].tracks[0].items[0] = c;
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("exceeds the media duration"))
+        );
+
+        // freezeAt within the media duration is valid; one flick beyond is not.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let mut c = media_clip(&media.id, 0, 3 * FPF);
+        c.freeze_at = Some(10 * FPF);
+        project.sequences[0].tracks[0].items[0] = c;
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("freezeAt"))
+        );
+        project.sequences[0].tracks[0].items[0].freeze_at = Some(10 * FPF + 1);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("freezeAt"))
+        );
+    }
+
+    #[test]
+    fn rule8_handle_bounds_and_one_transition_per_edit_point() {
+        // Media of 12 frames: A [0,10f) leaves a 2-frame tail handle; B has
+        // sourceIn 5f as its head handle.
+        let mut project = valid_project();
+        let media = media_item(&id::new_id(), 12 * FPF);
+        project.media.push(media.clone());
+        let a = media_clip(&media.id, 0, 10 * FPF);
+        let mut b = media_clip(&media.id, 10 * FPF, 7 * FPF);
+        b.source_in = 5 * FPF;
+        project.sequences[0].tracks[0].items = vec![a.clone(), b.clone()];
+
+        // Center 2f: A needs 1f ≤ 2f, B needs 1f ≤ 5f — valid (boundary uses
+        // the exact available handles).
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &a.id,
+                &b.id,
+                2 * FPF,
+            ));
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("transition"))
+        );
+
+        // A second transition at the same edit point is rejected.
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &a.id,
+                &b.id,
+                2 * FPF,
+            ));
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("share the edit point"))
+        );
+
+        // Center 6f needs a 3f tail on A but only 2f exist.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let a = media_clip(&media.id, 0, 10 * FPF);
+        let mut b = media_clip(&media.id, 10 * FPF, 7 * FPF);
+        b.source_in = 5 * FPF;
+        project.sequences[0].tracks[0].items = vec![a.clone(), b.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &a.id,
+                &b.id,
+                6 * FPF,
+            ));
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("exceeds the available source handles"))
+        );
+
+        // Start alignment consuming exactly A's full tail is a boundary pass;
+        // End alignment 6f needs a 6f head on B but only 5f exist.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let a = media_clip(&media.id, 0, 10 * FPF);
+        let mut b = media_clip(&media.id, 10 * FPF, 7 * FPF);
+        b.source_in = 5 * FPF;
+        project.sequences[0].tracks[0].items = vec![a.clone(), b.clone()];
+        let mut start_aligned =
+            crate::transition::new_transition("trs.crossDissolve", &a.id, &b.id, 2 * FPF);
+        start_aligned.alignment = crate::transition::TransitionAlignment::Start;
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(start_aligned);
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("source handles"))
+        );
+        let mut end_aligned =
+            crate::transition::new_transition("trs.crossDissolve", &a.id, &b.id, 6 * FPF);
+        end_aligned.alignment = crate::transition::TransitionAlignment::End;
+        project.sequences[0].tracks[0].transitions.push(end_aligned);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("exceeds the available source handles"))
+        );
+
+        // Title clips generate their frames: no source handles are required.
+        let mut project = valid_project();
+        let c1 = base_clip(0, 10 * FPF);
+        let c2 = base_clip(10 * FPF, 10 * FPF);
+        project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &c1.id,
+                &c2.id,
+                100 * FPF,
+            ));
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("source handles"))
+        );
+    }
+
+    #[test]
+    fn rule1_covers_clip_markers_and_track_effects() {
+        // Two clip markers sharing an id.
+        let mut project = valid_project();
+        let shared = id::new_id();
+        let mut m1 = crate::marker::new_marker(0, "a");
+        m1.id = shared.clone();
+        let mut m2 = crate::marker::new_marker(FPF, "b");
+        m2.id = shared;
+        project.sequences[0].tracks[0].items[0].markers = vec![m1, m2];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.path == "clipMarkers" && i.detail.contains("duplicate id"))
+        );
+
+        // A track effect with a malformed id.
+        let mut project = valid_project();
+        let mut effect = crate::effect::new_effect_instance("afx.gain");
+        effect.id = "not-a-uuid".into();
+        project.sequences[0].tracks[0].effects = vec![effect];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.path == "trackEffects" && i.detail.contains("not a UUID v7"))
         );
     }
 }
