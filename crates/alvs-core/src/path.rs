@@ -46,7 +46,7 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
 
     // Device paths are rejected outright (SEC-04).
     if raw.starts_with(r"\\.\") || raw.starts_with(r"\\?\GLOBALROOT") {
-        return PathDecision::Denied(AppError::EditBlocked {
+        return PathDecision::Denied(AppError::PathRejected {
             detail: format!("device path rejected: {}", redact(&raw)),
         });
     }
@@ -59,7 +59,7 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
     {
         let stem = name.split('.').next().unwrap_or(&name);
         if RESERVED_NAMES.contains(&stem) {
-            return PathDecision::Denied(AppError::EditBlocked {
+            return PathDecision::Denied(AppError::PathRejected {
                 detail: format!("reserved name rejected: {}", redact(&raw)),
             });
         }
@@ -76,7 +76,7 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
 
     // Canonicalize; a path that does not exist cannot be verified as contained.
     let Ok(canonical) = std::fs::canonicalize(candidate) else {
-        return PathDecision::Denied(AppError::EditBlocked {
+        return PathDecision::Denied(AppError::PathRejected {
             detail: format!("path cannot be canonicalized: {}", redact(&raw)),
         });
     };
@@ -86,7 +86,7 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
         .filter_map(|r| std::fs::canonicalize(r).ok())
         .collect();
     if canonical_roots.is_empty() {
-        return PathDecision::Denied(AppError::EditBlocked {
+        return PathDecision::Denied(AppError::PathRejected {
             detail: "no accessible root to contain the path".into(),
         });
     }
@@ -96,7 +96,7 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
     {
         return PathDecision::Allowed;
     }
-    PathDecision::Denied(AppError::EditBlocked {
+    PathDecision::Denied(AppError::PathRejected {
         detail: format!("path outside allowed roots: {}", redact(&raw)),
     })
 }

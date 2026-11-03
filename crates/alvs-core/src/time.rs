@@ -183,8 +183,8 @@ pub fn format_timecode(flicks: i64, tr: TimecodeRate) -> String {
 
 /// Parse a typed time (REQ-PLY-005): `HH:MM:SS:FF` / `HH;MM;SS;FF`
 /// (absolute), a plain integer (frame number), a decimal number (seconds),
-/// each optionally `+`/`-` prefixed (relative). Skipped drop-frame labels
-/// parse to the nearest earlier real frame.
+/// each optionally `+`/`-` prefixed (relative). A skipped drop-frame label
+/// canonicalizes forward to the next real frame (ST 12-1).
 pub fn parse_timecode(input: &str, tr: TimecodeRate) -> Result<ParsedTime, AppError> {
     let text = input.trim();
     if text.is_empty() {
@@ -261,7 +261,17 @@ fn parse_clock(body: &str, tr: TimecodeRate) -> Result<i64, AppError> {
             detail: format!("timecode out of range: {body:?}"),
         });
     }
-    let nominal = h * fps * 3600 + m * fps * 60 + s * fps + f;
+    // SMPTE ST 12-1 skips the first `d` frame labels of every non-tenth
+    // minute. A typed skipped label canonicalizes FORWARD to the next real
+    // frame (00:01:00;00 at 29.97 DF = frame 1800, the label 00:01:00;02).
+    let d = if tr.drop_frame {
+        tr.drop_per_minute()
+    } else {
+        0
+    };
+    let skipped = d > 0 && m >= 1 && m % 10 != 0 && s == 0 && f < d;
+    let bump = if skipped { d - f } else { 0 };
+    let nominal = h * fps * 3600 + m * fps * 60 + s * fps + f + bump;
     let real = nominal - drops_inverse(tr, nominal);
     let fpf = flicks_per_frame(tr.rate).ok_or_else(|| AppError::EditBlocked {
         detail: "invalid rate".into(),
@@ -373,6 +383,41 @@ mod tests {
         // Minute 1 first frame: 4 labels skipped.
         assert_eq!(format_timecode(3600 * fpf, t), "00:01:00;04");
         assert_eq!(format_timecode(35_964 * fpf, t), "00:10:00;00");
+    }
+
+    #[test]
+    fn skipped_drop_frame_labels_canonicalize_forward() {
+        // A typed skipped label (ST 12-1) resolves to the first real frame
+        // after the skip, and re-formats to the canonical label (F-10).
+        let t = tr(30_000, 1001, true);
+        let fpf = 23_543_520;
+        for label in ["00:01:00;00", "00:01:00;01"] {
+            match parse_timecode(label, t) {
+                Ok(crate::time::ParsedTime::Absolute(flicks)) => {
+                    assert_eq!(flicks, 1800 * fpf, "{label} must be frame 1800");
+                    assert_eq!(format_timecode(flicks, t), "00:01:00;02");
+                }
+                other => panic!("{label} did not parse: {other:?}"),
+            }
+        }
+        // Non-skipped labels are untouched: minute 10 keeps ;00.
+        match parse_timecode("00:10:00;00", t) {
+            Ok(crate::time::ParsedTime::Absolute(flicks)) => {
+                assert_eq!(flicks, 17_982 * fpf);
+            }
+            other => panic!("minute-10 label did not parse: {other:?}"),
+        }
+        // 59.94 skips four labels; all four canonicalize to 00:01:00;04.
+        let t60 = tr(60_000, 1001, true);
+        let fpf60 = 11_771_760;
+        for label in ["00:01:00;00", "00:01:00;01", "00:01:00;02", "00:01:00;03"] {
+            match parse_timecode(label, t60) {
+                Ok(crate::time::ParsedTime::Absolute(flicks)) => {
+                    assert_eq!(flicks, 3600 * fpf60, "{label} must be frame 3600");
+                }
+                other => panic!("{label} did not parse: {other:?}"),
+            }
+        }
     }
 
     #[test]

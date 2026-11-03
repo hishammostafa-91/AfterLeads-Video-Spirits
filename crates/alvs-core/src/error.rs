@@ -39,6 +39,8 @@ pub enum ErrorCode {
     E1104,
     /// E2001 — media is offline.
     E2001,
+    /// E9005 — a file path was rejected for security reasons (05 §5.7).
+    E9005,
 }
 
 impl ErrorCode {
@@ -54,6 +56,7 @@ impl ErrorCode {
             ErrorCode::E1102 => "E1102",
             ErrorCode::E1104 => "E1104",
             ErrorCode::E2001 => "E2001",
+            ErrorCode::E9005 => "E9005",
         }
     }
 
@@ -63,8 +66,10 @@ impl ErrorCode {
             ErrorCode::E0001 | ErrorCode::E0002 | ErrorCode::E1003 | ErrorCode::E1005 => {
                 Severity::Error
             }
+            ErrorCode::E9005 => Severity::Error,
             ErrorCode::E1004 | ErrorCode::E1104 | ErrorCode::E2001 => Severity::Warning,
-            ErrorCode::E1006 | ErrorCode::E1102 => Severity::Warning,
+            ErrorCode::E1006 => Severity::Warning,
+            ErrorCode::E1102 => Severity::Info,
         }
     }
 
@@ -132,6 +137,12 @@ pub enum AppError {
         /// Which item is offline (path redacted per 04 §4.9).
         detail: String,
     },
+    /// A file path was rejected by the SEC-04 policy (E9005, 05 §5.7).
+    #[error("path rejected: {detail}")]
+    PathRejected {
+        /// Which SEC-04 rule rejected the path.
+        detail: String,
+    },
 }
 
 impl AppError {
@@ -147,6 +158,7 @@ impl AppError {
             AppError::EditBlocked { .. } => ErrorCode::E1102,
             AppError::FrameRateAdjusted { .. } => ErrorCode::E1104,
             AppError::MediaOffline { .. } => ErrorCode::E2001,
+            AppError::PathRejected { .. } => ErrorCode::E9005,
         }
     }
 }
@@ -216,14 +228,24 @@ mod tests {
             AppError::EditBlocked { detail: "x".into() },
             AppError::FrameRateAdjusted { count: 3 },
             AppError::MediaOffline { detail: "x".into() },
+            AppError::PathRejected { detail: "x".into() },
         ];
         let mut codes: Vec<ErrorCode> = errors.iter().map(|e| e.code()).collect();
         codes.sort_by_key(|c| c.as_str());
         codes.dedup();
-        // All nine variants map to nine distinct codes (02 §2.11).
+        // All ten variants map to ten distinct codes (02 §2.11).
         assert_eq!(codes.len(), errors.len());
         assert_eq!(errors[0].code().as_str(), "E0001");
         assert_eq!(errors[7].code().as_str(), "E1104");
+    }
+
+    #[test]
+    fn severities_match_the_catalog() {
+        // E1102 is info (auto-dismiss) and E9005 is error (12 §12.13).
+        assert_eq!(ErrorCode::E1102.severity(), Severity::Info);
+        assert_eq!(ErrorCode::E9005.severity(), Severity::Error);
+        assert_eq!(ErrorCode::E9005.as_str(), "E9005");
+        assert_eq!(ErrorCode::E1006.severity(), Severity::Warning);
     }
 
     #[test]
