@@ -72,4 +72,4 @@ rotation: AnimatableValue,
 /**
  * Opacity percent.
  */
-opacity: AnimatableValue, };
+opacity: AnimatableValue, } & ({ [key in string]: number | string | boolean | Array<JsonValue> | { [key in string]: JsonValue } | null });

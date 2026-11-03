@@ -151,14 +151,11 @@ impl History {
         }
         let target = self.undo[i].clone();
         let popped: Vec<Arc<Project>> = self.undo[i + 1..].to_vec();
-        let popped_current = if i + 1 < self.undo.len() {
-            // `current` becomes the first redo entry
-            current
-        } else {
-            current
-        };
+        // Redo order: the state the user jumped from comes back first, then
+        // the popped roots in chronological order (they were pushed newest
+        // last, so reversed they end newest last on the redo stack).
         self.redo.extend(popped.iter().rev().cloned());
-        self.redo.push(popped_current);
+        self.redo.push(current);
         let removed_sizes: usize = self.sizes.iter().skip(i).sum();
         self.total_size = self.total_size.saturating_sub(removed_sizes);
         self.undo.truncate(i + 1);
@@ -241,24 +238,21 @@ impl Model {
                         });
                     }
                 }
-                if let crate::edit::EditOp::Batch { .. } = op {
-                    // batch = one undo step (04 §4.4): push once.
-                }
                 self.revision += 1;
                 // Push the BEFORE state onto the undo stack (ADR-009: undo
                 // restores the state that preceded the edit); a new edit
-                // invalidates the redo stack.
+                // invalidates the redo stack. `batch` is one op here, hence
+                // one undo step (04 §4.4).
                 self.history.clear_redo();
                 self.history.push(before.clone());
-                // The patch is the structural diff of the consecutive roots
-                // at the new revision (04 §4.4).
+                // Fill the wire shape (04 §4.2): revision, patch, and the
+                // History-panel label (a batch carries its own label key).
+                result.revision = self.revision;
                 result.patch = crate::patch::diff(&before, &self.root, self.revision);
-                if !result.adjusted.is_empty() {
-                    result.warnings.push((
-                        "E1104".into(),
-                        format!("{} items adjusted", result.adjusted.len()),
-                    ));
-                }
+                result.label = match op {
+                    crate::edit::EditOp::Batch { label_key, .. } => label_key.clone(),
+                    _ => op.history_key().into(),
+                };
                 Ok(result)
             }
             ApplyOutcome::Rejected(err) => {
@@ -280,9 +274,10 @@ impl Model {
         self.preserve_ui(ui);
         self.revision += 1;
         Some(EditResult {
+            revision: self.revision,
             patch: crate::patch::diff(&before, &self.root, self.revision),
+            label: String::new(),
             warnings: Vec::new(),
-            adjusted: Vec::new(),
         })
     }
 
@@ -298,9 +293,10 @@ impl Model {
         self.preserve_ui(ui);
         self.revision += 1;
         Some(EditResult {
+            revision: self.revision,
             patch: crate::patch::diff(&before, &self.root, self.revision),
+            label: String::new(),
             warnings: Vec::new(),
-            adjusted: Vec::new(),
         })
     }
 

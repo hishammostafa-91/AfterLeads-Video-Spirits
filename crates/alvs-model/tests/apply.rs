@@ -257,7 +257,7 @@ fn history_keys_cover_every_variant() {
                 sequence_id: String::new(),
                 marker_id: String::new(),
                 name: String::new(),
-                note: String::new(),
+                note: None,
             },
             "history.updateMarker",
         ),
@@ -500,7 +500,7 @@ fn delete_bin_moves_contents_to_parent_or_to_none() {
 }
 
 #[test]
-fn create_sequence_resolves_format_and_presets() {
+fn create_sequence_resolves_catalog_presets() {
     let mut m = empty_model();
     ok(
         &mut m,
@@ -520,15 +520,36 @@ fn create_sequence_resolves_format_and_presets() {
         },
     );
     assert!(m.root().sequences[2].format.auto_match_pending);
-    ok(
-        &mut m,
-        &EditOp::CreateSequence {
-            name: "S3".into(),
-            format: None,
-            from_preset: Some("SQP-03".into()),
-        },
-    );
-    assert!(!m.root().sequences[3].format.auto_match_pending);
+    // Named presets resolve to their concrete 12 §12.8 dimensions at the
+    // 30 fps / 48 kHz stereo Rec.709 defaults, with auto-match cleared.
+    for (index, preset, width, height) in [
+        (3usize, "SQP-02", 1920u32, 1080u32),
+        (4, "SQP-03", 1280, 720),
+        (5, "SQP-04", 2560, 1440),
+        (6, "SQP-05", 3840, 2160),
+        (7, "SQP-06", 1080, 1920),
+        (8, "SQP-07", 2160, 3840),
+        (9, "SQP-08", 1080, 1080),
+        (10, "SQP-09", 1080, 1350),
+        (11, "SQP-10", 3840, 1608),
+        (12, "SQP-11", 2048, 1080),
+        (13, "SQP-12", 4096, 2160),
+    ] {
+        ok(
+            &mut m,
+            &EditOp::CreateSequence {
+                name: format!("S{index}"),
+                format: None,
+                from_preset: Some(preset.into()),
+            },
+        );
+        let format = &m.root().sequences[index].format;
+        assert_eq!((format.width, format.height), (width, height), "{preset}");
+        assert!(!format.auto_match_pending, "{preset}");
+        assert_eq!(format.frame_rate.as_f64(), 30.0, "{preset}");
+        assert_eq!(format.sample_rate, 48_000, "{preset}");
+    }
+    // An explicit format wins over any preset.
     ok(
         &mut m,
         &EditOp::CreateSequence {
@@ -537,7 +558,174 @@ fn create_sequence_resolves_format_and_presets() {
             from_preset: None,
         },
     );
-    assert_eq!(m.root().sequences[4].format.frame_rate.as_f64(), 25.0);
+    assert_eq!(m.root().sequences[14].format.frame_rate.as_f64(), 25.0);
+    // SQP-13 (custom) without a format is rejected, as are unknown ids —
+    // 12 §12.8 is a closed catalog, never a silent fallback.
+    assert_eq!(
+        rejected_code(
+            &mut m,
+            &EditOp::CreateSequence {
+                name: "X".into(),
+                format: None,
+                from_preset: Some("SQP-13".into()),
+            }
+        ),
+        "E1003"
+    );
+    assert_eq!(
+        rejected_code(
+            &mut m,
+            &EditOp::CreateSequence {
+                name: "X".into(),
+                format: None,
+                from_preset: Some("SQP-99".into()),
+            }
+        ),
+        "E1003"
+    );
+    ok(
+        &mut m,
+        &EditOp::CreateSequence {
+            name: "Custom".into(),
+            format: Some(fps25()),
+            from_preset: Some("SQP-13".into()),
+        },
+    );
+    assert_eq!(m.root().sequences[14].format.frame_rate.as_f64(), 25.0);
+}
+
+#[test]
+fn duplicate_sequence_reids_every_nested_entity() {
+    // A populated sequence: a media clip with effect/mask/marker and a linked
+    // audio clip, a transition, and a caption track with an item.
+    let media = media_item(id::new_id());
+    let link = id::new_id();
+    let mut video = alvs_model::track::new_track(alvs_model::track::TrackKind::Video, "V1");
+    let mut c1 = clip(
+        id::new_id(),
+        ClipType::Media,
+        0,
+        3 * FPF_30,
+        Some(media.id.clone()),
+    );
+    let mut effect = alvs_model::effect::new_effect_instance("fx.color.basic");
+    effect.params.insert(
+        "exposure".into(),
+        alvs_model::effect::AnimatableValue::V {
+            v: alvs_model::effect::AnimatablePrimitive::Number(0.3),
+        },
+    );
+    c1.effects = vec![effect];
+    c1.masks = vec![alvs_model::mask::new_mask("msk.rectangle")];
+    c1.markers = vec![alvs_model::marker::new_marker(FPF_30, "take")];
+    c1.link_group_id = Some(link.clone());
+    let c2 = clip(id::new_id(), ClipType::Title, 3 * FPF_30, 3 * FPF_30, None);
+    video.items = vec![c1.clone(), c2.clone()];
+    video
+        .transitions
+        .push(alvs_model::transition::new_transition(
+            "trs.crossDissolve",
+            &c1.id,
+            &c2.id,
+            FPF_30,
+        ));
+    let mut audio = alvs_model::track::new_track(alvs_model::track::TrackKind::Audio, "A1");
+    let mut a1 = clip(
+        id::new_id(),
+        ClipType::Media,
+        0,
+        3 * FPF_30,
+        Some(media.id.clone()),
+    );
+    a1.link_group_id = Some(link);
+    a1.audio = Some(alvs_model::track::AudioClipSettings {
+        gain_db: 0.0,
+        volume: alvs_model::effect::AnimatableValue::V {
+            v: alvs_model::effect::AnimatablePrimitive::Number(0.0),
+        },
+        pan: alvs_model::effect::AnimatableValue::V {
+            v: alvs_model::effect::AnimatablePrimitive::Number(0.0),
+        },
+        fade_in: 0,
+        fade_out: 0,
+        fade_curve: alvs_model::track::FadeCurve::Linear,
+        channel_mode: alvs_model::track::ChannelMode::Stereo,
+        preserve_pitch: true,
+        extra: Default::default(),
+    });
+    audio.items = vec![a1];
+    let mut captions = alvs_model::caption::new_caption_track("CC", "en");
+    captions.items.push(alvs_model::caption::CaptionItem {
+        id: id::new_id(),
+        start: 0,
+        end: 1_000_000,
+        text: "Hello".into(),
+        position: None,
+        extra: Default::default(),
+    });
+    let mut sequence = alvs_model::sequence::new_sequence("Main", fmt());
+    sequence.tracks = vec![video, audio];
+    sequence.caption_tracks = vec![captions];
+    let mut project = alvs_model::project::new_project("T", sequence);
+    project.media.push(media);
+    let mut m = alvs_model::history::Model::new(project);
+    let source = m.root().sequences[0].clone();
+    // The fixture itself is valid (the post-duplicate validation below also
+    // proves it: the copy inherits its structure).
+    assert!(alvs_model::validate::validate(&m.root()).is_empty());
+
+    // Collect every id of the source.
+    let mut source_ids = vec![source.id.clone()];
+    for t in &source.tracks {
+        source_ids.push(t.id.clone());
+        for c in &t.items {
+            source_ids.push(c.id.clone());
+            source_ids.extend(c.effects.iter().map(|e| e.id.clone()));
+            source_ids.extend(c.masks.iter().map(|x| x.id.clone()));
+            source_ids.extend(c.markers.iter().map(|x| x.id.clone()));
+        }
+        source_ids.extend(t.transitions.iter().map(|x| x.id.clone()));
+    }
+    for ct in &source.caption_tracks {
+        source_ids.push(ct.id.clone());
+        source_ids.extend(ct.items.iter().map(|x| x.id.clone()));
+    }
+
+    ok(
+        &mut m,
+        &EditOp::DuplicateSequence {
+            sequence_id: source.id.clone(),
+            name: "Copy".into(),
+        },
+    );
+    let copy = m.root().sequences[1].clone();
+    assert_eq!(copy.name, "Copy");
+    // Every copied id differs from the source's (03 §3.2.2)…
+    let mut copy_ids = vec![copy.id.clone()];
+    for t in &copy.tracks {
+        copy_ids.push(t.id.clone());
+        for c in &t.items {
+            copy_ids.push(c.id.clone());
+            copy_ids.extend(c.effects.iter().map(|e| e.id.clone()));
+            copy_ids.extend(c.masks.iter().map(|x| x.id.clone()));
+            copy_ids.extend(c.markers.iter().map(|x| x.id.clone()));
+        }
+        copy_ids.extend(t.transitions.iter().map(|x| x.id.clone()));
+    }
+    for ct in &copy.caption_tracks {
+        copy_ids.push(ct.id.clone());
+        copy_ids.extend(ct.items.iter().map(|x| x.id.clone()));
+    }
+    for id in &copy_ids {
+        assert!(!source_ids.contains(id), "reused id {id}");
+    }
+    // …and the duplicated A/V pair keeps a link group of its own (rule 10
+    // holds: the two groups each have one video and one audio member).
+    let copy_link = copy.tracks[0].items[0].link_group_id.clone();
+    assert_ne!(copy_link, source.tracks[0].items[0].link_group_id);
+    assert_eq!(copy_link, copy.tracks[1].items[0].link_group_id);
+    // The whole project validates (apply already validated; assert anyway).
+    assert!(alvs_model::validate::validate(&m.root()).is_empty());
 }
 
 #[test]
@@ -668,8 +856,22 @@ fn update_sequence_fps_snaps_clips_and_reports_e1104() {
             },
         },
     );
-    assert_eq!(result.adjusted, vec![clip_id]);
-    assert!(result.warnings.iter().any(|(code, _)| code == "E1104"));
+    assert_eq!(
+        result
+            .warnings
+            .iter()
+            .find(|w| w.code.as_str() == "E1104")
+            .map(|w| w.params.get("count").map(String::as_str)),
+        Some(Some("1")),
+        "one E1104 envelope with the adjusted count: {:?}",
+        result.warnings
+    );
+    assert!(
+        result
+            .warnings
+            .iter()
+            .any(|w| w.detail.as_deref().is_some_and(|d| d.contains(&clip_id)))
+    );
     let clip = &m.root().sequences[0].tracks[0].items[0];
     assert_eq!(clip.start, 2 * FPF_25);
     assert_eq!(clip.duration, 3 * FPF_25);
@@ -693,7 +895,7 @@ fn update_sequence_same_fps_still_replaces_the_format() {
             },
         },
     );
-    assert!(result.adjusted.is_empty());
+    assert!(result.warnings.is_empty());
     assert_eq!(m.root().sequences[0].format.width, 1280);
     assert_eq!(m.root().sequences[0].format.height, 720);
 }
@@ -969,7 +1171,7 @@ fn markers_chapter_and_standard_add_update_remove() {
             sequence_id: sequence_id.clone(),
             marker_id: marker_id.clone(),
             name: "renamed".into(),
-            note: "text".into(),
+            note: Some("text".into()),
         },
     );
     assert_eq!(m.root().sequences[0].markers[0].name, "renamed");
@@ -1001,7 +1203,7 @@ fn markers_chapter_and_standard_add_update_remove() {
                 sequence_id: sequence_id.clone(),
                 marker_id: "nonexistent".into(),
                 name: "x".into(),
-                note: String::new()
+                note: None
             }
         ),
         "E1102"
@@ -1013,7 +1215,7 @@ fn markers_chapter_and_standard_add_update_remove() {
                 sequence_id: "nonexistent".into(),
                 marker_id: "x".into(),
                 name: "x".into(),
-                note: String::new()
+                note: None
             }
         ),
         "E1102"
@@ -1186,4 +1388,110 @@ fn undo_redo_and_step_on_a_fresh_model_are_noops() {
     assert!(m.undo().is_none());
     assert!(m.redo().is_none());
     assert!(!m.step(0));
+}
+
+#[test]
+fn rename_project_enforces_the_name_length_rule() {
+    // 03 §3.4.1: project names are 1–200 characters.
+    let mut m = empty_model();
+    assert_eq!(
+        rejected_code(
+            &mut m,
+            &EditOp::RenameProject {
+                name: String::new()
+            }
+        ),
+        "E1003"
+    );
+    let long = "x".repeat(201);
+    assert_eq!(
+        rejected_code(&mut m, &EditOp::RenameProject { name: long }),
+        "E1003"
+    );
+    let exact = "x".repeat(200);
+    ok(&mut m, &EditOp::RenameProject { name: exact });
+    assert_eq!(m.root().name.len(), 200);
+}
+
+#[test]
+fn update_sequence_fps_snaps_transition_durations_too() {
+    // Two adjacent clips joined by a 2-frame transition; the rate change to
+    // 25 fps snaps clips and the transition, and the result validates.
+    // Titles generate frames (no source handles bound the transition), and
+    // insertClips is WP-12, so the model is built directly.
+    let c1 = clip(id::new_id(), ClipType::Title, 0, 3 * FPF_30, None);
+    let c2 = clip(id::new_id(), ClipType::Title, 3 * FPF_30, 3 * FPF_30, None);
+    let transition =
+        alvs_model::transition::new_transition("trs.crossDissolve", &c1.id, &c2.id, 2 * FPF_30);
+    let mut sequence = alvs_model::sequence::new_sequence("Main", fmt());
+    let mut track = alvs_model::track::new_track(TrackKind::Video, "V1");
+    track.items = vec![c1, c2];
+    track.transitions.push(transition);
+    sequence.tracks.push(track);
+    let mut m = alvs_model::history::Model::new(alvs_model::project::new_project("T", sequence));
+    let sequence_id = m.root().sequences[0].id.clone();
+    let result = ok(
+        &mut m,
+        &EditOp::UpdateSequence {
+            sequence_id,
+            changes: SequenceChanges {
+                format: Some(fps25()),
+                ..Default::default()
+            },
+        },
+    );
+    assert!(result.warnings.iter().any(|w| w.code.as_str() == "E1104"));
+    let track = &m.root().sequences[0].tracks[0];
+    // 2 frames at 30 fps snap to 2 frames at 25 fps.
+    assert_eq!(track.transitions[0].duration, 2 * FPF_25);
+    // Adjacency held: the edit point moved with the clips.
+    assert_eq!(
+        track.items[0].start + track.items[0].duration,
+        track.items[1].start
+    );
+    assert!(alvs_model::validate::validate(&m.root()).is_empty());
+}
+
+#[test]
+fn update_marker_note_is_optional_and_never_erases() {
+    let mut m = empty_model();
+    let sequence_id = m.root().sequences[0].id.clone();
+    ok(
+        &mut m,
+        &EditOp::AddMarkers {
+            sequence_id: sequence_id.clone(),
+            markers: vec![MarkerInput {
+                t: 5 * FPF_30,
+                duration: 0,
+                name: "m".into(),
+                color: "CLR-03".into(),
+                note: "keep me".into(),
+                chapter: false,
+            }],
+        },
+    );
+    let marker_id = m.root().sequences[0].markers[0].id.clone();
+    // Rename without a note: the note survives (04 §4.4 partial update).
+    ok(
+        &mut m,
+        &EditOp::UpdateMarker {
+            sequence_id: sequence_id.clone(),
+            marker_id: marker_id.clone(),
+            name: "renamed".into(),
+            note: None,
+        },
+    );
+    assert_eq!(m.root().sequences[0].markers[0].note, "keep me");
+    assert_eq!(m.root().sequences[0].markers[0].name, "renamed");
+    // An explicit note replaces it.
+    ok(
+        &mut m,
+        &EditOp::UpdateMarker {
+            sequence_id,
+            marker_id,
+            name: "renamed".into(),
+            note: Some("replaced".into()),
+        },
+    );
+    assert_eq!(m.root().sequences[0].markers[0].note, "replaced");
 }

@@ -6,7 +6,9 @@
 pub use crate::asset::{Asset, LutInfo};
 pub use crate::bin::Bin;
 pub use crate::caption::{CaptionBox, CaptionItem, CaptionStyle, CaptionTrack};
-pub use crate::edit::{ParamIntrinsic, ParamTarget};
+pub use crate::edit::{
+    EditOp, MarkerInput, MediaChanges, ParamIntrinsic, ParamTarget, SequenceChanges, TrackChanges,
+};
 pub use crate::effect::{AnimatablePrimitive, AnimatableValue, EffectInstance, Keyframe};
 pub use crate::marker::{Marker, MarkerKind};
 pub use crate::media::{

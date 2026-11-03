@@ -171,6 +171,9 @@ pub struct Derived {
     pub optimized: Option<Optimized>,
     /// Stabilized file when present.
     pub stabilized: Option<Stabilized>,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// A media item (03 §3.4.2).

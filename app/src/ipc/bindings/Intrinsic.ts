@@ -2,6 +2,7 @@
 import type { AnimatableValue } from "./AnimatableValue";
 import type { Crop } from "./Crop";
 import type { Transform } from "./Transform";
+import type { JsonValue } from "./serde_json/JsonValue";
 
 /**
  * The intrinsic block of a video clip (03 §3.4.6; 12 §12.1.1).
@@ -22,4 +23,4 @@ opacity: AnimatableValue,
 /**
  * Blend mode id (BLM catalog, 12 §12.4).
  */
-blendMode: string, };
+blendMode: string, } & ({ [key in string]: number | string | boolean | Array<JsonValue> | { [key in string]: JsonValue } | null });

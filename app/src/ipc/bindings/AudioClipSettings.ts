@@ -2,6 +2,7 @@
 import type { AnimatableValue } from "./AnimatableValue";
 import type { ChannelMode } from "./ChannelMode";
 import type { FadeCurve } from "./FadeCurve";
+import type { JsonValue } from "./serde_json/JsonValue";
 
 /**
  * Audio clip settings (03 §3.4.6).
@@ -38,4 +39,4 @@ channelMode: ChannelMode,
 /**
  * Preserve pitch under speed changes.
  */
-preservePitch: boolean, };
+preservePitch: boolean, } & ({ [key in string]: number | string | boolean | Array<JsonValue> | { [key in string]: JsonValue } | null });

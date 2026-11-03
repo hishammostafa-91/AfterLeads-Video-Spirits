@@ -62,6 +62,9 @@ pub struct TitleLayer {
     pub rotation: AnimatableValue,
     /// Opacity percent.
     pub opacity: AnimatableValue,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Title stroke (03 §3.4.9).
@@ -73,6 +76,9 @@ pub struct TitleStroke {
     pub color: AnimatableValue,
     /// Stroke width in frame heights.
     pub width: AnimatableValue,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Title background box (03 §3.4.9).
@@ -86,6 +92,9 @@ pub struct TitleBox {
     pub padding: f64,
     /// Corner radius in frame heights.
     pub radius: f64,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// A title animation (03 §3.4.9): `tan.*` catalog id, duration, easing.
@@ -100,6 +109,9 @@ pub struct TitleAnimation {
     pub duration: i64,
     /// Easing id (EAS catalog).
     pub easing: String,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// A title document (03 §3.4.9).
@@ -147,5 +159,6 @@ pub fn new_title_layer(text: &str, font: &str) -> TitleLayer {
         position: point(0.5, 0.8),
         rotation: num(0.0),
         opacity: num(100.0),
+        extra: BTreeMap::new(),
     }
 }

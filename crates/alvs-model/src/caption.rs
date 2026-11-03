@@ -22,6 +22,9 @@ pub struct CaptionBox {
     pub padding: f64,
     /// Corner radius in frame heights.
     pub radius: f64,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Caption text style (03 §3.4.10); sizes in frame heights (03 §3.3.3).
@@ -57,6 +60,9 @@ pub struct CaptionStyle {
     /// Maximum wrapped lines.
     #[ts(type = "number")]
     pub max_lines: u32,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// A caption item (03 §3.4.10): sorted, non-overlapping, `start < end`,
@@ -121,10 +127,12 @@ pub fn default_caption_style() -> CaptionStyle {
             color: [0.0, 0.0, 0.0, 0.6],
             padding: 0.01,
             radius: 0.005,
+            extra: BTreeMap::new(),
         }),
         align: "center".into(),
         vertical_position: 0.9,
         max_lines: 2,
+        extra: BTreeMap::new(),
     }
 }
 

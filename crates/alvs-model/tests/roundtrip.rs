@@ -153,12 +153,14 @@ fn kitchen_sink() -> Project {
                     v: AnimatablePrimitive::Number(100.0),
                     e: "linear".into(),
                     h: None,
+                    extra: BTreeMap::new(),
                 },
                 Keyframe {
                     t: 705_600_000,
                     v: AnimatablePrimitive::Number(130.0),
                     e: "bezier".into(),
                     h: Some([0.33, 0.0, 0.67, 1.0]),
+                    extra: BTreeMap::new(),
                 },
             ],
         },
@@ -207,6 +209,7 @@ fn kitchen_sink() -> Project {
                 anchor: v_point(0.5, 0.5),
                 flip_h: false,
                 flip_v: false,
+                extra: BTreeMap::new(),
             },
             crop: Crop {
                 left: v_num(0.0),
@@ -214,9 +217,11 @@ fn kitchen_sink() -> Project {
                 right: v_num(0.0),
                 bottom: v_num(0.0),
                 feather: v_num(0.0),
+                extra: BTreeMap::new(),
             },
             opacity: v_num(100.0),
             blend_mode: "normal".into(),
+            extra: BTreeMap::new(),
         }),
         audio: Some(AudioClipSettings {
             gain_db: 0.0,
@@ -227,6 +232,7 @@ fn kitchen_sink() -> Project {
             fade_curve: FadeCurve::ConstantPower,
             channel_mode: ChannelMode::Stereo,
             preserve_pitch: true,
+            extra: BTreeMap::new(),
         }),
         deinterlace: Deinterlace::Auto,
         effects: vec![effect],
@@ -270,6 +276,7 @@ fn kitchen_sink() -> Project {
                 animation_id: "tan.fade".into(),
                 duration: 352_800_000,
                 easing: "cubicOut".into(),
+                extra: BTreeMap::new(),
             }),
             anim_out: None,
             template_id: Some("tpl.lowerThird.clean".into()),
@@ -317,6 +324,7 @@ fn kitchen_sink() -> Project {
             fade_curve: FadeCurve::Linear,
             channel_mode: ChannelMode::LeftToBoth,
             preserve_pitch: true,
+            extra: BTreeMap::new(),
         }),
         deinterlace: Deinterlace::Auto,
         effects: Vec::new(),
@@ -366,6 +374,7 @@ fn kitchen_sink() -> Project {
             r#in: None,
             out: None,
             playhead: 0,
+            extra: BTreeMap::new(),
         },
         selected_track_targets: BTreeMap::new(),
         extra: BTreeMap::new(),
@@ -422,12 +431,48 @@ fn unknown_fields_survive_the_round_trip() {
     // A field a newer version might write on the project and on a clip.
     value["futureTopLevel"] = serde_json::json!({ "v2": true });
     value["sequences"][0]["tracks"][0]["items"][0]["futureClipField"] = serde_json::json!(7);
+    // …and at nested levels (03 §3.2.3: every persisted object keeps them):
+    // intrinsic transform, a keyframe, the audio object, the caption style,
+    // and a title animation.
+    value["sequences"][0]["tracks"][0]["items"][0]["intrinsic"]["transform"]["futureTransform"] =
+        serde_json::json!(true);
+    value["sequences"][0]["tracks"][0]["items"][0]["effects"][0]["params"]["saturation"]["k"][0]
+        ["futureKeyframe"] = serde_json::json!("keep");
+    value["sequences"][0]["tracks"][0]["items"][0]["audio"]["futureAudio"] = serde_json::json!(1.5);
+    value["sequences"][0]["captionTracks"][0]["style"]["futureStyleProp"] =
+        serde_json::json!({ "v11": [] });
+    value["sequences"][0]["tracks"][0]["items"][1]["title"]["animIn"]["futureAnim"] =
+        serde_json::json!(42);
     let back: Project = serde_json::from_value(value).unwrap_or_else(|e| panic!("load: {e}"));
     let resaved = serde_json::to_value(&back).unwrap_or(serde_json::Value::Null);
     assert_eq!(resaved["futureTopLevel"]["v2"], true, "project extra lost");
     assert_eq!(
         resaved["sequences"][0]["tracks"][0]["items"][0]["futureClipField"], 7,
         "clip extra lost"
+    );
+    assert_eq!(
+        resaved["sequences"][0]["tracks"][0]["items"][0]["intrinsic"]["transform"]["futureTransform"],
+        true,
+        "transform extra lost"
+    );
+    assert_eq!(
+        resaved["sequences"][0]["tracks"][0]["items"][0]["effects"][0]["params"]["saturation"]["k"]
+            [0]["futureKeyframe"],
+        "keep",
+        "keyframe extra lost"
+    );
+    assert_eq!(
+        resaved["sequences"][0]["tracks"][0]["items"][0]["audio"]["futureAudio"], 1.5,
+        "audio extra lost"
+    );
+    assert_eq!(
+        resaved["sequences"][0]["captionTracks"][0]["style"]["futureStyleProp"]["v11"],
+        serde_json::json!([]),
+        "caption style extra lost"
+    );
+    assert_eq!(
+        resaved["sequences"][0]["tracks"][0]["items"][1]["title"]["animIn"]["futureAnim"], 42,
+        "title animation extra lost"
     );
     // And the typed view still round-trips.
     let again: Project =

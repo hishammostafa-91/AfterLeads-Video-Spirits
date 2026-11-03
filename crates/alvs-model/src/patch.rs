@@ -156,9 +156,23 @@ pub fn diff(old: &Arc<Project>, new: &Arc<Project>, revision: u64) -> EntityPatc
         };
         let sequence_changed = prev != sequence;
         if sequence_changed {
-            // Project-level changes to this sequence.
+            // The entity changed (the UI store refreshes it), but only
+            // *structural* changes (tracks, clips' containers, captions,
+            // format, points, master audio) invalidate rendered time:
+            // markers are metadata, so a marker-only change carries just
+            // the point ranges from the marker walk below (research D10).
             patch.upsert.sequences.push(sequence.clone());
-            dirty_sequences.push(sequence.id.clone());
+            let structural = prev.tracks != sequence.tracks
+                || prev.caption_tracks != sequence.caption_tracks
+                || prev.name != sequence.name
+                || prev.format != sequence.format
+                || prev.in_point != sequence.in_point
+                || prev.out_point != sequence.out_point
+                || prev.master_audio != sequence.master_audio
+                || prev.extra != sequence.extra;
+            if structural {
+                dirty_sequences.push(sequence.id.clone());
+            }
         }
         // Tracks.
         for track in &sequence.tracks {
@@ -286,18 +300,15 @@ pub fn diff(old: &Arc<Project>, new: &Arc<Project>, revision: u64) -> EntityPatc
     }
 
     // Coalesce per-sequence dirty ranges: one full-extent entry per changed
-    // sequence (structural) — point ranges from markers stay as-is.
-    let mut seen_full: std::collections::BTreeSet<&str> = Default::default();
-    patch.dirty_ranges.retain(|r| {
-        let id = r.sequence_id.as_str();
-        if seen_full.contains(id) && r.start == r.end {
-            return false; // drop point ranges for structurally dirty sequences
-        }
-        true
-    });
-    let _ = &mut seen_full;
+    // sequence (structural) — point ranges from markers stay as-is, except
+    // for sequences that are structurally dirty anyway (the full extent
+    // already covers the point).
+    let structural: std::collections::BTreeSet<&str> =
+        dirty_sequences.iter().map(String::as_str).collect();
+    patch
+        .dirty_ranges
+        .retain(|r| !(structural.contains(r.sequence_id.as_str()) && r.start == r.end));
     for id in &dirty_sequences {
-        seen_full.insert(id.as_str());
         let end = new
             .sequences
             .iter()

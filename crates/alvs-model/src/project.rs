@@ -115,6 +115,9 @@ pub struct TimelineScroll {
     pub x: i64,
     /// Vertical position in pixels.
     pub y: u32,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Source viewer state (03 §3.4.11).
@@ -133,11 +136,17 @@ pub struct SourceViewer {
     /// Playhead (flicks).
     #[ts(type = "number")]
     pub playhead: i64,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
-/// Create a fresh project: one sequence, current timestamps, fresh ids
-/// (model side of REQ-PRJ-001; the dialog is WP-05).
-pub fn new_project(name: &str, sequence: Sequence) -> Project {
+/// Create a fresh project stamped with the caller's build identity
+/// (03 §3.4.1 `savedBy`): one sequence, current timestamps, fresh ids (model
+/// side of REQ-PRJ-001; the dialog is WP-05). Production callers (WP-03+)
+/// inject the real application version and commit; tests use
+/// [`new_project`] with a dev identity.
+pub fn new_project_with(name: &str, sequence: Sequence, saved_by: SavedBy) -> Project {
     let now = iso_now();
     Project {
         format: "afterleads-video-spirits.project".into(),
@@ -146,12 +155,7 @@ pub fn new_project(name: &str, sequence: Sequence) -> Project {
         name: name.into(),
         created_utc: now.clone(),
         modified_utc: now,
-        saved_by: SavedBy {
-            app: "AfterLeads-Video-Spirits".into(),
-            version: "1.0.0".into(),
-            commit: "dev".into(),
-            extra: BTreeMap::new(),
-        },
+        saved_by,
         settings: ProjectSettings {
             default_sequence_id: sequence.id.clone(),
             proxy_mode: false,
@@ -164,6 +168,23 @@ pub fn new_project(name: &str, sequence: Sequence) -> Project {
         ui: ViewState::default(),
         extra: BTreeMap::new(),
     }
+}
+
+/// The development/test identity used by [`new_project`] (03 §3.4.1: real
+/// `savedBy` comes from the writing application's build info).
+pub fn dev_saved_by() -> SavedBy {
+    SavedBy {
+        app: "AfterLeads-Video-Spirits".into(),
+        version: "dev".into(),
+        commit: "dev".into(),
+        extra: BTreeMap::new(),
+    }
+}
+
+/// Create a fresh project with the development identity (see
+/// [`new_project_with`]).
+pub fn new_project(name: &str, sequence: Sequence) -> Project {
+    new_project_with(name, sequence, dev_saved_by())
 }
 
 /// RFC 3339 UTC timestamp for `createdUtc`/`modifiedUtc` (03 §3.4.1). Uses the

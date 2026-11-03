@@ -72,6 +72,9 @@ pub struct Keyframe {
     pub e: String,
     /// Bezier handles `[x1, y1, x2, y2]`, only for `e = "bezier"`.
     pub h: Option<[f64; 4]>,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// An effect instance (03 §3.4.7). Missing parameters take manifest

@@ -406,37 +406,75 @@ fn check_nesting(project: &Project, issues: &mut Vec<Issue>) {
         }
         edges.insert(sequence.id.as_str(), nested);
     }
-    // DFS from every node with an explicit stack + state map.
-    for start in edges.keys().copied().collect::<Vec<_>>() {
-        let mut stack: Vec<(&str, usize)> = vec![(start, 0)];
-        let mut on_path: BTreeSet<&str> = BTreeSet::new();
-        let mut depth_seen: BTreeMap<&str, usize> = BTreeMap::new();
-        while let Some((node, depth)) = stack.pop() {
-            if depth > 0 {
-                if on_path.contains(node) && depth > depth_seen.get(node).copied().unwrap_or(0) {
-                    issues.push(Issue::new(
-                        ErrorCode::E1006,
-                        format!("sequences/{start}"),
-                        format!("sequence nesting cycle via {node}"),
-                    ));
-                    break;
+    // Cycle detection: white/grey/black DFS over the whole graph (03
+    // §3.5.3 forbids cycles — legitimate reuse of a nested sequence is a
+    // diamond, never a cycle). One report is sufficient; depth is undefined
+    // on a cyclic graph, so it is not measured once a cycle is reported.
+    let mut color: HashMap<&str, u8> = HashMap::new(); // 0 white, 1 grey, 2 black
+    let mut cyclic = false;
+    'cycles: for start in edges.keys().copied().collect::<Vec<_>>() {
+        let mut stack: Vec<(&str, u8)> = vec![(start, 0)];
+        while let Some((node, phase)) = stack.pop() {
+            if phase == 0 {
+                if color.get(node).copied().unwrap_or(0) != 0 {
+                    continue; // grey cannot occur mid-start; black is done
                 }
-                depth_seen.insert(node, depth);
-            }
-            if depth > limits::NESTING_DEPTH {
-                issues.push(Issue::new(
-                    ErrorCode::E1003,
-                    format!("sequences/{start}"),
-                    format!("nesting depth exceeds {}", limits::NESTING_DEPTH),
-                ));
-                break;
-            }
-            if let Some(children) = edges.get(node) {
-                on_path.insert(node);
-                for child in children.iter().rev() {
-                    stack.push((child, depth + 1));
+                color.insert(node, 1);
+                stack.push((node, 1));
+                if let Some(children) = edges.get(node) {
+                    for child in children {
+                        if color.get(child).copied().unwrap_or(0) == 1 {
+                            issues.push(Issue::new(
+                                ErrorCode::E1006,
+                                format!("sequences/{start}"),
+                                format!("sequence nesting cycle via {child}"),
+                            ));
+                            cyclic = true;
+                            break 'cycles;
+                        }
+                        stack.push((child, 0));
+                    }
                 }
+            } else {
+                color.insert(node, 2);
             }
+        }
+    }
+    if cyclic {
+        return;
+    }
+    // Depth: the longest nesting chain below each sequence (memoized), so a
+    // deep chain found via any parent is caught once; ≤ 8 (03 §3.5.3).
+    fn longest_chain<'a>(
+        edges: &HashMap<&'a str, Vec<&'a str>>,
+        node: &'a str,
+        cache: &mut HashMap<&'a str, usize>,
+    ) -> usize {
+        if let Some(cached) = cache.get(node) {
+            return *cached;
+        }
+        let mut best = 0;
+        if let Some(children) = edges.get(node) {
+            for child in children {
+                best = best.max(1 + longest_chain(edges, child, cache));
+            }
+        }
+        cache.insert(node, best);
+        best
+    }
+    let mut depth_cache: HashMap<&str, usize> = HashMap::new();
+    for (id, children) in &edges {
+        let mut depth = 0;
+        for child in children {
+            depth = depth.max(1 + longest_chain(&edges, child, &mut depth_cache));
+        }
+        if depth > limits::NESTING_DEPTH {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                format!("sequences/{id}"),
+                format!("nesting depth exceeds {}", limits::NESTING_DEPTH),
+            ));
+            break;
         }
     }
 }
@@ -476,6 +514,19 @@ fn check_sequence(sequence: &Sequence, media: &HashMap<&str, &MediaItem>, issues
                 format!("{path}/markers/{}", marker.id),
                 "two chapter markers share the same t",
             ));
+        }
+    }
+
+    // Rule 9 for master-bus effect parameters (no clip bound applies).
+    for effect in &sequence.master_audio.effects {
+        for (param, value) in &effect.params {
+            check_animatable(
+                &format!("{path}/masterAudio/{}", effect.id),
+                param,
+                value,
+                None,
+                issues,
+            );
         }
     }
 
@@ -575,11 +626,54 @@ fn check_track_rules(
             ));
         }
     }
-    // Rules 5–7 per clip.
+    // Rules 5–7 per clip; rule 9 over every clip animatable; rule 12 for
+    // source-time (clip) markers.
     for clip in &track.items {
         let cpath = format!("{path}/items/{}", clip.id);
         check_clip_timing(clip, &cpath, fpf, media, issues);
-        check_keyframes(clip, &cpath, issues);
+        check_clip_animatables(clip, &cpath, issues);
+        let mut chapter_times: BTreeSet<i64> = BTreeSet::new();
+        for marker in &clip.markers {
+            if marker.t < 0 || marker.duration < 0 {
+                issues.push(Issue::new(
+                    ErrorCode::E1003,
+                    format!("{cpath}/markers/{}", marker.id),
+                    "marker t and duration must be ≥ 0",
+                ));
+            }
+            if marker.kind == crate::marker::MarkerKind::Chapter && !chapter_times.insert(marker.t)
+            {
+                issues.push(Issue::new(
+                    ErrorCode::E1003,
+                    format!("{cpath}/markers/{}", marker.id),
+                    "two chapter markers share the same t",
+                ));
+            }
+        }
+    }
+    // Rule 9 for track-effect parameters (no clip bound applies).
+    for effect in &track.effects {
+        for (param, value) in &effect.params {
+            check_animatable(
+                &format!("{path}/effects/{}", effect.id),
+                param,
+                value,
+                None,
+                issues,
+            );
+        }
+    }
+    // Rule 9 for transition parameters (no clip bound applies).
+    for transition in &track.transitions {
+        for (param, value) in &transition.params {
+            check_animatable(
+                &format!("{path}/transitions/{}", transition.id),
+                param,
+                value,
+                None,
+                issues,
+            );
+        }
     }
     // Rule 8: transitions join adjacent clips, one per edit point, handle bounds.
     let edit_points: BTreeMap<i64, usize> = {
@@ -759,65 +853,177 @@ fn check_clip_timing(
     }
 }
 
-/// Rule 9 for every animatable parameter of a clip's effects.
-fn check_keyframes(clip: &Clip, path: &str, issues: &mut Vec<Issue>) {
-    let duration = clip.duration;
+/// Rule 9 + the §3.5.15 keyframe limit for one animatable parameter.
+/// `bound` is the maximum legal `t` (the owning clip's duration) when the
+/// parameter lives on a clip; track/master/transition scopes pass `None`
+/// (only ordering, easing, and the count limit apply there).
+fn check_animatable(
+    path: &str,
+    param: &str,
+    value: &AnimatableValue,
+    bound: Option<i64>,
+    issues: &mut Vec<Issue>,
+) {
+    let AnimatableValue::K { k } = value else {
+        return;
+    };
+    if k.len() > limits::KEYFRAMES_PER_PARAM {
+        issues.push(Issue::new(
+            ErrorCode::E1003,
+            path.to_string(),
+            format!(
+                "parameter {param} exceeds {} keyframes",
+                limits::KEYFRAMES_PER_PARAM
+            ),
+        ));
+    }
+    for window in k.windows(2) {
+        if window[0].t >= window[1].t {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path.to_string(),
+                format!("parameter {param} keyframes not strictly sorted by t"),
+            ));
+            break;
+        }
+    }
+    for kf in k {
+        if let Some(duration) = bound
+            && !(0..=duration).contains(&kf.t)
+        {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path.to_string(),
+                format!(
+                    "parameter {param} keyframe t {} outside clip duration",
+                    kf.t
+                ),
+            ));
+        }
+        let bezier = kf.e == "bezier";
+        if bezier != kf.h.is_some() {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path.to_string(),
+                format!("parameter {param} keyframe handles must exist only for bezier"),
+            ));
+        }
+        if matches!(
+            kf.v,
+            crate::effect::AnimatablePrimitive::Bool(_)
+                | crate::effect::AnimatablePrimitive::Str(_)
+        ) && kf.e != "hold"
+        {
+            issues.push(Issue::new(
+                ErrorCode::E1003,
+                path.to_string(),
+                format!("parameter {param}: boolean and enum values must use hold easing"),
+            ));
+        }
+    }
+}
+
+/// Rule 9 for every animatable parameter reachable from a clip (03 §3.5.9
+/// plus the §3.5.15 count limit): effects, intrinsic transform/crop/opacity,
+/// the audio object, masks, generator params, and title layers — the
+/// malicious-file keyframe limit must hold on every persisted surface.
+fn check_clip_animatables(clip: &Clip, path: &str, issues: &mut Vec<Issue>) {
+    let bound = Some(clip.duration);
     for effect in &clip.effects {
         for (param, value) in &effect.params {
-            let AnimatableValue::K { k } = value else {
-                continue;
-            };
-            if k.len() > limits::KEYFRAMES_PER_PARAM {
-                issues.push(Issue::new(
-                    ErrorCode::E1003,
-                    format!("{path}/effects/{}", effect.id),
-                    format!(
-                        "parameter {param} exceeds {} keyframes",
-                        limits::KEYFRAMES_PER_PARAM
-                    ),
-                ));
+            check_animatable(
+                &format!("{path}/effects/{}", effect.id),
+                param,
+                value,
+                bound,
+                issues,
+            );
+        }
+    }
+    if let Some(intrinsic) = &clip.intrinsic {
+        let transform = &intrinsic.transform;
+        for (name, value) in [
+            ("position", &transform.position),
+            ("scale", &transform.scale),
+            ("scaleX", &transform.scale_x),
+            ("scaleY", &transform.scale_y),
+            ("rotation", &transform.rotation),
+            ("anchor", &transform.anchor),
+        ] {
+            check_animatable(
+                &format!("{path}/intrinsic/transform"),
+                name,
+                value,
+                bound,
+                issues,
+            );
+        }
+        let crop = &intrinsic.crop;
+        for (name, value) in [
+            ("left", &crop.left),
+            ("top", &crop.top),
+            ("right", &crop.right),
+            ("bottom", &crop.bottom),
+            ("feather", &crop.feather),
+        ] {
+            check_animatable(
+                &format!("{path}/intrinsic/crop"),
+                name,
+                value,
+                bound,
+                issues,
+            );
+        }
+        check_animatable(
+            &format!("{path}/intrinsic"),
+            "opacity",
+            &intrinsic.opacity,
+            bound,
+            issues,
+        );
+    }
+    if let Some(audio) = &clip.audio {
+        check_animatable(
+            &format!("{path}/audio"),
+            "volume",
+            &audio.volume,
+            bound,
+            issues,
+        );
+        check_animatable(&format!("{path}/audio"), "pan", &audio.pan, bound, issues);
+    }
+    for mask in &clip.masks {
+        let mpath = format!("{path}/masks/{}", mask.id);
+        for (param, value) in &mask.params {
+            check_animatable(&mpath, param, value, bound, issues);
+        }
+        check_animatable(&mpath, "feather", &mask.feather, bound, issues);
+        check_animatable(&mpath, "expansion", &mask.expansion, bound, issues);
+        check_animatable(&mpath, "opacity", &mask.opacity, bound, issues);
+    }
+    if let Some(generator) = &clip.generator {
+        for (param, value) in &generator.params {
+            check_animatable(&format!("{path}/generator"), param, value, bound, issues);
+        }
+    }
+    if let Some(title) = &clip.title {
+        for (index, layer) in title.layers.iter().enumerate() {
+            let lpath = format!("{path}/title/layers/{index}");
+            for (name, value) in [
+                ("size", &layer.size),
+                ("fill", &layer.fill),
+                ("position", &layer.position),
+                ("rotation", &layer.rotation),
+                ("opacity", &layer.opacity),
+            ] {
+                check_animatable(&lpath, name, value, bound, issues);
             }
-            for window in k.windows(2) {
-                if window[0].t >= window[1].t {
-                    issues.push(Issue::new(
-                        ErrorCode::E1003,
-                        format!("{path}/effects/{}", effect.id),
-                        format!("parameter {param} keyframes not strictly sorted by t"),
-                    ));
-                    break;
-                }
+            if let Some(stroke) = &layer.stroke {
+                check_animatable(&lpath, "stroke.color", &stroke.color, bound, issues);
+                check_animatable(&lpath, "stroke.width", &stroke.width, bound, issues);
             }
-            for kf in k {
-                if !(0..=duration).contains(&kf.t) {
-                    issues.push(Issue::new(
-                        ErrorCode::E1003,
-                        format!("{path}/effects/{}", effect.id),
-                        format!(
-                            "parameter {param} keyframe t {} outside clip duration",
-                            kf.t
-                        ),
-                    ));
-                }
-                let bezier = kf.e == "bezier";
-                if bezier != kf.h.is_some() {
-                    issues.push(Issue::new(
-                        ErrorCode::E1003,
-                        format!("{path}/effects/{}", effect.id),
-                        format!("parameter {param} keyframe handles must exist only for bezier"),
-                    ));
-                }
-                if matches!(
-                    kf.v,
-                    crate::effect::AnimatablePrimitive::Bool(_)
-                        | crate::effect::AnimatablePrimitive::Str(_)
-                ) && kf.e != "hold"
-                {
-                    issues.push(Issue::new(
-                        ErrorCode::E1003,
-                        format!("{path}/effects/{}", effect.id),
-                        format!("parameter {param}: boolean and enum values must use hold easing"),
-                    ));
-                }
+            if let Some(box_) = &layer.box_ {
+                check_animatable(&lpath, "box.color", &box_.color, bound, issues);
             }
         }
     }
@@ -1291,6 +1497,7 @@ mod tests {
             fade_curve: crate::track::FadeCurve::Linear,
             channel_mode: crate::track::ChannelMode::Stereo,
             preserve_pitch: true,
+            extra: BTreeMap::new(),
         });
         clip
     }
@@ -1306,6 +1513,7 @@ mod tests {
             v,
             e: e.into(),
             h,
+            extra: BTreeMap::new(),
         }
     }
 
@@ -2195,6 +2403,245 @@ mod tests {
             validate(&project)
                 .iter()
                 .any(|i| i.path == "trackEffects" && i.detail.contains("not a UUID v7"))
+        );
+    }
+
+    #[test]
+    fn rule3_sequence_reuse_is_not_a_cycle() {
+        // A diamond: A nests B and C; B nests D; C nests E; E nests D.
+        // D is reused, which is legal — no E1006, and the longest chain
+        // (A→C→E→D = 3) is within the depth limit.
+        let mut ids = Vec::new();
+        for _ in 0..5 {
+            ids.push(id::new_id());
+        }
+        let mut sequences = Vec::new();
+        for (i, id) in ids.iter().enumerate() {
+            let mut s = new_sequence(&format!("S{i}"), sqp02_fallback_format());
+            s.id = id.clone();
+            s.format.auto_match_pending = false;
+            sequences.push(s);
+        }
+        let mut nest = |s: usize, target: usize| {
+            let mut clip = base_clip(0, FPF);
+            clip.clip_type = ClipType::Sequence;
+            clip.sequence_id = Some(ids[target].clone());
+            let mut t = new_track(TrackKind::Video, "V1");
+            t.items.push(clip);
+            sequences[s].tracks.push(t);
+        };
+        nest(0, 1); // A → B
+        nest(0, 2); // A → C
+        nest(1, 3); // B → D
+        nest(2, 4); // C → E
+        nest(4, 3); // E → D (reuse)
+        let first = sequences.remove(0);
+        let mut project = new_project("T", first);
+        for s in sequences {
+            project.sequences.push(s);
+        }
+        let issues = validate(&project);
+        assert!(
+            !issues.iter().any(|i| i.code == ErrorCode::E1006),
+            "diamond reuse must not be a cycle: {issues:?}"
+        );
+        assert!(
+            !issues
+                .iter()
+                .any(|i| i.detail.contains("nesting depth exceeds")),
+            "longest chain is 3 ≤ 8: {issues:?}"
+        );
+    }
+
+    #[test]
+    fn rule9_covers_intrinsic_masks_titles_track_and_master_surfaces() {
+        // A keyframed intrinsic transform param beyond the clip duration.
+        let mut project = valid_project();
+        let clip = &mut project.sequences[0].tracks[0].items[0];
+        clip.intrinsic = Some(crate::track::Intrinsic {
+            transform: crate::track::Transform {
+                position: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Point([0.5, 0.5]),
+                },
+                scale: crate::effect::AnimatableValue::K {
+                    k: vec![
+                        keyframe(
+                            0,
+                            "linear",
+                            None,
+                            crate::effect::AnimatablePrimitive::Number(100.0),
+                        ),
+                        keyframe(
+                            9 * FPF,
+                            "linear",
+                            None,
+                            crate::effect::AnimatablePrimitive::Number(90.0),
+                        ),
+                    ],
+                },
+                scale_x: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(100.0),
+                },
+                scale_y: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(100.0),
+                },
+                uniform_scale: true,
+                rotation: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                anchor: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Point([0.5, 0.5]),
+                },
+                flip_h: false,
+                flip_v: false,
+                extra: BTreeMap::new(),
+            },
+            crop: crate::track::Crop {
+                left: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                top: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                right: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                bottom: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                feather: crate::effect::AnimatableValue::V {
+                    v: crate::effect::AnimatablePrimitive::Number(0.0),
+                },
+                extra: BTreeMap::new(),
+            },
+            opacity: crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Number(100.0),
+            },
+            blend_mode: "normal".into(),
+            extra: BTreeMap::new(),
+        });
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("outside clip duration")
+                    && i.path.contains("intrinsic/transform"))
+        );
+
+        // Unsorted keyframes on a mask parameter.
+        let mut project = valid_project();
+        let clip = &mut project.sequences[0].tracks[0].items[0];
+        let mut mask = crate::mask::new_mask("msk.rectangle");
+        mask.params.insert(
+            "size".into(),
+            crate::effect::AnimatableValue::K {
+                k: vec![
+                    keyframe(
+                        FPF,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(1.0),
+                    ),
+                    keyframe(
+                        0,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(0.5),
+                    ),
+                ],
+            },
+        );
+        clip.masks = vec![mask];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("not strictly sorted") && i.path.contains("masks"))
+        );
+
+        // Unsorted keyframes on a track-effect parameter (no clip bound; the
+        // count/order rules still apply).
+        let mut project = valid_project();
+        let mut effect = crate::effect::new_effect_instance("afx.gain");
+        effect.params.insert(
+            "gain".into(),
+            crate::effect::AnimatableValue::K {
+                k: vec![
+                    keyframe(
+                        2 * FPF,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(1.0),
+                    ),
+                    keyframe(
+                        FPF,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(0.5),
+                    ),
+                ],
+            },
+        );
+        project.sequences[0].tracks[0].effects = vec![effect];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("not strictly sorted") && i.path.contains("effects"))
+        );
+
+        // Unsorted keyframes on a master-bus effect parameter.
+        let mut project = valid_project();
+        let mut effect = crate::effect::new_effect_instance("afx.limiter");
+        effect.params.insert(
+            "threshold".into(),
+            crate::effect::AnimatableValue::K {
+                k: vec![
+                    keyframe(
+                        FPF,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(-6.0),
+                    ),
+                    keyframe(
+                        0,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(0.0),
+                    ),
+                ],
+            },
+        );
+        project.sequences[0].master_audio.effects = vec![effect];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("not strictly sorted") && i.path.contains("masterAudio"))
+        );
+    }
+
+    #[test]
+    fn rule12_clip_markers_follow_the_marker_rules() {
+        // A negative source-time marker on a clip is rejected (03 §3.5.12).
+        let mut project = valid_project();
+        let mut marker = crate::marker::new_marker(-1, "bad");
+        marker.id = id::new_id();
+        project.sequences[0].tracks[0].items[0].markers = vec![marker];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("≥ 0") && i.path.contains("/markers/"))
+        );
+
+        // Two clip chapter markers sharing t are rejected.
+        let mut project = valid_project();
+        let mut a = crate::marker::new_marker(0, "a");
+        a.kind = crate::marker::MarkerKind::Chapter;
+        let mut b = crate::marker::new_marker(0, "b");
+        b.kind = crate::marker::MarkerKind::Chapter;
+        project.sequences[0].tracks[0].items[0].markers = vec![a, b];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("chapter markers share"))
         );
     }
 }

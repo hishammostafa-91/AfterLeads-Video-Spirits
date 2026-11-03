@@ -80,6 +80,9 @@ pub struct Transform {
     pub flip_h: bool,
     /// Vertical flip.
     pub flip_v: bool,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Intrinsic crop (03 §3.4.6), normalized to frame heights (03 §3.3.3).
@@ -97,6 +100,9 @@ pub struct Crop {
     pub bottom: AnimatableValue,
     /// Edge feather.
     pub feather: AnimatableValue,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// The intrinsic block of a video clip (03 §3.4.6; 12 §12.1.1).
@@ -112,6 +118,9 @@ pub struct Intrinsic {
     pub opacity: AnimatableValue,
     /// Blend mode id (BLM catalog, 12 §12.4).
     pub blend_mode: String,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Audio clip settings (03 §3.4.6).
@@ -137,6 +146,9 @@ pub struct AudioClipSettings {
     pub channel_mode: ChannelMode,
     /// Preserve pitch under speed changes.
     pub preserve_pitch: bool,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// Fade shape (03 §3.4.6).
@@ -176,6 +188,9 @@ pub struct GeneratorParams {
     pub generator_id: String,
     /// Generator parameters (manifest-typed, 03 §3.4.7 value types).
     pub params: BTreeMap<String, AnimatableValue>,
+    /// Unknown fields (03 §3.2.3).
+    #[serde(default, flatten, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 /// A clip on a track (03 §3.4.6). The per-type payload fields are `Option`:
