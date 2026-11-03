@@ -19,4 +19,6 @@
 //! app backend (CMP-12, `app/src-tauri/src/project_io.rs`).
 
 pub mod error;
+pub mod keys;
+pub mod paths;
 pub mod utc;
