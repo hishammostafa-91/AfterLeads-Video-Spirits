@@ -3,10 +3,13 @@
 //! Reduced rationals for frame rates and speeds (docs/03 §3.3.2):
 //! always reduced, `den > 0`.
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 /// A rational number `{ num, den }` with `den > 0`, always reduced (03 §3.3.2).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
+#[ts(export)]
 pub struct Rational {
     /// Numerator.
     pub num: u32,
