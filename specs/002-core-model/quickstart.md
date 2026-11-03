@@ -29,10 +29,10 @@ Included in §2. Expected: fixture pairs round-trip through the migration driver
 ## 5. Property suite at CI scale (SC-005)
 
 ```powershell
-cargo nextest run -p alvs-model --locked proptest
+cargo nextest run -p alvs-model --locked random_edit_sequences_hold_invariants
 ```
 
-Expected: 10,000 random sequences × 50 ops green (invariants hold after every applied step; rejections are documented codes). **Record the measured duration in the PR evidence** against the ≤ 25-minute CI budget (research D13/F10); the `ALVS_PROPTEST_CASES` knob exists to raise the scale for the future nightly run, never to lower the CI scale (G-08). The nightly 1,000,000-scale runs when the nightly full-matrix job exists.
+Expected: 10,000 random sequences × 50 ops green (invariants hold after every applied step; rejections are documented codes). **Record the measured duration in the PR evidence** against the ≤ 25-minute CI budget (research D13/F10); the `ALVS_PROPTEST_CASES` knob exists to raise the scale for the future nightly run, never to lower the CI scale (G-08). The nightly 1,000,000-scale runs when the nightly full-matrix job exists. (The filter is the test name — nextest matches test names, not binary names.)
 
 ## 6. TypeScript bindings + drift gates (SC-006, FR-015)
 
