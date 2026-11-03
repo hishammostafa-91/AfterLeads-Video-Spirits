@@ -1101,4 +1101,751 @@ mod tests {
         check_link_groups(&project, &mut issues);
         assert!(issues.iter().any(|i| i.detail.contains("link group has")));
     }
+
+    /// Flicks per frame at 30 fps.
+    const FPF: i64 = 23_520_000;
+
+    fn base_clip(start: i64, duration: i64) -> Clip {
+        Clip {
+            id: id::new_id(),
+            clip_type: ClipType::Title,
+            media_id: None,
+            stream_index: None,
+            start,
+            duration,
+            source_in: 0,
+            speed: Rational::new(1, 1).unwrap_or(Rational { num: 1, den: 1 }),
+            reverse: false,
+            freeze_at: None,
+            enabled: true,
+            name: None,
+            label: None,
+            link_group_id: None,
+            group_id: None,
+            intrinsic: None,
+            audio: None,
+            deinterlace: crate::track::Deinterlace::Auto,
+            effects: Vec::new(),
+            masks: Vec::new(),
+            markers: Vec::new(),
+            title: None,
+            generator: None,
+            sequence_id: None,
+            extra: Default::default(),
+        }
+    }
+
+    fn media_clip(media_id: &str, start: i64, duration: i64) -> Clip {
+        let mut clip = base_clip(start, duration);
+        clip.clip_type = ClipType::Media;
+        clip.media_id = Some(media_id.into());
+        clip.stream_index = Some(0);
+        clip
+    }
+
+    fn audio_clip(media_id: &str, start: i64, duration: i64) -> Clip {
+        let mut clip = media_clip(media_id, start, duration);
+        clip.audio = Some(crate::track::AudioClipSettings {
+            gain_db: 0.0,
+            volume: crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Number(0.0),
+            },
+            pan: crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Number(0.0),
+            },
+            fade_in: 0,
+            fade_out: 0,
+            fade_curve: crate::track::FadeCurve::Linear,
+            channel_mode: crate::track::ChannelMode::Stereo,
+            preserve_pitch: true,
+        });
+        clip
+    }
+
+    fn keyframe(
+        t: i64,
+        e: &str,
+        h: Option<[f64; 4]>,
+        v: crate::effect::AnimatablePrimitive,
+    ) -> crate::effect::Keyframe {
+        crate::effect::Keyframe {
+            t,
+            v,
+            e: e.into(),
+            h,
+        }
+    }
+
+    fn project_with_kfs(k: Vec<crate::effect::Keyframe>) -> Project {
+        let mut project = valid_project();
+        let mut effect = crate::effect::new_effect_instance("fx.color.basic");
+        let mut params = BTreeMap::new();
+        params.insert("p".into(), crate::effect::AnimatableValue::K { k });
+        effect.params = params;
+        project.sequences[0].tracks[0].items[0].effects = vec![effect];
+        project
+    }
+
+    #[test]
+    fn full_house_project_with_every_entity_kind_is_valid() {
+        let mut project = valid_project();
+        project.bins.push(crate::bin::Bin {
+            id: id::new_id(),
+            name: "Footage".into(),
+            parent_id: None,
+            label: None,
+            expanded: true,
+            extra: Default::default(),
+        });
+        let asset = crate::asset::Asset {
+            id: id::new_id(),
+            kind: "lut".into(),
+            name: "teal.cube".into(),
+            rel_path: "assets/teal.cube".into(),
+            sha256: "deadbeef".into(),
+            lut_info: Some(crate::asset::LutInfo {
+                lut_type: "3d".into(),
+                size: 33,
+                extra: Default::default(),
+            }),
+            extra: Default::default(),
+        };
+        let mut media = media_item(&id::new_id(), 60 * 705_600_000);
+        media.bin_id = Some(project.bins[0].id.clone());
+        project.assets.push(asset.clone());
+        project.media.push(media.clone());
+
+        let mut c1 = media_clip(&media.id, 0, 3 * FPF);
+        let mut effect = crate::effect::new_effect_instance("fx.color.basic");
+        let mut params = BTreeMap::new();
+        params.insert(
+            "exposure".into(),
+            crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Number(0.3),
+            },
+        );
+        params.insert(
+            "lut".into(),
+            crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Str(format!("asset:{}", asset.id)),
+            },
+        );
+        params.insert(
+            "mix".into(),
+            crate::effect::AnimatableValue::K {
+                k: vec![
+                    keyframe(
+                        0,
+                        "linear",
+                        None,
+                        crate::effect::AnimatablePrimitive::Number(1.0),
+                    ),
+                    keyframe(
+                        FPF,
+                        "bezier",
+                        Some([0.1, 0.0, 0.9, 1.0]),
+                        crate::effect::AnimatablePrimitive::Number(0.5),
+                    ),
+                ],
+            },
+        );
+        effect.params = params;
+        let mask = crate::mask::new_mask("msk.rectangle");
+        effect.mask_ids = vec![mask.id.clone()];
+        c1.effects = vec![effect];
+        c1.masks = vec![mask];
+        let c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &c1.id,
+                &c2.id,
+                FPF,
+            ));
+
+        let mut chapter = crate::marker::new_marker(0, "chapter");
+        chapter.kind = crate::marker::MarkerKind::Chapter;
+        project.sequences[0].markers = vec![chapter, crate::marker::new_marker(FPF, "std")];
+
+        let mut captions = crate::caption::new_caption_track("English", "en");
+        captions.items.push(crate::caption::CaptionItem {
+            id: id::new_id(),
+            start: 0,
+            end: 1_000_000,
+            text: "Hello".into(),
+            position: None,
+            extra: Default::default(),
+        });
+        project.sequences[0].caption_tracks.push(captions);
+
+        let issues = validate(&project);
+        assert!(issues.is_empty(), "{issues:?}");
+    }
+
+    #[test]
+    fn rule2_bin_active_mask_sequence_and_transition_references() {
+        // Dangling bin parent.
+        let mut project = valid_project();
+        project.bins.push(crate::bin::Bin {
+            id: id::new_id(),
+            name: "B".into(),
+            parent_id: Some("nonexistent".into()),
+            label: None,
+            expanded: true,
+            extra: Default::default(),
+        });
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("parentId"))
+        );
+
+        // Dangling media bin.
+        let mut project = valid_project();
+        let mut media = media_item(&id::new_id(), 60 * 705_600_000);
+        media.bin_id = Some("nonexistent".into());
+        project.media.push(media);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("binId"))
+        );
+
+        // Dangling active sequence.
+        let mut project = valid_project();
+        project.ui.active_sequence_id = Some("nonexistent".into());
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("activeSequenceId"))
+        );
+
+        // Effect mask reference not on the clip.
+        let mut project = valid_project();
+        let mut effect = crate::effect::new_effect_instance("fx.color.basic");
+        effect.mask_ids = vec!["nonexistent".into()];
+        project.sequences[0].tracks[0].items[0].effects = vec![effect];
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("maskId"))
+        );
+
+        // Dangling nested sequence reference.
+        let mut project = valid_project();
+        let mut nested = base_clip(3 * FPF, FPF);
+        nested.clip_type = ClipType::Sequence;
+        nested.sequence_id = Some("nonexistent".into());
+        project.sequences[0].tracks[0].items.push(nested);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("sequenceId"))
+        );
+
+        // Dangling transition endpoint.
+        let mut project = valid_project();
+        let clip_id = project.sequences[0].tracks[0].items[0].id.clone();
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                "nonexistent",
+                &clip_id,
+                FPF,
+            ));
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("clip reference"))
+        );
+    }
+
+    #[test]
+    fn rule2_asset_references_in_params_resolve() {
+        let mut project = valid_project();
+        project.assets.push(crate::asset::Asset {
+            id: id::new_id(),
+            kind: "lut".into(),
+            name: "teal.cube".into(),
+            rel_path: "assets/teal.cube".into(),
+            sha256: "aa".into(),
+            lut_info: None,
+            extra: Default::default(),
+        });
+        let asset_id = project.assets[0].id.clone();
+        let mut effect = crate::effect::new_effect_instance("fx.color.basic");
+        let mut params = BTreeMap::new();
+        params.insert(
+            "ok".into(),
+            crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Str(format!("asset:{asset_id}")),
+            },
+        );
+        params.insert(
+            "bad".into(),
+            crate::effect::AnimatableValue::V {
+                v: crate::effect::AnimatablePrimitive::Str("asset:nonexistent".into()),
+            },
+        );
+        effect.params = params;
+        project.sequences[0].tracks[0].items[0].effects = vec![effect];
+        let issues = validate(&project);
+        let asset_issues = issues
+            .iter()
+            .filter(|i| i.detail.contains("asset reference"))
+            .count();
+        assert_eq!(asset_issues, 1);
+    }
+
+    #[test]
+    fn rule3_nesting_depth_over_eight_is_rejected() {
+        let mut ids = Vec::new();
+        for _ in 0..10 {
+            ids.push(id::new_id());
+        }
+        let mut sequences = Vec::new();
+        for i in 0..10 {
+            let mut s = new_sequence(&format!("S{i}"), sqp02_fallback_format());
+            s.id = ids[i].clone();
+            s.format.auto_match_pending = false;
+            if i < 9 {
+                let mut clip = base_clip(0, FPF);
+                clip.clip_type = ClipType::Sequence;
+                clip.sequence_id = Some(ids[i + 1].clone());
+                let mut t = new_track(TrackKind::Video, "V1");
+                t.items.push(clip);
+                s.tracks.push(t);
+            }
+            sequences.push(s);
+        }
+        let first = sequences.remove(0);
+        let mut project = new_project("T", first);
+        for s in sequences {
+            project.sequences.push(s);
+        }
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("nesting depth exceeds")),
+            "{issues:?}"
+        );
+    }
+
+    #[test]
+    fn rule5_audio_clips_use_the_quarter_frame_grid() {
+        let mut project = valid_project();
+        let media = media_item(&id::new_id(), 60 * 705_600_000);
+        project.media.push(media.clone());
+        let mut track = new_track(TrackKind::Audio, "A1");
+        // Five quarter-frames: not a frame multiple, but quarter-aligned.
+        track.items.push(audio_clip(&media.id, 5 * (FPF / 4), FPF));
+        project.sequences[0].tracks.push(track);
+        let issues = validate(&project);
+        assert!(
+            !issues.iter().any(|i| i.detail.contains("frame grid")),
+            "{issues:?}"
+        );
+
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let mut track = new_track(TrackKind::Audio, "A1");
+        track
+            .items
+            .push(audio_clip(&media.id, 5 * (FPF / 4) + 1, FPF));
+        project.sequences[0].tracks.push(track);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("frame grid"))
+        );
+    }
+
+    #[test]
+    fn rule6_speed_outside_bounds_rejected() {
+        let mut project = valid_project();
+        project.sequences[0].tracks[0].items[0].speed =
+            Rational::new(1, 20).unwrap_or(Rational { num: 1, den: 20 });
+        let issues = validate(&project);
+        assert!(issues.iter().any(|i| i.detail.contains("outside")));
+    }
+
+    #[test]
+    fn rule8_transitions_join_adjacent_clips_with_positive_duration() {
+        // A valid adjacent pair with a centered transition is accepted.
+        let mut project = valid_project();
+        let media = media_item(&id::new_id(), 60 * 705_600_000);
+        project.media.push(media.clone());
+        let c1 = media_clip(&media.id, 0, 3 * FPF);
+        let c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &c1.id,
+                &c2.id,
+                FPF,
+            ));
+        let issues = validate(&project);
+        assert!(
+            !issues.iter().any(|i| i.detail.contains("transition")),
+            "{issues:?}"
+        );
+
+        // A gap between the clips is not an edit point.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let c1 = media_clip(&media.id, 0, 3 * FPF);
+        let c2 = media_clip(&media.id, 4 * FPF, 3 * FPF);
+        project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &c1.id,
+                &c2.id,
+                FPF,
+            ));
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.code == ErrorCode::E1102 && i.detail.contains("adjacent"))
+        );
+
+        // Zero duration is rejected.
+        let mut project = valid_project();
+        project.media.push(media.clone());
+        let c1 = media_clip(&media.id, 0, 3 * FPF);
+        let c2 = media_clip(&media.id, 3 * FPF, 3 * FPF);
+        project.sequences[0].tracks[0].items = vec![c1.clone(), c2.clone()];
+        project.sequences[0].tracks[0]
+            .transitions
+            .push(crate::transition::new_transition(
+                "trs.crossDissolve",
+                &c1.id,
+                &c2.id,
+                0,
+            ));
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("transition duration must be > 0"))
+        );
+    }
+
+    #[test]
+    fn rule9_keyframe_rules() {
+        // Unsorted keyframes.
+        let project = project_with_kfs(vec![
+            keyframe(
+                FPF,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(1.0),
+            ),
+            keyframe(
+                0,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(0.0),
+            ),
+        ]);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("not strictly sorted"))
+        );
+
+        // t beyond the clip duration.
+        let project = project_with_kfs(vec![
+            keyframe(
+                0,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(0.0),
+            ),
+            keyframe(
+                4 * FPF,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(1.0),
+            ),
+        ]);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("outside clip duration"))
+        );
+
+        // Bezier without handles, and handles without bezier.
+        let project = project_with_kfs(vec![
+            keyframe(
+                0,
+                "bezier",
+                None,
+                crate::effect::AnimatablePrimitive::Number(0.0),
+            ),
+            keyframe(
+                FPF,
+                "linear",
+                Some([0.1, 0.0, 0.9, 1.0]),
+                crate::effect::AnimatablePrimitive::Number(1.0),
+            ),
+        ]);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("handles must exist only for bezier"))
+        );
+
+        // Booleans and enum strings must use hold easing.
+        let project = project_with_kfs(vec![keyframe(
+            0,
+            "linear",
+            None,
+            crate::effect::AnimatablePrimitive::Bool(true),
+        )]);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("hold easing"))
+        );
+
+        let project = project_with_kfs(vec![keyframe(
+            0,
+            "linear",
+            None,
+            crate::effect::AnimatablePrimitive::Str("a".into()),
+        )]);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("hold easing"))
+        );
+
+        // A well-formed keyframe set passes.
+        let project = project_with_kfs(vec![
+            keyframe(
+                0,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(0.0),
+            ),
+            keyframe(
+                FPF,
+                "bezier",
+                Some([0.1, 0.0, 0.9, 1.0]),
+                crate::effect::AnimatablePrimitive::Number(1.0),
+            ),
+        ]);
+        assert!(
+            !validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("keyframe"))
+        );
+    }
+
+    #[test]
+    fn rule9_keyframe_count_limit() {
+        let duration = 10_002 * FPF;
+        let mut project = valid_project();
+        project.sequences[0].tracks[0].items[0].duration = duration;
+        let mut k = Vec::new();
+        for i in 0..=limits::KEYFRAMES_PER_PARAM {
+            k.push(keyframe(
+                i as i64 * FPF,
+                "linear",
+                None,
+                crate::effect::AnimatablePrimitive::Number(0.0),
+            ));
+        }
+        let mut effect = crate::effect::new_effect_instance("fx.color.basic");
+        let mut params = BTreeMap::new();
+        params.insert("p".into(), crate::effect::AnimatableValue::K { k });
+        effect.params = params;
+        project.sequences[0].tracks[0].items[0].effects = vec![effect];
+        let issues = validate(&project);
+        assert!(issues.iter().any(|i| i.detail.contains("exceeds")));
+    }
+
+    #[test]
+    fn rule10_link_group_audio_and_media_mismatch() {
+        let mut project = valid_project();
+        let media = media_item(&id::new_id(), 60 * 705_600_000);
+        project.media.push(media.clone());
+        let link = id::new_id();
+        for _ in 0..3 {
+            let mut track = new_track(TrackKind::Audio, "A");
+            let mut clip = audio_clip(&media.id, 0, FPF);
+            clip.link_group_id = Some(link.clone());
+            track.items.push(clip);
+            project.sequences[0].tracks.push(track);
+        }
+        let mut issues = Vec::new();
+        check_link_groups(&project, &mut issues);
+        assert!(issues.iter().any(|i| i.detail.contains("link group has")));
+
+        // Mixed media inside one group.
+        let other = media_item(&id::new_id(), 60 * 705_600_000);
+        project.media.push(other.clone());
+        let mut track = new_track(TrackKind::Video, "V2");
+        let mut clip = audio_clip(&other.id, 0, FPF);
+        clip.link_group_id = Some(link);
+        track.items.push(clip);
+        project.sequences[0].tracks.push(track);
+        let mut issues = Vec::new();
+        check_link_groups(&project, &mut issues);
+        assert!(issues.iter().any(|i| i.detail.contains("same mediaId")));
+    }
+
+    #[test]
+    fn rule11_caption_bounds_and_order() {
+        let mut project = valid_project();
+        let mut track = crate::caption::new_caption_track("en", "en");
+        track.items.push(crate::caption::CaptionItem {
+            id: id::new_id(),
+            start: 0,
+            end: 0,
+            text: "ok".into(),
+            position: None,
+            extra: Default::default(),
+        });
+        project.sequences[0].caption_tracks.push(track);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("start must be < end"))
+        );
+
+        let mut project = valid_project();
+        let mut track = crate::caption::new_caption_track("en", "en");
+        track.items.push(crate::caption::CaptionItem {
+            id: id::new_id(),
+            start: 0,
+            end: 2_000_000,
+            text: "a".into(),
+            position: None,
+            extra: Default::default(),
+        });
+        track.items.push(crate::caption::CaptionItem {
+            id: id::new_id(),
+            start: 1_000_000,
+            end: 3_000_000,
+            text: "b".into(),
+            position: None,
+            extra: Default::default(),
+        });
+        project.sequences[0].caption_tracks.push(track);
+        assert!(
+            validate(&project)
+                .iter()
+                .any(|i| i.detail.contains("sorted and non-overlapping"))
+        );
+    }
+
+    #[test]
+    fn rule12_negative_marker_times_rejected() {
+        let mut project = valid_project();
+        project.sequences[0].markers = vec![crate::marker::new_marker(-1, "neg")];
+        let issues = validate(&project);
+        assert!(issues.iter().any(|i| i.detail.contains("≥ 0")));
+    }
+
+    #[test]
+    fn rule13_height_rate_and_color_space_ranges() {
+        let mut project = valid_project();
+        project.sequences[0].format.height = 1_081;
+        project.sequences[0].format.frame_rate =
+            Rational::new(31, 1).unwrap_or(Rational { num: 31, den: 1 });
+        project.sequences[0].format.color_space = "rec2020".into();
+        let issues = validate(&project);
+        assert!(issues.iter().any(|i| i.detail.contains("height")));
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("frame rate is not valid"))
+        );
+        assert!(issues.iter().any(|i| i.detail.contains("rec709-sdr")));
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("no exact flicks duration"))
+        );
+    }
+
+    #[test]
+    fn rule15_media_items_limit() {
+        let mut project = valid_project();
+        for _ in 0..=limits::MEDIA_ITEMS {
+            project.media.push(media_item(&id::new_id(), 0));
+        }
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("media items exceed the limit"))
+        );
+    }
+
+    #[test]
+    fn rule15_sequences_limit() {
+        let mut project = valid_project();
+        for i in 0..limits::SEQUENCES {
+            project
+                .sequences
+                .push(new_sequence(&format!("S{i}"), sqp02_fallback_format()));
+        }
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("sequences exceed the limit"))
+        );
+    }
+
+    #[test]
+    fn rule15_clips_limit() {
+        let mut project = valid_project();
+        project.sequences[0].tracks[0].items.clear();
+        for i in 0..=limits::CLIPS_PER_SEQUENCE {
+            project.sequences[0].tracks[0]
+                .items
+                .push(base_clip(i as i64 * FPF, FPF));
+        }
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("clips exceed the limit"))
+        );
+    }
+
+    #[test]
+    fn rule15_captions_limit() {
+        let mut project = valid_project();
+        let mut track = crate::caption::new_caption_track("en", "en");
+        for i in 0..=limits::CAPTIONS_PER_TRACK {
+            track.items.push(crate::caption::CaptionItem {
+                id: id::new_id(),
+                start: i as i64 * 10_000_000,
+                end: i as i64 * 10_000_000 + 5_000_000,
+                text: "c".into(),
+                position: None,
+                extra: Default::default(),
+            });
+        }
+        project.sequences[0].caption_tracks.push(track);
+        let issues = validate(&project);
+        assert!(
+            issues
+                .iter()
+                .any(|i| i.detail.contains("captions exceed the limit"))
+        );
+    }
 }
