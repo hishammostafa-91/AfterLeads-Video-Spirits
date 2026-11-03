@@ -65,7 +65,7 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Create `crates/alvs-store/src/project.rs`: `trait DocumentHooks` (serialize; parse_and_validate; migrate → (bytes, migrated) with E1005; fixup_media_paths rel-first-when-absolute-missing) + `trait RecentProjects` (record/list/set_pinned) + `ProjectStore<H>`: `save(Arc<H::Doc>)` = background-thread serialize → atomic write → backup into `Backups\` → prune to `alvs.general.backupsKeep` → delete sidecar → `recent.record`; `open(path)` = exist → raw-length size gate (`alvs_model::validate` size hook, 03 §3.5.15) → parse_and_validate → migrate (write `<Name>.alvs.v<old>.bak` first) → newer → read-only E1004 → basic lock acquire (`create_new` + `{pid, host, user, startedUtc, appVersion}`) → fixup_media_paths; every write SEC-04-contained
+- [ ] T011 [US1] Create `crates/alvs-store/src/project.rs`: `trait DocumentHooks` (serialize; parse_and_validate; migrate → (bytes, migrated) with E1005; fixup_media_paths rel-first-when-absolute-missing) + `trait RecentProjects` (record/list/set_pinned) + `ProjectStore<H>`: `save(Arc<H::Doc>)` = background-thread serialize → atomic write → backup into `Backups\` → prune to `alvs.general.backupsKeep` → delete sidecar → `recent.record`; `open(path)` = exist → raw-length size gate (`alvs_model::validate` size hook, 03 §3.5.15) → parse_and_validate → migrate (write `<Name>.alvs.v<old>.bak` first) → newer → read-only E1004 → basic lock acquire (creating `crates/alvs-store/src/lock.rs` now with the exclusive `create_new` acquire writing `{pid, host, user, startedUtc, appVersion}` and the release; the liveness/takeover semantics arrive in T022) → fixup_media_paths; every write SEC-04-contained
 - [ ] T012 [US1] Create `app/src-tauri/src/project_io.rs`: `ProjectHooks` implementing `DocumentHooks` for `alvs_model::Project` (03 §3.2 serialization; parse + `validate`; `alvs_model::migrate` driver + result validation; media abs+rel resolution) and add the row-legal app-crate deps (`alvs-core`, `alvs-model`, `alvs-store`); `cargo build --workspace --locked` passes
 - [ ] T013 [US1] Make T009/T010 green; verify the suite filters `t_prj_002` and `t_rel_007` pass with `cargo nextest run -p alvs-store --locked`
 
@@ -136,7 +136,7 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 5
 
-- [ ] T021 [P] [US5] Create `crates/alvs-store/tests/t_prj_008.rs`: exclusive create; live same-host lock → ReadOnly + E1007; dead pid (spawn+kill a real child or a reserved fake pid strategy, deterministic) → TakeoverAvailable; other host with startedUtc < 24 h → no takeover; ≥ 24 h → takeover; release removes the file
+- [ ] T021 [P] [US5] Create `crates/alvs-store/tests/t_prj_008.rs`: exclusive create; live same-host lock → ReadOnly + E1007; dead pid (spawn a real sleeping child via `std::process::Command`, kill and reap it, then probe its pid) → TakeoverAvailable; other host with startedUtc < 24 h → no takeover; ≥ 24 h → takeover; release removes the file
 
 ### Implementation for User Story 5
 

@@ -26,7 +26,7 @@ Deliver the persistence layer exactly as the WP-03 card specifies: the new crate
 
 **Constraints**: every behavior cites 03 §3.6–3.9 / 02 §2.5/§2.11 / 05 SEC-03/04; CMP row compliance enforced by `tools/check_deps.py` (the Option-A seam keeps `alvs-store` at `alvs-core`-only regular deps); licenses via `cargo deny` (deny.toml allowlist verbatim from 05 §5.6); no `unwrap`/`expect` outside tests; AGPL headers (02 §2.14); **one canonical doc change rides this PR (G-19): docs/02 §2.14's `unsafe` allowlist gained `alvs-store` narrowed to the two Win32 groups of D11/D12 (OD-11, owner decision 2026-11-03; docs/00 Set version 1.0.4 → 1.1.0 per §0.11 rule 2)**.
 
-**Scale/Scope**: ~12 modules in one new crate + one SQL migration + two touched crates (`alvs-core` additive, app backend thin); ~19 spec FRs; the largest surfaces are the 68-key settings table (§3.6) and the §3.7 DDL.
+**Scale/Scope**: 14 modules in one new crate + one SQL migration + two touched crates (`alvs-core` additive, app backend thin); ~19 spec FRs; the largest surfaces are the 68-key settings table (§3.6) and the §3.7 DDL.
 
 ## Constitution Check
 
