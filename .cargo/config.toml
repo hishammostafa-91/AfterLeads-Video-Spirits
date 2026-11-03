@@ -3,3 +3,8 @@
 # Windows build hardening (WP-00 card: crt-static + control-flow-guard).
 [target.x86_64-pc-windows-msvc]
 rustflags = ["-C", "target-feature=+crt-static", "-C", "control-flow-guard"]
+
+# ts-rs bindings land in the canonical UI path (docs/04 §4.2, ADR-010);
+# the `#[ts(export)]` tests write here during `cargo test`.
+[env]
+TS_RS_EXPORT_DIR = { value = "app/src/ipc/bindings", relative = true }

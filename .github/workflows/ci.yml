@@ -87,6 +87,10 @@ jobs:
         if: always()
       - run: python tools/check_placeholders.py
         if: always()
+      - run: cargo test -p alvs-model export_bindings --locked
+        if: always()
+      - run: git diff --exit-code -- app/src/ipc/bindings
+        if: always()
 
   ui:
     runs-on: windows-2025

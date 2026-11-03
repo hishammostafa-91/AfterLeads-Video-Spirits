@@ -1,0 +1,65 @@
+{
+  "assets": [],
+  "bins": [],
+  "createdUtc": "2026-11-03T15:05:32Z",
+  "format": "afterleads-video-spirits.project",
+  "futureUnknownField": {
+    "kept": true,
+    "note": "survives the driver via extra"
+  },
+  "id": "01a1a1f1-acfb-7097-a5a7-3db236a930ee",
+  "media": [],
+  "modifiedUtc": "2026-11-03T15:05:32Z",
+  "name": "Migration Fixture",
+  "savedBy": {
+    "app": "AfterLeads-Video-Spirits",
+    "commit": "dev",
+    "version": "1.0.0"
+  },
+  "schemaVersion": 1,
+  "sequences": [
+    {
+      "captionTracks": [],
+      "format": {
+        "audioLayout": "stereo",
+        "autoMatchPending": true,
+        "colorSpace": "rec709-sdr",
+        "dropFrameTimecode": false,
+        "frameRate": {
+          "den": 1,
+          "num": 30
+        },
+        "height": 1080,
+        "sampleRate": 48000,
+        "width": 1920
+      },
+      "id": "01a1a1f1-acfb-7097-a5a7-3db1cfc03117",
+      "inPoint": null,
+      "markers": [],
+      "masterAudio": {
+        "effects": [],
+        "volumeDb": 0.0
+      },
+      "name": "Main",
+      "outPoint": null,
+      "tracks": []
+    }
+  ],
+  "settings": {
+    "defaultSequenceId": "01a1a1f1-acfb-7097-a5a7-3db1cfc03117",
+    "proxyMode": false
+  },
+  "ui": {
+    "activeSequenceId": null,
+    "playheads": {},
+    "selectedTrackTargets": {},
+    "sourceViewer": {
+      "in": null,
+      "mediaId": null,
+      "out": null,
+      "playhead": 0
+    },
+    "timelineScroll": {},
+    "timelineZoom": {}
+  }
+}

@@ -211,4 +211,4 @@ Task: "Create tools/check_placeholders.py (D14)"                  # T015
 
 ## Phase 9: Convergence
 
-- [ ] T032 After the owner merges WP-01, dispatch the Nightly CI workflow manually (Actions → Nightly CI → Run workflow) and record the run URL and outcomes in specs/001-ci-quality-gates/evidence.md (`dependency-audit` green; `docs-links` informational) — GitHub offers schedule/dispatch only for workflows present on the default branch, so this proof is structurally post-merge (quickstart §7; FR-011) (partial)
+- [x] T032 After the owner merges WP-01, dispatch the Nightly CI workflow manually (Actions → Nightly CI → Run workflow) and record the run URL and outcomes in specs/001-ci-quality-gates/evidence.md (`dependency-audit` green; `docs-links` informational) — GitHub offers schedule/dispatch only for workflows present on the default branch, so this proof is structurally post-merge (quickstart §7; FR-011) (partial)
