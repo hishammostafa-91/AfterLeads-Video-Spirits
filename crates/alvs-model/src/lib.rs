@@ -18,3 +18,4 @@ pub mod sequence;
 pub mod title;
 pub mod track;
 pub mod transition;
+pub mod validate;

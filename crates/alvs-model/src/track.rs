@@ -246,6 +246,14 @@ pub struct Clip {
 
 use alvs_core::rational::Rational;
 
+/// Whether a speed rational is fully reduced (03 §3.3.2: always reduced).
+pub fn speed_is_reduced(rate: Rational) -> bool {
+    fn gcd(a: u32, b: u32) -> u32 {
+        if b == 0 { a } else { gcd(b, a % b) }
+    }
+    rate.den > 0 && gcd(rate.num, rate.den) == 1
+}
+
 /// A track (03 §3.4.6).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
