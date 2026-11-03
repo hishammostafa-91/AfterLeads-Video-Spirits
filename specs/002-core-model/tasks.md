@@ -183,3 +183,21 @@ Task: "transition/marker/caption types"      # T014
 - `ALVS_PROPTEST_CASES` raises the property scale (nightly future); lowering CI scale with it is a gate weakening (G-08) and is forbidden.
 - No persistence, no clip-editing semantics, no UI (card "Not included"; FR-010/FR-019).
 - Stop and ask (G-17) on any discrepancy with the canonical docs; verify every API against the vendored crate sources before use (anti-hallucination rule 1).
+
+---
+
+## Phase 9: Convergence
+
+**Purpose**: Gaps found by `/speckit.converge` (2026-11-03) between the implemented state and spec.md/plan.md/tasks.md/contracts. Ordered CRITICAL/HIGH first; constitution-violation tasks would precede all (none found).
+
+- [ ] T032 Return the `EntityPatch` from edits per the crate contract: add `patch: EntityPatch` to `EditResult`, fill it in `Model::apply` via `diff(before, after)`, and change `undo()`/`redo()` to return `Option<EditResult>` carrying the transition patch; update apply/patch tests to the contract shape (FR-012; US4/AC4; contracts/crate-apis.md `edit`+`history` rows) (partial)
+- [ ] T033 Enforce rule 7's media bounds in `validate.rs`: `sourceIn + duration × speed ≤ media duration` (images and image stills unlimited) and `freezeAt` within the media duration, using the in-model probe duration; positive+negative fixtures (03 §3.5.7; FR-008; T017) (partial)
+- [ ] T034 Complete rule 8 in `validate.rs`: at most one transition per edit point, and `0 < duration ≤` the available handles for its alignment computed from probe-derived source handles (media clips; title/generator/sequence clips unconstrained); fixtures incl. center/start/end alignments (03 §3.5.8 + §3.4.10; FR-008; T017) (partial)
+- [ ] T035 Add the `project file ≤ 256 MB` limit of rule 15 as a first-pass check over the JSON document size with a malicious-fixture test that rejects without full traversal (03 §3.5.15; FR-008; T018; SC-004; 05 THR-02) (missing)
+- [ ] T036 Enforce `Rational` invariants on deserialization in `crates/alvs-core/src/rational.rs`: reject `den == 0` and normalize to reduced form via `Rational::new` (custom Deserialize or `try_from`), so untrusted JSON cannot inject non-reduced/zero-denominator values; tests incl. raw-JSON injection of `{"num":32,"den":2}` and `den:0` (03 §3.3.2; FR-002) (partial)
+- [ ] T037 Preserve the non-undoable view state across `undo`/`redo`/`step` in `history.rs`: carry the current root's `ui` into the restored root ("never part of undo history"); regression test that a playhead/zoom change survives undo (03 §3.4.11; FR-006; spec US2) (contradicts)
+- [ ] T038 Define `ParamTarget` per 04 §4.4 in `edit.rs` — `{ clipId, intrinsic: "transform"|"crop"|"opacity"|"audio" } | { clipId, effectInstanceId } | { clipId, maskId } | { clipId, titleLayerId } | { trackId, effectInstanceId } | { transitionId } | { sequenceId, masterEffectInstanceId }` — with serde (camelCase, tag-by-shape per the doc) and TS export through `dto.rs`/bindings; serde shape tests (04 §4.4; FR-009; T019; contracts/crate-apis.md `edit` row) (missing)
+- [ ] T039 Validate the migrated result inside the migration driver: after the step chain, deserialize the value as `Project` (and run `validate`) and fail E1005 with a precise detail when the result is invalid; synthetic invalid-step test (03 §3.9.6; FR-013; T025; contracts/crate-apis.md `migrate` row) (partial)
+- [ ] T040 Extend T-PRJ-006 to the named scale: undo/redo exact-inverse equality over 200 and 1,000 applied edits within the budget, and multi-step redo ordering after a `step(i)` jump (SC-003; T022; contracts/crate-apis.md guarantee 1) (partial)
+- [ ] T041 Prove patch-application equivalence on a rich diff: apply a multi-kind patch (upserts and removes across entity kinds incl. dirty-range-bearing changes) to a normalized copy of the prior state and assert equality with the new root (spec US4/AC4; T023; contracts/crate-apis.md `patch` row) (partial)
+- [ ] T042 Extend rule 1's id walk in `validate.rs` to clip markers and track effects so every id in the project is checked for uniqueness and UUID v7 form, with a duplicate-id fixture (03 §3.5.1; FR-008) (partial)
