@@ -80,8 +80,8 @@ Monorepo per docs/02 §2.13: `crates/alvs-core` and `crates/alvs-model` (both in
 
 **Independent Test**: positive+negative fixture per rule; oversized file rejected (SC-004 part).
 
-- [ ] T017 [US3] Create `crates/alvs-model/src/validate.rs`: `validate(&Project) -> Vec<Issue>` implementing 03 §3.5 rules 1–14 (IDs, references incl. the §3.5.2 list, nesting depth ≤ 8 → E1006, track sort/overlap, frame-grid multiples incl. audio quarter-frame, duration>0 + speed bounds, source bounds + freezeAt, transition adjacency/handles/one-per-edit, keyframe rules, link-group shape, caption rules, marker rules incl. chapter uniqueness, format ranges incl. 44.1/48 kHz, asset sha256); each rule covered by a passing and a failing fixture (crates/alvs-model/src/validate.rs)
-- [ ] T018 [US3] Add the 03 §3.5.15 size limits as first-pass checks (≤ 99 tracks/kind, ≤ 20,000 clips/sequence, ≤ 100 sequences, ≤ 50,000 media, ≤ 10,000 keyframes/parameter, ≤ 20,000 captions/track, file ≤ 256 MB over the JSON value); malicious-fixture tests reject without traversal (05 THR-02; T-PRJ-007 part) (crates/alvs-model/src/validate.rs)
+- [x] T017 [US3] Create `crates/alvs-model/src/validate.rs`: `validate(&Project) -> Vec<Issue>` implementing 03 §3.5 rules 1–14 (IDs, references incl. the §3.5.2 list, nesting depth ≤ 8 → E1006, track sort/overlap, frame-grid multiples incl. audio quarter-frame, duration>0 + speed bounds, source bounds + freezeAt, transition adjacency/handles/one-per-edit, keyframe rules, link-group shape, caption rules, marker rules incl. chapter uniqueness, format ranges incl. 44.1/48 kHz, asset sha256); each rule covered by a passing and a failing fixture (crates/alvs-model/src/validate.rs)
+- [x] T018 [US3] Add the 03 §3.5.15 size limits as first-pass checks (≤ 99 tracks/kind, ≤ 20,000 clips/sequence, ≤ 100 sequences, ≤ 50,000 media, ≤ 10,000 keyframes/parameter, ≤ 20,000 captions/track, file ≤ 256 MB over the JSON value); malicious-fixture tests reject without traversal (05 THR-02; T-PRJ-007 part) (crates/alvs-model/src/validate.rs)
 
 **Checkpoint**: SC-004 part — validation is complete and size-hardened.
 
