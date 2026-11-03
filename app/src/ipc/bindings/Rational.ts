@@ -2,6 +2,11 @@
 
 /**
  * A rational number `{ num, den }` with `den > 0`, always reduced (03 §3.3.2).
+ *
+ * Deserialization enforces the same invariants as [`Rational::new`]: a
+ * zero denominator is rejected and any input is normalized to its reduced
+ * form, so an untrusted project file cannot smuggle a non-canonical value
+ * (e.g. `{"num":32,"den":2}` loads as 16/1) past the type (05 THR-02).
  */
 export type Rational = { 
 /**

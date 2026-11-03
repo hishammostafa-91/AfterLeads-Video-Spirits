@@ -4,17 +4,44 @@
 //! always reduced, `den > 0`.
 
 use schemars::JsonSchema;
+use serde::de::Error as _;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// A rational number `{ num, den }` with `den > 0`, always reduced (03 §3.3.2).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
+///
+/// Deserialization enforces the same invariants as [`Rational::new`]: a
+/// zero denominator is rejected and any input is normalized to its reduced
+/// form, so an untrusted project file cannot smuggle a non-canonical value
+/// (e.g. `{"num":32,"den":2}` loads as 16/1) past the type (05 THR-02).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, TS, JsonSchema)]
 #[ts(export)]
 pub struct Rational {
     /// Numerator.
     pub num: u32,
     /// Denominator; strictly positive.
     pub den: u32,
+}
+
+impl<'de> Deserialize<'de> for Rational {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(rename_all = "camelCase")]
+        struct RawRational {
+            num: u32,
+            den: u32,
+        }
+        let raw = RawRational::deserialize(deserializer)?;
+        match Rational::new(raw.num, raw.den) {
+            Some(reduced) => Ok(reduced),
+            None => Err(D::Error::custom(
+                "rational denominator must be > 0 (03 §3.3.2)",
+            )),
+        }
+    }
 }
 
 impl Rational {
@@ -62,6 +89,25 @@ mod tests {
     fn zero_denominator_is_rejected() {
         assert!(Rational::new(1, 0).is_none());
         assert!(Rational::new(0, 0).is_none());
+    }
+
+    #[test]
+    fn deserialization_enforces_the_type_invariants() {
+        // A non-reduced pair from an untrusted file loads in reduced form.
+        let r: Rational =
+            serde_json::from_str(r#"{"num":32,"den":2}"#).unwrap_or(Rational { num: 1, den: 1 });
+        assert_eq!((r.num, r.den), (16, 1));
+        // Zero denominators are rejected at the boundary (03 §3.3.2).
+        let err = serde_json::from_str::<Rational>(r#"{"num":1,"den":0}"#);
+        assert!(err.is_err());
+        // Reduced input round-trips unchanged.
+        let r: Rational = serde_json::from_str(r#"{"num":30000,"den":1001}"#)
+            .unwrap_or(Rational { num: 1, den: 1 });
+        assert_eq!((r.num, r.den), (30000, 1001));
+        assert_eq!(
+            serde_json::to_string(&r).unwrap_or_default(),
+            r#"{"num":30000,"den":1001}"#
+        );
     }
 
     proptest! {
