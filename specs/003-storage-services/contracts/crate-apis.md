@@ -68,10 +68,11 @@ pub trait DocumentHooks {
     fn migrate(bytes: &[u8]) -> Result<(Vec<u8>, bool), StoreError>; // migrated?, E1005
     fn fixup_media_paths(doc: &mut Self::Doc, project_dir: &Path) -> Result<(), StoreError>;
 }
-pub struct ProjectStore { /* … */ }
-impl ProjectStore {
-    pub fn save(&self, doc: &impl DocumentHooks::Doc /* via H */) -> Result<SaveReceipt, StoreError>;
-    // §3.9.2: serialize (caller thread) → atomic write → backup → prune →
+pub struct ProjectStore<H: DocumentHooks> { /* … */ }
+impl<H: DocumentHooks> ProjectStore<H> {
+    pub fn save(&self, snapshot: Arc<H::Doc>) -> Result<SaveReceipt, StoreError>;
+    // §3.9.2: serialize the snapshot on a background thread (Arc clone handed over;
+    // the caller keeps editing) → atomic write → backup → prune →
     // delete sidecar → recent.record
     pub fn open(path: &Path) -> Result<Opened<H::Doc>, StoreError>;
     // exist → size gate → parse → migrate(.bak first) → validate → lock → fixup media

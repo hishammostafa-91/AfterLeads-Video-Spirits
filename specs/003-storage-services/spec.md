@@ -25,7 +25,7 @@ The user saves a project and trusts it: the `.alvs` file (UTF-8 JSON per 03 §3.
 **Acceptance Scenarios**:
 
 1. **Given** a dirty project, **When** it is saved, **Then** serialization happens on a background thread, the file is replaced atomically, a timestamped backup is written and pruned, the autosave sidecar is deleted, and recent projects are updated (03 §3.9.2).
-2. **Given** a write that fails on the final replace (disk full, permission denied), **When** save is attempted, **Then** the previous file is intact and an actionable error (E8001/E8004/E1008/E5003 per 12 §12.13) is reported (03 §3.9.1; REQ-REL-007).
+2. **Given** a write that fails on the final replace (disk full, permission denied), **When** save is attempted, **Then** the previous file is intact and an actionable error (E1008/E8001/E8004 per 03 §3.9.1; 12 §12.13) is reported (REQ-REL-007 save path; E5003 names the export half, WP-22).
 3. **Given** a project whose media absolute path no longer exists but whose relative path does, **When** the project opens, **Then** the media resolves via the relative path (REQ-PRJ-002).
 4. **Given** a file larger than the 03 §3.5.15 document limit, **When** open is attempted, **Then** it is rejected by the size check before parsing (SEC-03; 03 §3.5 rule 15).
 
@@ -129,7 +129,7 @@ Logs roll at 10 MB keeping 10 files in the logs folder, as structured JSON lines
 ### Edge Cases
 
 - Crash between `.tmp` write and replace: the original file must remain and the `.tmp` be left behind or cleaned; no torn main file ever (03 §3.9.1; NFR-REL-02).
-- Disk full or permission denied at any write (project, autosave, backup, settings, cache): previous files stay intact, actionable codes E8001/E8004/E1008/E5003 (REQ-REL-007; 12 §12.13).
+- Disk full or permission denied at any write (project, autosave, backup, settings, cache): previous files stay intact, actionable codes E1008/E8001/E8004 (03 §3.9.1; REQ-REL-007 — E5003 names the export half, WP-22).
 - Corrupt `settings.json` with **no** backup yet (first run): fall back to defaults and report E8002 (03 §3.6; assumption below).
 - Corrupt `cache.sqlite`: rename + rebuild, E8003 — cache loss is acceptable, user data is not (03 §3.7).
 - Lock without a live process but a *different host* and younger than 24 h: no take-over (03 §3.9.4).
@@ -197,3 +197,4 @@ All requirements are scoped to the WP-03 card. IDs are feature-local (FR-xxx) an
 - Recent projects live in SQLite per 03 §3.7 (not a settings key), trimmed by `alvs.general.recentLimit`; thumbnails in that table are stored as file references written by later packages (nullable until then).
 - The workspace gates that already exist (crate rules, clippy `-D warnings`, tests) keep applying to the new crate; the card adds no coverage threshold for this package.
 - Portable mode detection is the presence of `portable.flag` next to the executable (03 §3.8); no other mode exists in 1.0.
+- Log file naming (`app.log` + `app.log.1…9`) is a WP-03 convention: 03 §3.8/§3.9.8 pin the folder, the 10-file count, and the 10 MB size, but not the file names; T-REL-003 and the later diagnostics-bundle work (WP-27) adopt this scheme.

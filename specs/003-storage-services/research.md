@@ -28,7 +28,7 @@ Method per G-10: repository → lockfile/registry → crates.io/docs.rs (verifie
 
 ## D3 — Logging pipeline: JSON lines, custom size rotation (02 §2.11; 03 §3.6/§3.8/§3.9.8; REQ-REL-003)
 
-- **Decision**: `tracing_subscriber::fmt().json()` writing through **our own size-rotating writer** (rotate at 10 MB; keep `app.log` + `app.log.1` … `app.log.9`; delete older), wrapped in `tracing_appender::non_blocking` (WorkerGuard flushed at shutdown). The `ts` field uses `UtcTime::rfc_3339()` (tracing-subscriber feature `time`). Level from `alvs.advanced.logLevel`. Paths are logged only at debug and always pass through `redact` (D15); media content/caption text never logged.
+- **Decision**: `tracing_subscriber::fmt().json()` writing through **our own size-rotating writer** (rotate at 10 MB; keep `app.log` + `app.log.1` … `app.log.9`; delete older — the file-name scheme is a WP-03 convention: 03 §3.8/§3.9.8 pin the folder, count, and size, not the names), wrapped in `tracing_appender::non_blocking` (WorkerGuard flushed at shutdown). The `ts` field uses `UtcTime::rfc_3339()` (tracing-subscriber feature `time`). Level from `alvs.advanced.logLevel`. Paths are logged only at debug and always pass through `redact` (D15); media content/caption text never logged.
 - **Rationale (the load-bearing finding)**: docs.rs tracing-appender 0.2.5 — `RollingFileAppender` "rotate[s] log files **at a fixed schedule**" (`Rotation::NEVER/MINUTELY/HOURLY/DAILY`); there is **no size-based rotation**. REQ-REL-003 mandates "10 files × 10 MB". The custom writer is therefore required by the canonical numbers, while `tracing-appender` still supplies the prescribed non-blocking write path (02 §2.11 names the crate; we use it for what it actually provides). `time` arrives only as tracing-subscriber's own feature-gated optional dependency (already in the lock at 0.3.55), not a direct dep.
 - **Alternatives**: time-based rotation + `max_log_files` — violates the 10 MB half; writing directly (no non_blocking) — blocks callers, loses the guard's flush semantics.
 
@@ -84,15 +84,15 @@ Method per G-10: repository → lockfile/registry → crates.io/docs.rs (verifie
 
 ## D13 — Failure injection for the "simulated failure" tests (T-PRJ-002, T-REL-007)
 
-- **Decision**: the atomic-write primitive is generic over a small `Fs` seam (`write_tmp`, `flush`, `replace`); production uses the std/windows implementation; tests inject failures at each step (tmp write, flush, replace) plus one *real* permission-denied case (read-only directory). No `#[cfg(test)]` in production code; the seam is `pub(crate)`.
-- **Rationale**: disk-full cannot be reproduced deterministically on CI; REQ-REL-007 demands proof that previous files survive — injection at the exact steps is the honest equivalent; real ACL denial covers the permission half natively.
+- **Decision**: the atomic-write primitive is generic over a small `Fs` seam (`write_tmp`, `flush`, `replace`); production uses the std/windows implementation; tests inject failures at each step (tmp write, flush, replace). No test-only behavior forks exist in production code — the seam is always compiled and never `#[cfg(test)]`-gated (`pub(crate)` visibility). Step-wise injection lives in in-crate `#[cfg(test)]` unit tests (02 §2.14 "tests next to code"); the end-to-end acceptance suites live in `crates/alvs-store/tests/`. **Real** permission failures use Windows-deterministic constructs — the directory READONLY attribute does *not* deny file creation on Windows, so: (a) pre-create `<target>.tmp` as a directory (the subsequent open fails with `ERROR_ACCESS_DENIED`) and (b) mark the existing target file read-only for the replace step (`MOVEFILE_REPLACE_EXISTING` then fails `ACCESS_DENIED` end-to-end → E8004).
+- **Rationale**: disk-full cannot be reproduced deterministically on CI; REQ-REL-007 demands proof that previous files survive — injection at the exact steps is the honest equivalent; the two native-denial constructs above exercise the E8004 path for real without ACL flakiness.
 
 ## D14 — Session marker and crash-recovery service (03 §3.9.5; REQ-REL-001 services)
 
 - **Decision**: `session.marker` (content `{ pid, startedUtc }`) created at startup, removed on clean exit. `evaluate(main_path, autosave_path)` compares file modification times and returns the DLG-15 data: `Recovery { autosave_ts, saved_ts }` when a marker was left **and** the autosave is newer, else `None`. Choosing the autosave opens it as an unsaved document (its next save writes the main file) — that policy is expressed by the returned offer plus an `open_recovery` path that loads the sidecar without locking semantics changes.
 - **Rationale**: §3.9.5 verbatim; the service exposes exactly what the (later) dialog renders; timestamps are compared, not existence (spec edge case).
 
-## D15 — Redaction helper in `alvs-core` (CMP-01 "logging setup helpers"; REQ-RL-003)
+## D15 — Redaction helper in `alvs-core` (CMP-01 "logging setup helpers"; REQ-REL-003)
 
 - **Decision**: `alvs-core::redact::redact_paths(&str) -> String` replaces path-shaped substrings — drive-letter absolutes (`X:\…`), UNC (`\\server\share\…`), and the known env roots — with `<path>`; pure string work, no deps. Debug-level log sites and diagnostics export call it; diagnostics application is gated by `alvs.advanced.redactDiagnostics` (default true).
 - **Rationale**: CMP-01's own description places "logging setup helpers" in `alvs-core`; every crate can then log paths safely without depending on `alvs-store` (which most rows forbid anyway).

@@ -16,7 +16,7 @@ Deliver the persistence layer exactly as the WP-03 card specifies: the new crate
 
 **Storage**: this package *is* the storage layer — `.alvs` + sidecar + `Backups\` + `.v<old>.bak` in the project folder; `settings.json`(+`.bak`), `cache.sqlite`, `session.marker`, logs under the app folders (03 §3.8).
 
-**Testing**: the card's seven suites (T-PRJ-002/003/004/008, T-SET-003, T-REL-003, T-REL-007 save part) as named filters + per-module unit tests; deterministic and offline via `Clock`/`Fs` seams (D10/D13) and std temp dirs with uuid names; proptest only for the civil-date math (D5). No coverage threshold is in the card — none invented (D18).
+**Testing**: the card's seven suites (T-PRJ-002/003/004/008, T-SET-003, T-REL-003, T-REL-007 save part) as named filters + per-module unit tests; deterministic and offline via `Clock`/`Fs` seams (D10/D13) and std temp dirs with uuid names; proptest only for the civil-date math (D5), run with a **fixed seed** (`ProptestConfig` seed pinned, `PROPTEST_SEED` honored in CI) or exhaustive bounded strategies — constitution III's seeded-determinism rule. No coverage threshold is in the card — none invented (D18).
 
 **Target Platform**: Windows 11 x64 — `MoveFileExW`/`FlushFileBuffers`, `OpenProcess` liveness, `CREATE_NEW` exclusivity, `%APPDATA%`/`%LOCALAPPDATA%` roots, long paths via `alvs-core::path`.
 
@@ -24,7 +24,7 @@ Deliver the persistence layer exactly as the WP-03 card specifies: the new crate
 
 **Performance Goals**: none in the card; the obligations are durability bounds — zero torn files, ≤ one autosave interval of lost work (NFR-REL-02), settings writes debounced 500 ms, DB busy_timeout 5 s.
 
-**Constraints**: every behavior cites 03 §3.6–3.9 / 02 §2.5/§2.11 / 05 SEC-03/04; CMP row compliance enforced by `tools/check_deps.py` (the Option-A seam keeps `alvs-store` at `alvs-core`-only regular deps); licenses via `cargo deny` (deny.toml allowlist verbatim from 05 §5.6); no `unwrap`/`expect` outside tests; AGPL headers (02 §2.14); no canonical doc changes required (D2 avoids the CMP-08 amendment).
+**Constraints**: every behavior cites 03 §3.6–3.9 / 02 §2.5/§2.11 / 05 SEC-03/04; CMP row compliance enforced by `tools/check_deps.py` (the Option-A seam keeps `alvs-store` at `alvs-core`-only regular deps); licenses via `cargo deny` (deny.toml allowlist verbatim from 05 §5.6); no `unwrap`/`expect` outside tests; AGPL headers (02 §2.14); **one canonical doc change is pending the owner's F-01 decision (review 2026-11-03): D11/D12's two Win32 FFI calls (`MoveFileExW` per §3.9.1, process-liveness per §3.9.4) need `unsafe` in `alvs-store`, which docs/02 §2.14's allowlist (alvs-media / alvs-render / CMP-12) does not cover — Option (a) adds a narrowly-scoped `alvs-store` entry to §2.14 in this PR (G-19), Option (b) routes the two calls through a CMP-12-implemented seam instead.**
 
 **Scale/Scope**: ~12 modules in one new crate + one SQL migration + two touched crates (`alvs-core` additive, app backend thin); ~19 spec FRs; the largest surfaces are the 68-key settings table (§3.6) and the §3.7 DDL.
 

@@ -20,7 +20,7 @@ cargo nextest run -p alvs-store --locked
 | 4 | T-PRJ-008 locks | `cargo nextest run -p alvs-store --locked t_prj_008` | exclusive create; live lock → E1007 read-only; dead pid → takeover; other host < 24 h → no takeover |
 | 5 | T-SET-003 settings | `cargo nextest run -p alvs-store --locked t_set_003` | invalid → default + one E8002; unknown keys preserved; corrupt → `.bak` restore (no `.bak` → defaults) |
 | 6 | T-REL-003 logs | `cargo nextest run -p alvs-store --locked t_rel_003` | rotation at 10 MB, ≤ 10 files, JSON `ts/level/target/msg`, paths redacted |
-| 7 | T-REL-007 (save part) | `cargo nextest run -p alvs-store --locked t_rel_007` | disk-full (injected) and permission (read-only dir) failures on save/autosave/backup/settings keep previous files intact with E8001/E8004/E1008 |
+| 7 | T-REL-007 (save part) | `cargo nextest run -p alvs-store --locked t_rel_007` | disk-full (injected) and permission failures (pre-created `.tmp` directory; read-only target file at the replace step) on save/autosave/backup/settings keep previous files intact with E8001/E8004/E1008 |
 
 Filters are name prefixes on the test functions; the exact test names appear in `tasks.md`.
 
@@ -30,7 +30,7 @@ Filters are name prefixes on the test functions; the exact test names appear in 
 cargo nextest run -p alvs-store --locked project   # save/open pipeline against real alvs-model Project
 ```
 
-**Expected**: the `DocumentHooks` implementation over `alvs_model::Project` round-trips a WP-02 fixture (including a `v1` migration fixture with `.v1.bak` written and a `schemaVersion`-newer file opening read-only E1004).
+**Expected**: the `DocumentHooks` implementation over `alvs_model::Project` (a) round-trips a current `schemaVersion = 1` WP-02 fixture with **no** migration (the registry is empty at v1 — the only registered version), and (b) opens a `schemaVersion = 2` fixture **read-only** with E1004. The physical `.v<old>.bak` write and E1005-on-failure path are exercised through a **test-local** `DocumentHooks` carrying synthetic versions and migration steps (legal: the WP-02 driver takes caller-supplied steps), since no real step exists until the version that first bumps the schema.
 
 ## 4. Gates
 
