@@ -24,7 +24,7 @@ Deliver the persistence layer exactly as the WP-03 card specifies: the new crate
 
 **Performance Goals**: none in the card; the obligations are durability bounds — zero torn files, ≤ one autosave interval of lost work (NFR-REL-02), settings writes debounced 500 ms, DB busy_timeout 5 s.
 
-**Constraints**: every behavior cites 03 §3.6–3.9 / 02 §2.5/§2.11 / 05 SEC-03/04; CMP row compliance enforced by `tools/check_deps.py` (the Option-A seam keeps `alvs-store` at `alvs-core`-only regular deps); licenses via `cargo deny` (deny.toml allowlist verbatim from 05 §5.6); no `unwrap`/`expect` outside tests; AGPL headers (02 §2.14); **one canonical doc change is pending the owner's F-01 decision (review 2026-11-03): D11/D12's two Win32 FFI calls (`MoveFileExW` per §3.9.1, process-liveness per §3.9.4) need `unsafe` in `alvs-store`, which docs/02 §2.14's allowlist (alvs-media / alvs-render / CMP-12) does not cover — Option (a) adds a narrowly-scoped `alvs-store` entry to §2.14 in this PR (G-19), Option (b) routes the two calls through a CMP-12-implemented seam instead.**
+**Constraints**: every behavior cites 03 §3.6–3.9 / 02 §2.5/§2.11 / 05 SEC-03/04; CMP row compliance enforced by `tools/check_deps.py` (the Option-A seam keeps `alvs-store` at `alvs-core`-only regular deps); licenses via `cargo deny` (deny.toml allowlist verbatim from 05 §5.6); no `unwrap`/`expect` outside tests; AGPL headers (02 §2.14); **one canonical doc change rides this PR (G-19): docs/02 §2.14's `unsafe` allowlist gained `alvs-store` narrowed to the two Win32 groups of D11/D12 (OD-11, owner decision 2026-11-03; docs/00 Set version 1.0.4 → 1.1.0 per §0.11 rule 2)**.
 
 **Scale/Scope**: ~12 modules in one new crate + one SQL migration + two touched crates (`alvs-core` additive, app backend thin); ~19 spec FRs; the largest surfaces are the 68-key settings table (§3.6) and the §3.7 DDL.
 
@@ -34,7 +34,7 @@ Deliver the persistence layer exactly as the WP-03 card specifies: the new crate
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. Canonical documentation first | PASS | Every FR/decision cites 01/02/03/05/09/12 sections; the one canonical conflict (card vs CMP-08) was escalated to the owner (G-17) and resolved as Option A without doc changes; versions verified (D1). |
+| I. Canonical documentation first | PASS | Every FR/decision cites 01/02/03/05/09/12 sections; both canonical conflicts were escalated to the owner (G-17) — the card-vs-CMP-08 one resolved as Option A (no doc change), the §2.14 `unsafe` one resolved as OD-11 (scoped doc change in this PR, G-19); versions verified (D1). |
 | II. Scope discipline | PASS | FR-019/D16 fence out dialogs (WP-05+), export errors (WP-22), cache-content writers/eviction (WP-07/08/21), job re-queue, models, single-instance, startup orchestration; no 1.1/1.2 items. |
 | III. Test-first evidence | PASS | The seven named suites are the acceptance (SC-001..007); determinism via Clock/Fs injection (constitution III's no-wall-clock rule). |
 | IV. Protected main and clean history | PASS | Work on `feat/003-storage-services` from `main` `6355f6d`; gates + review before the owner's merge. |

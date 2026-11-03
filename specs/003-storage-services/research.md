@@ -73,13 +73,13 @@ Method per G-10: repository → lockfile/registry → crates.io/docs.rs (verifie
 ## D11 — Lock files (03 §3.9.4; REQ-PRJ-011)
 
 - **Decision**: create `<Name>.alvs.lock` with `OpenOptions::create_new` (maps to `CREATE_NEW` — exclusive). Content: `{ pid, host, user, startedUtc, appVersion }` (host/user from `COMPUTERNAME`/`USERNAME`). On existing lock: same host + process alive → read-only outcome (E1007); process dead → take-over allowed; different host → take-over only when the lock's `startedUtc` is ≥ 24 h old; lock removed on close. Liveness: `windows` `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` + `WaitForSingleObject(handle, 0)` (`WAIT_OBJECT_0` = exited) + `CloseHandle`.
-- **Rationale**: §3.9.4 names every field and rule; `create_new` gives exclusivity without inventing locking machinery; the Win32 probe is the standard PID-liveness check and the `windows` crate is the baseline Win32 row.
+- **Rationale**: §3.9.4 names every field and rule; `create_new` gives exclusivity without inventing locking machinery; the Win32 probe is the standard PID-liveness check and the `windows` crate is the baseline Win32 row. The probe's `unsafe` blocks are legal per **OD-11** (owner decision 2026-11-03): docs/02 §2.14's allowlist gained `alvs-store` narrowed to this probe and D12's replace call, each block carrying a `// SAFETY:` comment and a test.
 - **Alternatives**: `tasklist` subprocess (spawns a process — violates the no-shell posture), `sysinfo` crate (not baseline).
 
 ## D12 — Atomic write primitive (03 §3.9.1; REQ-REL-007 save path)
 
 - **Decision**: write `<target>.tmp` in the same folder → `File::sync_all()` (std maps this to `FlushFileBuffers` on Windows) → replace via `windows::Win32::Storage::FileSystem::MoveFileExW` with `MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH`. Any failure keeps the original untouched; the `.tmp` is best-effort removed; error mapping: full-disk kinds → E8001, permission → E8004, others → E1008 (save context). Applied to every user/app file this package writes (project, sidecar, backups, settings, `.bak`, marker, lock).
-- **Rationale**: std's `fs::rename` on Windows calls `MoveFileExW` **without** `MOVEFILE_WRITE_THROUGH`, so the exact §3.9.1 flag pair needs the `windows` crate; `sync_all` already *is* `FlushFileBuffers`, so no unsafe handle plumbing for the flush half.
+- **Rationale**: std's `fs::rename` on Windows calls `MoveFileExW` **without** `MOVEFILE_WRITE_THROUGH`, so the exact §3.9.1 flag pair needs the `windows` crate; `sync_all` already *is* `FlushFileBuffers`, so no unsafe handle plumbing for the flush half. The one `unsafe` block (the `MoveFileExW` call) is legal per **OD-11** (owner decision 2026-11-03): docs/02 §2.14's allowlist gained `alvs-store` narrowed to this call and D11's liveness probe, with `// SAFETY:` comment and test.
 - **Alternatives**: `tempfile`-style crate — not baseline; `replace_file`/POSIX-style — not the Windows contract §3.9.1 states.
 
 ## D13 — Failure injection for the "simulated failure" tests (T-PRJ-002, T-REL-007)
