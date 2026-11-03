@@ -8,10 +8,13 @@
 pub mod asset;
 pub mod bin;
 pub mod caption;
+pub mod edit;
 pub mod effect;
+pub mod history;
 pub mod marker;
 pub mod mask;
 pub mod media;
+pub mod patch;
 pub mod project;
 pub mod schema;
 pub mod sequence;

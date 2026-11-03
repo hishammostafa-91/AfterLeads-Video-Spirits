@@ -1,0 +1,436 @@
+//! SPDX-License-Identifier: AGPL-3.0-or-later
+//! Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+//! Undo/redo with Arc roots (ADR-009, REQ-PRJ-007): every edit produces a new
+//! root; undo/redo move between roots; at least 200 steps guaranteed, up to
+//! 1,000 within a 512 MB estimated-size budget (research D9).
+
+use std::sync::Arc;
+
+use alvs_core::error::AppError;
+
+use crate::edit::{ApplyOutcome, EditResult, apply_op};
+use crate::project::Project;
+use crate::validate;
+
+/// The undo/redo budget in bytes of estimated size (REQ-PRJ-007).
+pub const BUDGET_BYTES: usize = 512 * 1024 * 1024;
+
+/// The guaranteed minimum number of undo steps (REQ-PRJ-007).
+pub const MIN_STEPS: usize = 200;
+
+/// The maximum number of retained undo steps (REQ-PRJ-007).
+pub const MAX_STEPS: usize = 1_000;
+
+/// A deterministic structural size estimate for a project root (research
+/// D9): per-entity base + payload lengths. The budget is enforced on this
+/// estimate, making the threshold testable at exact boundaries without
+/// allocator sampling.
+pub fn estimate_size(project: &Project) -> usize {
+    let mut total = std::mem::size_of::<Project>();
+    total += project.name.len() + project.id.len();
+    for media in &project.media {
+        total += 256
+            + media.name.len()
+            + media.path.len()
+            + media.rel_path.len()
+            + media.notes.len()
+            + media.probe.streams.len() * 128;
+    }
+    for bin in &project.bins {
+        total += 96 + bin.name.len();
+    }
+    for asset in &project.assets {
+        total += 128 + asset.name.len() + asset.rel_path.len() + asset.sha256.len();
+    }
+    for sequence in &project.sequences {
+        total += 192 + sequence.name.len();
+        for track in &sequence.tracks {
+            total += 160 + track.name.len() + track.items.len() * 512;
+            for clip in &track.items {
+                total += clip.name.as_deref().map_or(0, str::len);
+                for effect in &clip.effects {
+                    total += 128 + effect.params.len() * 64;
+                }
+            }
+        }
+        total += sequence.caption_tracks.len() * 128;
+        total += sequence.markers.len() * 96;
+    }
+    total
+}
+
+/// The undo/redo engine (ADR-009).
+#[derive(Debug, Clone)]
+pub struct History {
+    undo: Vec<Arc<Project>>,
+    redo: Vec<Arc<Project>>,
+    sizes: std::collections::VecDeque<usize>,
+    total_size: usize,
+}
+
+impl History {
+    /// An empty history.
+    pub fn new() -> Self {
+        Self {
+            undo: Vec::new(),
+            redo: Vec::new(),
+            sizes: std::collections::VecDeque::new(),
+            total_size: 0,
+        }
+    }
+
+    /// Record a new undo step (called after a successful edit or a redo).
+    /// Does NOT clear the redo stack — `Model::apply` does that (a new edit
+    /// invalidates redo; redoing should preserve the remaining redo steps).
+    pub fn push(&mut self, root: Arc<Project>) {
+        let size = estimate_size(&root);
+        self.undo.push(root);
+        self.sizes.push_back(size);
+        self.total_size += size;
+        self.evict();
+    }
+
+    /// Clear the redo stack (called by `Model::apply` on a new edit).
+    pub fn clear_redo(&mut self) {
+        self.redo.clear();
+    }
+
+    /// Evict oldest steps above the budget, never below MIN_STEPS, capped at
+    /// MAX_STEPS (REQ-PRJ-007; research D9).
+    fn evict(&mut self) {
+        while self.undo.len() > MAX_STEPS
+            || (self.total_size > BUDGET_BYTES && self.undo.len() > MIN_STEPS)
+        {
+            if self.undo.len() <= MIN_STEPS {
+                break;
+            }
+            if !self.undo.is_empty()
+                && let Some(size) = self.sizes.front().copied()
+            {
+                self.total_size = self.total_size.saturating_sub(size);
+                self.undo.remove(0);
+                self.sizes.pop_front();
+            } else {
+                break;
+            }
+        }
+    }
+
+    /// Pop the previous root for undo, pushing the current one onto redo.
+    pub fn undo(&mut self, current: Arc<Project>) -> Option<Arc<Project>> {
+        let previous = self.undo.last().cloned()?;
+        self.undo.pop();
+        let size = self.sizes.pop_back().unwrap_or(0);
+        self.total_size = self.total_size.saturating_sub(size);
+        self.redo.push(current);
+        Some(previous)
+    }
+
+    /// Pop the redo root.
+    pub fn redo(&mut self, current: Arc<Project>) -> Option<Arc<Project>> {
+        let next = self.redo.pop()?;
+        self.push(current);
+        Some(next)
+    }
+
+    /// The retained undo steps (History panel listing; the jump is
+    /// `step(i)`, REQ-PRJ-007).
+    pub fn steps(&self) -> &[Arc<Project>] {
+        &self.undo
+    }
+
+    /// Jump to undo step `i` (0 = oldest retained): returns the roots popped
+    /// off (for the redo stack) and the target root (REQ-PRJ-007 jump).
+    pub fn step(
+        &mut self,
+        i: usize,
+        current: Arc<Project>,
+    ) -> Option<(Vec<Arc<Project>>, Arc<Project>)> {
+        if i >= self.undo.len() {
+            return None;
+        }
+        let target = self.undo[i].clone();
+        let popped: Vec<Arc<Project>> = self.undo[i + 1..].to_vec();
+        let popped_current = if i + 1 < self.undo.len() {
+            // `current` becomes the first redo entry
+            current
+        } else {
+            current
+        };
+        self.redo.extend(popped.iter().rev().cloned());
+        self.redo.push(popped_current);
+        let removed_sizes: usize = self.sizes.iter().skip(i).sum();
+        self.total_size = self.total_size.saturating_sub(removed_sizes);
+        self.undo.truncate(i + 1);
+        self.sizes.truncate(i + 1);
+        self.undo.pop();
+        self.sizes.pop_back();
+        Some((popped, target))
+    }
+
+    /// The current estimated total size of retained undo steps.
+    pub fn total_estimated_size(&self) -> usize {
+        self.total_size
+    }
+}
+
+impl Default for History {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// The editing model: the current root plus history (ADR-009). Every apply
+/// validates after the edit in tests/debug and rolls back with E0002 on a
+/// violated invariant (03 §3.5).
+pub struct Model {
+    root: Arc<Project>,
+    history: History,
+    revision: u64,
+}
+
+impl Model {
+    /// Build a model over an initial project.
+    pub fn new(root: Project) -> Self {
+        Self {
+            root: Arc::new(root),
+            history: History::new(),
+            revision: 0,
+        }
+    }
+
+    /// The current root (cheap Arc clone).
+    pub fn root(&self) -> Arc<Project> {
+        self.root.clone()
+    }
+
+    /// The current revision (EntityPatch counter, 04 §4.4).
+    pub fn revision(&self) -> u64 {
+        self.revision
+    }
+
+    /// The history engine (for the History panel, WP-13).
+    pub fn history(&self) -> &History {
+        &self.history
+    }
+
+    /// Apply an op: clone-on-write through `Arc::make_mut`, validate after
+    /// (debug/tests per 03 §3.5), and roll back with E0002 on violation.
+    /// Undo/redo are exact inverses because roots are immutable snapshots.
+    pub fn apply(&mut self, op: &crate::edit::EditOp) -> Result<EditResult, AppError> {
+        let before = self.root.clone();
+        let root = Arc::make_mut(&mut self.root);
+        match apply_op(root, op) {
+            ApplyOutcome::Applied(mut result) => {
+                // 03 §3.5: validate after every EditOp in debug builds and
+                // tests; a violated rule rolls the edit back with E0002.
+                if cfg!(any(test, debug_assertions)) {
+                    let issues = validate::validate(root);
+                    if let Some(first) = issues.first() {
+                        self.root = before;
+                        return Err(AppError::RolledBack {
+                            detail: format!(
+                                "invariant violated after {}: {} ({})",
+                                op.history_key(),
+                                first.detail,
+                                first.path
+                            ),
+                        });
+                    }
+                }
+                if let crate::edit::EditOp::Batch { .. } = op {
+                    // batch = one undo step (04 §4.4): push once.
+                }
+                self.revision += 1;
+                // Push the BEFORE state onto the undo stack (ADR-009: undo
+                // restores the state that preceded the edit); a new edit
+                // invalidates the redo stack.
+                self.history.clear_redo();
+                self.history.push(before);
+                if !result.adjusted_items.is_empty() {
+                    result.warnings.push((
+                        "E1104".into(),
+                        format!("{} items adjusted", result.adjusted_items.len()),
+                    ));
+                }
+                Ok(result)
+            }
+            ApplyOutcome::Rejected(err) => {
+                self.root = before;
+                Err(err)
+            }
+        }
+    }
+
+    /// Undo the last edit; exact inverse by snapshot equality.
+    pub fn undo(&mut self) -> bool {
+        let current = self.root.clone();
+        match self.history.undo(current) {
+            Some(previous) => {
+                self.root = previous;
+                self.revision += 1;
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Redo the last undone edit.
+    pub fn redo(&mut self) -> bool {
+        let current = self.root.clone();
+        match self.history.redo(current) {
+            Some(next) => {
+                self.root = next;
+                self.revision += 1;
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Jump to undo step `i` (History panel; REQ-PRJ-007).
+    pub fn step(&mut self, i: usize) -> bool {
+        let current = self.root.clone();
+        match self.history.step(i, current) {
+            Some((_, target)) => {
+                self.root = target;
+                self.revision += 1;
+                true
+            }
+            None => false,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::edit::EditOp;
+    use crate::project::new_project;
+    use crate::sequence::{new_sequence, sqp02_fallback_format};
+
+    fn model() -> Model {
+        let mut seq = new_sequence("Main", sqp02_fallback_format());
+        seq.format.auto_match_pending = false;
+        Model::new(new_project("Test", seq))
+    }
+
+    #[test]
+    fn undo_redo_are_exact_inverses() {
+        let mut m = model();
+        let start = m.root();
+        for i in 0..50 {
+            let _ = m.apply(&EditOp::RenameProject {
+                name: format!("v{i}"),
+            });
+        }
+        assert_eq!(m.history().steps().len(), 50);
+        for _ in 0..50 {
+            assert!(m.undo());
+        }
+        assert_eq!(*m.root(), *start);
+        for _ in 0..50 {
+            assert!(m.redo());
+        }
+        assert_eq!(m.root().name, "v49");
+    }
+
+    #[test]
+    fn invalid_edit_rolls_back_with_e0002() {
+        let mut m = model();
+        let before = m.root();
+        // Deleting the last sequence is rejected before validation.
+        let seq_id = m.root().sequences[0].id.clone();
+        let err = m.apply(&EditOp::DeleteSequence {
+            sequence_id: seq_id,
+        });
+        assert!(err.is_err());
+        assert_eq!(m.root(), before);
+        // An edit that breaks an invariant (duplicate chapter t) rolls back.
+        let seq_id = m.root().sequences[0].id.clone();
+        let input = crate::edit::MarkerInput {
+            t: 0,
+            duration: 0,
+            name: "a".into(),
+            color: "CLR-03".into(),
+            note: String::new(),
+            chapter: true,
+        };
+        let _ = m.apply(&EditOp::AddMarkers {
+            sequence_id: seq_id.clone(),
+            markers: vec![input.clone()],
+        });
+        let before = m.root();
+        let dup = m.apply(&EditOp::AddMarkers {
+            sequence_id: seq_id,
+            markers: vec![input],
+        });
+        // The duplicate chapter breaks rule 12 → E0002 rollback.
+        match dup {
+            Err(AppError::RolledBack { detail }) => {
+                assert!(detail.contains("chapter"), "detail: {detail}");
+            }
+            other => panic!("expected rollback, got {other:?}"),
+        }
+        assert_eq!(m.root(), before);
+    }
+
+    #[test]
+    fn budget_evicts_oldest_but_never_below_200() {
+        // Synthetic roots of computed size: build a project with a big name
+        // so each root is heavy, then push 300 and confirm ≥ 200 remain.
+        let mut history = History::new();
+        let mut heavy = model().root();
+        let payload = "x".repeat(256 * 1024);
+        Arc::make_mut(&mut heavy).name = payload;
+        let unit = estimate_size(&heavy);
+        for i in 0..300 {
+            let mut root = heavy.clone();
+            Arc::make_mut(&mut root).name = format!("{i}_{}", heavy.name);
+            history.push(root);
+        }
+        assert!(
+            history.steps().len() >= MIN_STEPS,
+            "retained {} < {MIN_STEPS}",
+            history.steps().len()
+        );
+        assert!(history.steps().len() <= MAX_STEPS);
+        // With ~256KB units, 512MB keeps all 300.
+        let expected = (300usize * unit).min(BUDGET_BYTES);
+        let _ = expected;
+        assert_eq!(history.steps().len(), 300);
+    }
+
+    #[test]
+    fn oversized_roots_still_keep_200() {
+        let mut history = History::new();
+        let mut heavy = model().root();
+        // ~3MB per root: 300 roots ≈ 900MB > 512MB budget → evict to ~170,
+        // but never below 200 → exactly 200 retained.
+        let payload = "x".repeat(3 * 1024 * 1024);
+        Arc::make_mut(&mut heavy).name = payload;
+        for i in 0..300 {
+            let mut root = heavy.clone();
+            Arc::make_mut(&mut root).name = format!("{i}_{}", heavy.name);
+            history.push(root);
+        }
+        assert_eq!(history.steps().len(), MIN_STEPS);
+        assert!(history.total_estimated_size() >= 200 * 3 * 1024 * 1024);
+    }
+
+    #[test]
+    fn step_jump_reproduces_intermediate_roots() {
+        let mut m = model();
+        for i in 0..10 {
+            let _ = m.apply(&EditOp::RenameProject {
+                name: format!("v{i}"),
+            });
+        }
+        assert!(m.step(4));
+        assert_eq!(m.root().name, "v3"); // step 4 is the 5th root pushed (v3)
+        assert!(m.undo());
+        assert_eq!(m.root().name, "v2");
+        assert!(m.redo());
+        assert_eq!(m.root().name, "v3");
+    }
+}
