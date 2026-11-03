@@ -17,3 +17,6 @@
 //! save/open pipeline live behind [`project::DocumentHooks`]; the
 //! production implementation for `alvs_model::Project` is composed in the
 //! app backend (CMP-12, `app/src-tauri/src/project_io.rs`).
+
+pub mod error;
+pub mod utc;
