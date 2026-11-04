@@ -41,11 +41,18 @@ const RESERVED_NAMES: [&str; 22] = [
 /// The shared SEC-04 prelude: device paths and reserved names are
 /// rejected; a UNC path from a project file demands confirmation
 /// (THR-13). `None` means the candidate passed the prelude.
+///
+/// Prefix tests are case-insensitive, and the verbatim spelling
+/// `\\?\UNC\host\share\…` counts as UNC (owner decision 2026-11-04,
+/// review T033) — Windows treats both spellings as the same SMB path,
+/// and an SMB touch would leak NTLM credentials.
 fn prelude(candidate: &Path, origin: PathOrigin) -> Option<PathDecision> {
     let raw = candidate.to_string_lossy();
+    let upper = raw.to_ascii_uppercase();
 
-    // Device paths are rejected outright (SEC-04).
-    if raw.starts_with(r"\\.\") || raw.starts_with(r"\\?\GLOBALROOT") {
+    // Device paths are rejected outright (SEC-04) — `\\.\` in any case
+    // and the verbatim GLOBALROOT device namespace in any case.
+    if upper.starts_with(r"\\.\") || upper.starts_with(r"\\?\GLOBALROOT") {
         return Some(PathDecision::Denied(AppError::PathRejected {
             detail: format!("device path rejected: {}", redact(&raw)),
         }));
@@ -67,7 +74,10 @@ fn prelude(candidate: &Path, origin: PathOrigin) -> Option<PathDecision> {
 
     // UNC paths from a project file require explicit confirmation (SEC-04,
     // THR-13: Windows would leak NTLM credentials to the SMB server).
-    let is_unc = raw.starts_with(r"\\") && !raw.starts_with(r"\\?\");
+    // `\\server\share` and `\\?\UNC\server\share` are the same SMB path;
+    // other `\\?\` prefixes are verbatim-LOCAL paths, not UNC.
+    let verbatim = upper.starts_with(r"\\?\");
+    let is_unc = upper.starts_with(r"\\") && (!verbatim || upper.starts_with(r"\\?\UNC\"));
     if is_unc && origin == PathOrigin::ProjectFile {
         return Some(PathDecision::NeedsConfirmation {
             path: candidate.to_path_buf(),
@@ -194,6 +204,13 @@ mod tests {
             &[],
         );
         assert!(matches!(d, PathDecision::Denied(_)));
+        // The verbatim device namespace in any case (review T033).
+        let d = check_path(
+            Path::new(r"\\?\globalroot\Device\Harddisk0"),
+            PathOrigin::ProjectFile,
+            &[],
+        );
+        assert!(matches!(d, PathDecision::Denied(_)));
     }
 
     #[test]
@@ -224,6 +241,21 @@ mod tests {
             check_path(unc, PathOrigin::UserPicked, &[]),
             PathDecision::Denied(_)
         ));
+        // The verbatim spelling is the same SMB path and gets the same
+        // treatment, whatever its case (owner decision, review T033) —
+        // decided before any canonicalize could touch the network.
+        for spelling in [
+            r"\\?\UNC\server\share\clip.mp4",
+            r"\\?\unc\server\share\clip.mp4",
+        ] {
+            assert!(
+                matches!(
+                    check_path(Path::new(spelling), PathOrigin::ProjectFile, &[]),
+                    PathDecision::NeedsConfirmation { .. }
+                ),
+                "{spelling} must demand confirmation"
+            );
+        }
     }
 
     #[test]

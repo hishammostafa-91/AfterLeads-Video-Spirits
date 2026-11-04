@@ -110,21 +110,18 @@ enum MediaGate {
 /// parent wherever the media lives, and a missing path cannot be
 /// canonicalized and lands on [`MediaGate::Offline`], exactly matching
 /// the plain existence probe this gate replaces.
+/// Gate one media candidate per SEC-04's project-file rules (05 §5.7):
+/// device paths (verbatim GLOBALROOT included, any case) and reserved
+/// names are rejected, UNC paths — plain or verbatim `\\?\UNC\`, any
+/// case (owner decision 2026-11-04, review T033) — demand confirmation
+/// before access, and an ordinary local path is usable when it exists.
+/// All of that is `check_path`'s prelude; the candidate's own folder
+/// stands in as the containment root here, so containment — the write
+/// rule — stays satisfied for every existing local path wherever the
+/// media lives, while a missing path cannot be canonicalized and lands
+/// on [`MediaGate::Offline`], exactly matching the plain existence
+/// probe this gate replaces.
 fn gate_media_path(candidate: &Path) -> MediaGate {
-    // Verbatim spellings slip check_path's prelude — its UNC rule
-    // excludes every `\\?\` prefix, and its GLOBALROOT device test is
-    // case-sensitive — so the gate recognizes them first, before any
-    // delegation: canonicalizing `\\?\UNC\host\share\…` is itself the
-    // SMB probe (THR-13), and `\\?\GLOBALROOT\…` in any case is a
-    // device path (T033). The matching hardening inside
-    // `alvs-core::path` is WP-01's surface and the owner's call.
-    let upper = candidate.to_string_lossy().to_ascii_uppercase();
-    if upper.starts_with(r"\\?\UNC\") {
-        return MediaGate::NeedsConfirmation(candidate.to_path_buf());
-    }
-    if upper.starts_with(r"\\?\GLOBALROOT") {
-        return MediaGate::Offline;
-    }
     let root = candidate
         .parent()
         .map(Path::to_path_buf)
@@ -539,11 +536,11 @@ mod tests {
 
     #[test]
     fn media_gate_blocks_verbatim_unc_and_globalroot_spellings() {
-        // T033: verbatim spellings slip check_path's prelude (its UNC
-        // rule excludes `\\?\` prefixes; its GLOBALROOT test is
-        // case-sensitive), and canonicalizing `\\?\UNC\…` is itself the
-        // SMB probe — so the gate must recognize them before any
-        // delegation, whatever the case, in either position.
+        // T033 (owner decision 2026-11-04): the verbatim spellings are
+        // the same SMB/device paths in any case — the canonical prelude
+        // in `alvs-core::path::check_path` now decides them before any
+        // canonicalize could touch the network; this matrix proves the
+        // gate end-to-end, whatever the case, in either position.
         let dir = scratch("verbatim");
         for spelling in [
             r"\\?\UNC\alvs-host\share\a.mp4",

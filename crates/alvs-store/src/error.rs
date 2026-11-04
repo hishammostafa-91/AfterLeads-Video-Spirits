@@ -102,13 +102,16 @@ impl StoreError {
     /// always `error.<code>` and the recovery action uses the catalog row.
     ///
     /// `recovery[].commandId` is "a command ID from 12 §12.10 or a
-    /// dialog action" (04 §4.9): `file.saveAs` below is the real
-    /// catalog row KB-004; the others (`retry`, `disk.freeSpace`,
-    /// `chooseLocation`, `project.openReadOnly`, `project.takeOverLock`)
-    /// are dialog actions in the `media.relink` style of §4.9's own
-    /// example — verbs the shell renders as recovery UI. If the owner
-    /// later registers them as IPC commands they move to 12 §12.10
-    /// (G-19); nothing here may invent catalog rows (review F-05).
+    /// dialog action" (04 §4.9). Each entry is the machine form of the
+    /// recovery column 12 §12.13 already documents for the code (owner
+    /// ratification 2026-11-04, review F-05): E1008 → `file.saveAs`
+    /// (catalog row KB-004; "Save As elsewhere"), E5003 → `retry`
+    /// ("Retry"), E8001 → `disk.freeSpace` ("Free space"), E8004 →
+    /// `chooseLocation` ("Choose another location"), E1007 →
+    /// `project.openReadOnly`/`project.takeOverLock` ("Open read-only /
+    /// take over"). Registering the dialog verbs as IPC commands would
+    /// add 12 §12.10 rows through the owner (G-19); nothing here may
+    /// invent catalog rows.
     pub fn envelope(self) -> ErrorEnvelope {
         let code = self.code();
         let detail = self.to_string();
