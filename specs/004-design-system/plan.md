@@ -12,11 +12,11 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 
 **Language/Version**: TypeScript 6.0.x (`strict`; typescript-eslint peer `<6.1` — 00 §0.8 row), React 19.3, Vite 8.3, pnpm 12.x (12.16.1 installed). The `app/` crate skeleton, `tsconfig.json`, `vite.config.ts`, and `src/ipc/bindings` already exist from WP-00/WP-02; no Rust changes in this package (backend untouched).
 
-**Primary Dependencies** (all 00 §0.8 baseline rows — versions below are the baseline's approved majors/minors; exact pins resolve from the registry at implementation and lock into `app/pnpm-lock.yaml`, G-10/G-11; no ADRs needed — ADR-011 already decides the stack): `react-aria-components` 1.22.x; `react-intl` 12.x + `@formatjs/cli` 6.x; `zustand` 5.x; tests: `vitest` 5.x, `@testing-library/react` 16.x, `jsdom` 30.x, `@playwright/test` 1.64.x, `@axe-core/playwright` 4.x; lint: `eslint` 9.39.x, `typescript-eslint` 8.x, `eslint-plugin-jsx-a11y` 6.x, `eslint-plugin-react-hooks` 7.x, `eslint-plugin-i18next` 6.x, `eslint-plugin-formatjs` 8.x, `stylelint` 17.x + `stylelint-config-standard` 40.x + `stylelint-use-logical` 2.x, `prettier` 3.x. Explicitly NOT added now: `dockview` (WP-05 workspace composition), any virtualization library (none in the baseline — custom windowing hook, research D10), any HTTP client (SEC-10).
+**Primary Dependencies** (all 00 §0.8 baseline rows — versions below are the baseline's approved majors/minors; exact pins resolve from the registry at implementation and lock into the **root `pnpm-lock.yaml`** via the existing pnpm workspace, G-10/G-11; no ADRs needed — ADR-011 already decides the stack): `react-aria-components` 1.22.x, `react-intl` 12.x + `@formatjs/cli` 6.x, `zustand` 5.x, `lucide-react` 1.x (ISC base icons, 07 §7.5); tests: `vitest` 5.x, `@testing-library/react` 16.x (requires the peer `@testing-library/dom ^10` — not a baseline row; owner question F03, see research D1), `jsdom` 30.x, `@playwright/test` 1.64.x, `@axe-core/playwright` 4.x; lint: `eslint` 9.39.x, `typescript-eslint` 8.x, `eslint-plugin-jsx-a11y` 6.x, `eslint-plugin-react-hooks` 7.x, `eslint-plugin-i18next` 6.x, `eslint-plugin-formatjs` 8.x, `stylelint` 17.x + `stylelint-config-standard` 40.x + `stylelint-use-logical` 2.x, `prettier` 3.x. Explicitly NOT added now: `dockview` (WP-05 workspace composition), any virtualization library (none in the baseline — custom windowing hook, research D10), any HTTP client (SEC-10).
 
 **Storage**: none persistent — theme/accent/locale live in Zustand stores with a swappable persistence seam (URL params in the harness now; `alvs.appearance.*` settings keys bind in WP-05/WP-24). Locale catalogs are static JSON in `app/src/locales/`; fonts are static assets in `assets/fonts/` with an integrity manifest.
 
-**Testing**: Vitest + Testing Library for component behavior and i18n units (T-UI-001/002 logic, T-I18N-003/004 — deterministic, jsdom); the Playwright harness for snapshots (every component × 9 story states × dark/light × en/ar) and per-story axe checks (T-A11Y-004); snapshot determinism by fixed viewport, `prefers-reduced-motion: reduce` emulation, awaited `document.fonts.ready`, and stubbed dates (constitution III). `pnpm -C app test` backs the `ui-test` gate; the Playwright suite runs via `pnpm -C app harness` (and in CI after this package).
+**Testing**: Vitest + Testing Library for component behavior and i18n units (T-UI-001/002 logic, T-I18N-003/004 — deterministic, jsdom); the Playwright harness for snapshots (every component × 9 story states × dark/light × en/ar) and per-story axe checks (T-A11Y-004); snapshot determinism by fixed viewport, `prefers-reduced-motion: reduce` emulation, awaited `document.fonts.ready`, and stubbed dates (constitution III). `pnpm -C app test` backs the `ui-test` gate; the Playwright suite runs via `pnpm -C app harness` and — per research D15 — in CI through the extended `ui` job and a `ui-harness` job, so every gate passes locally **and** in CI (G-08).
 
 **Target Platform**: Windows 11 x64, WebView2 (Chromium) — CSS `forced-colors` and the standardized CSS `zoom` property are the platform hooks for High Contrast and the 80–200% application zoom (research D3).
 
@@ -26,7 +26,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 
 **Constraints**: every behavior cites 07 §7.1/§7.4–7.6/§7.11–7.13, 02 ADR-011 + §2.14, 12 §12.14/§12.16/§12.17; no JSX text literals; tokens and logical properties only (Stylelint-enforced); `eslint-plugin-jsx-a11y` errors fail CI; AGPL headers on every new file; no new dependencies outside the baseline rows; pseudo-locales exist only for tests.
 
-**Scale/Scope**: ~35 components (07 §7.6) × 9 story states, 1 tokens file + theme layer, 7 locale files (+2 generated pseudo-locales), 3 font families, 4 lint configs, 1 Playwright harness. The largest surfaces are the component matrix and the token set.
+**Scale/Scope**: all 41 components of 07 §7.6 (review F02) × 9 story states, 1 tokens file + theme layer, 7 locale files (+2 generated pseudo-locales), 3 font families, 4 lint configs, 1 Playwright harness, and the CI wiring that runs the new gates (research D15). The largest surfaces are the component matrix and the token set.
 
 ## Constitution Check
 
@@ -34,7 +34,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. Canonical documentation first | PASS | Every FR/decision cites 01 REQ rows, 07 §7.1/§7.4–7.6/§7.11–7.13, 02 ADR-011/§2.14, 12 §12.14/§12.16/§12.17; versions verified against 00 §0.8 rows (G-10); no conflicts to escalate. |
+| I. Canonical documentation first | PASS* | Every FR/decision cites 01 REQ rows, 07 §7.1/§7.4–7.6/§7.11–7.13, 02 ADR-011/§2.14, 12 §12.14/§12.16/§12.17; versions verified against 00 §0.8 rows (G-10). One mild canonical tension escalated to the owner (07 §7.4.3's manual High-Contrast selection vs 01 REQ-APP-009's "activates automatically" — review F05, see research D2); one baseline gap escalated (`@testing-library/dom` peer — F03/D1); one artifact location escalated (notices manifest — F08/D16). |
 | II. Scope discipline | PASS | FR-018 fences workspace/panels/menus/backend (WP-05), settings pages (WP-24), translation review (WP-25), title fonts (WP-17), custom feature icons (ship with features). |
 | III. Test-first evidence | PASS | Acceptance = T-UI-001/002, T-I18N-003/004, T-A11Y-004 + the snapshot matrix (card); harness snapshots deterministic (D7). |
 | IV. Protected main and clean history | PASS | Work on `feat/004-design-system` from main `1dc6b02`; gates + review before the owner's merge. |
@@ -42,7 +42,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 | VI. Global and accessible by default | PASS | The package IS this principle's infrastructure: six locales from day one (G-13), RTL rules, WCAG 2.2 AA, keyboard/ARIA via React Aria (REQ-A11Y-002..004). |
 | VII. Private, secure, local-first | PASS | No network (font files bundled with recorded hashes — no runtime download), no telemetry; fonts from official upstream repositories with OFL licenses recorded in the notices manifest (G-12). |
 | VIII. Simplicity and performance budgets | PASS | Baseline stack per ADR-011; custom windowing instead of a new dependency (D10); no speculative abstractions — stories double as documentation. |
-| IX. Open-source integrity | PASS | SPDX headers on all new files; Lucide (ISC) base icons; OFL fonts with license files in the bundle + notices; nothing copied from other products (G-20). |
+| IX. Open-source integrity | PASS* | SPDX headers on all new files; Lucide (ISC) base icons; OFL fonts with license files in the bundle; nothing copied from other products (G-20). The formal notices-manifest listing (12 §12.16) is an open owner question (F08, research D16) — the license files ship with this package either way. |
 | Technology constraints | PASS | Baseline rows only (00 §0.8 UI/lint/test tables); toolchain unchanged. |
 
 ## Project Structure
@@ -52,7 +52,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 ```text
 specs/004-design-system/
 ├── plan.md              # This file
-├── research.md          # Phase 0 — D1..D14
+├── research.md          # Phase 0 — D1..D16
 ├── data-model.md        # Phase 1 — entities, validation rules, story matrix
 ├── quickstart.md        # Phase 1 — per-acceptance validation guide
 ├── contracts/
@@ -64,9 +64,9 @@ specs/004-design-system/
 
 ```text
 app/
-├── package.json                   # + react-aria-components, react-intl, zustand, test/lint stack,
-│                                  #   scripts: typecheck/lint/test/i18n:check/harness (activates UI gates)
-├── pnpm-lock.yaml                 # created and committed
+├── package.json                   # + react-aria-components, react-intl, zustand, lucide-react, test/lint stack;
+│                                  #   the four scripts typecheck/lint/test/i18n:check activate the UI gates
+│                                  #   (harness is NOT a gate — it runs on demand and in CI; review F11)
 ├── eslint.config.js  .stylelintrc.json  .prettierrc.json
 ├── index.html                     # lang/dir bootstrap
 └── src/
@@ -75,9 +75,10 @@ app/
     │   ├── fonts.css              # @font-face for FNT-01..03 (fallback chain per §7.4.5)
     │   ├── theme.ts               # theme/accent state + persistence seam (Zustand)
     │   └── icons.ts               # Lucide base-set loader + icon conventions
-    ├── components/                # every 07 §7.6 component: <Name>.tsx + <Name>.module.css + <Name>.test.tsx
-    │   ├── Button.tsx  IconButton.tsx  Menu.tsx  Tabs.tsx  Dialog.tsx  Tooltip.tsx  Toast.tsx
-    │   ├── NumberField.tsx  Slider.tsx  TimecodeField.tsx  KeyframeToggle.tsx
+    ├── components/                # every 07 §7.6 component (41, review F02): <Name>.tsx + .module.css + .test.tsx
+    │   ├── Button.tsx  IconButton.tsx  Menu.tsx (Menu/MenuBar/ContextMenu/Submenu)  Tabs.tsx
+    │   ├── Dialog.tsx (Dialog/AlertDialog/Popover)  Tooltip.tsx  Toast.tsx
+    │   ├── NumberField.tsx  Slider.tsx (Slider/AngleDial)  TimecodeField.tsx  KeyframeToggle.tsx
     │   ├── ColorPicker.tsx  ColorWheel.tsx  CurveEditor.tsx  PointControl.tsx
     │   ├── Fields.tsx (Text/Search/TextArea)  Selection.tsx (Checkbox/Switch/Radio/Select/ComboBox)
     │   ├── Collections.tsx (Tree/GridList/Table/ListBox + windowing)
@@ -97,6 +98,7 @@ app/
     └── App.tsx                    # mounts the harness entry (replaced by WP-05's shell)
 assets/fonts/                      # FNT-01..03 files + licenses + fonts.json
 tests/ui/                          # Playwright config + harness/axe specs (repo tests/ dir)
+.github/workflows/ci.yml           # ui job gains the four gates + a ui-harness job (research D15, G-08)
 ```
 
 **Structure Decision**: module-per-concern under `app/src` mirroring 07's own decomposition (design / components / i18n / harness); tokens as one verbatim CSS file because 07 §7.4 is specified as one token sheet; the harness lives inside the app (same Vite build) with its own route, so snapshots test the real component CSS, not a copy.
@@ -109,7 +111,7 @@ No constitution violations; no entries.
 
 ## Phase 0 — Research
 
-See [research.md](research.md) — D1..D14 with citations and evidence; **zero unresolved clarifications** (the spec carries none). The decisions the reviewer should scrutinize hardest: **D3** (CSS `zoom` for the 80–200% application zoom), **D7** (snapshot determinism strategy), and **D10** (custom windowing instead of a new dependency).
+See [research.md](research.md) — D1..D16 with citations and evidence; **zero unresolved technical clarifications** and **three owner questions** (F03 `@testing-library/dom` baseline row, F05 manual High-Contrast selection, F08 notices-manifest home — all recorded in the decisions they affect). The decisions the reviewer should scrutinize hardest: **D3** (CSS `zoom` for the 80–200% application zoom), **D7** (snapshot determinism + CDP forced-colors), and **D10** (custom windowing instead of a new dependency).
 
 ## Phase 1 — Design
 

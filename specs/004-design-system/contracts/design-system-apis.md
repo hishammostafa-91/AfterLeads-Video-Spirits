@@ -67,7 +67,7 @@ Inventory = 07 §7.6 exactly; RAC-based unless noted (D6). Shared prop conventio
 - `pnpm -C app typecheck` → `tsc --noEmit` (strict, no `any`).
 - `pnpm -C app lint` → ESLint (all rule families) + Stylelint + `prettier --check`.
 - `pnpm -C app test` → Vitest (+ font-manifest integrity re-hash).
-- `pnpm -C app i18n:check` → locale key-set equality + meta coverage.
+- `pnpm -C app i18n:check` → the full docs/08 §8.4 localization gate: key-set equality across all six locales + ICU syntax validation (`@formatjs/cli` parser) + unused-key detection (IDs extracted from source vs catalogs).
 - `pnpm -C app harness` → Playwright: snapshots (dark/light × en/ar, all stories) + per-story axe.
 
 These first four script names are what `tools/verify.ps1` probes; defining them activates the `ui-*` and `i18n` gates.
