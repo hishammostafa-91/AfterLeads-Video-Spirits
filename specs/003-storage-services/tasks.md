@@ -81,12 +81,12 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [US2] Create `crates/alvs-store/tests/t_prj_003.rs`: autosave fires exactly when dirty ∧ `ms_since_last ≥ interval` (fake `Clock`; interval from the keys table default 60), sidecar content equals the snapshot, main file untouched; marker created/cleared; `evaluate` returns the offer with both timestamps only when marker present ∧ autosave mtime > main mtime
+- [X] T014 [P] [US2] Create `crates/alvs-store/tests/t_prj_003.rs`: autosave fires exactly when dirty ∧ `ms_since_last ≥ interval` (fake `Clock`; interval from the keys table default 60), sidecar content equals the snapshot, main file untouched; marker created/cleared; `evaluate` returns the offer with both timestamps only when marker present ∧ autosave mtime > main mtime
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Create `crates/alvs-store/src/autosave.rs`: pure decision core `fn decision(dirty, since_last_ms, interval_sec)` + `Clock` trait + production driver thread writing `<Name>.alvs.autosave` via the atomic primitive; sidecar deleted on save/clean close (03 §3.9.3; research D10)
-- [ ] T016 [US2] Create `crates/alvs-store/src/session.rs`: marker `{pid, startedUtc}` create-at-startup/clear-on-clean-exit + `evaluate(main, autosave)` by mtime → `RecoveryOffer` (03 §3.9.5; research D14); make T014 green
+- [X] T015 [US2] Create `crates/alvs-store/src/autosave.rs`: pure decision core `fn decision(dirty, since_last_ms, interval_sec)` + `Clock` trait + production driver thread writing `<Name>.alvs.autosave` via the atomic primitive; sidecar deleted on save/clean close (03 §3.9.3; research D10)
+- [X] T016 [US2] Create `crates/alvs-store/src/session.rs`: marker `{pid, startedUtc}` create-at-startup/clear-on-clean-exit + `evaluate(main, autosave)` by mtime → `RecoveryOffer` (03 §3.9.5; research D14); make T014 green
 
 **Checkpoint**: US1+US2 independently functional.
 
