@@ -25,6 +25,7 @@ pub mod cache;
 pub mod error;
 pub mod keys;
 pub mod lock;
+pub mod logging;
 pub mod paths;
 pub mod project;
 pub mod recent;

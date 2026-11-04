@@ -8,4 +8,5 @@ pub mod error;
 pub mod id;
 pub mod path;
 pub mod rational;
+pub mod redact;
 pub mod time;

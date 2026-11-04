@@ -173,12 +173,12 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 7
 
-- [ ] T026 [P] [US7] Create `crates/alvs-store/tests/t_rel_003.rs`: writes past 10 MB rotate to ≤ 10 files (`app.log`, `app.log.1`…`app.log.9`, older deleted); lines carry `ts`/`level`/`target`/`msg` (+ `job_id`/`project_id`/`code` when provided); user paths in debug lines are redacted; `redact_paths` unit coverage lives beside the helper
+- [X] T026 [P] [US7] Create `crates/alvs-store/tests/t_rel_003.rs`: writes past 10 MB rotate to ≤ 10 files (`app.log`, `app.log.1`…`app.log.9`, older deleted); lines carry `ts`/`level`/`target`/`msg` (+ `job_id`/`project_id`/`code` when provided); user paths in debug lines are redacted; `redact_paths` unit coverage lives beside the helper
 
 ### Implementation for User Story 7
 
-- [ ] T027 [P] [US7] Create `crates/alvs-core/src/redact.rs`: `redact_paths(&str) -> String` replacing drive-letter absolutes, UNC, and env-root paths with `<path>` (CMP-01 "logging setup helpers"; research D15) with unit tests
-- [ ] T028 [US7] Create `crates/alvs-store/src/logging.rs`: `tracing_subscriber::fmt().json()` with `UtcTime::rfc_3339`, the `SizeRotatingWriter` (10 MB threshold, keep 10) wrapped in `tracing_appender::non_blocking` with a `LogGuard` flushed on drop, level from `alvs.advanced.logLevel` (research D3; naming per spec Assumptions); make T026 green
+- [X] T027 [P] [US7] Create `crates/alvs-core/src/redact.rs`: `redact_paths(&str) -> String` replacing drive-letter absolutes, UNC, and env-root paths with `<path>` (CMP-01 "logging setup helpers"; research D15) with unit tests
+- [X] T028 [US7] Create `crates/alvs-store/src/logging.rs`: `tracing_subscriber::fmt().json()` with `UtcTime::rfc_3339`, the `SizeRotatingWriter` (10 MB threshold, keep 10) wrapped in `tracing_appender::non_blocking` with a `LogGuard` flushed on drop, level from `alvs.advanced.logLevel` (research D3; naming per spec Assumptions); make T026 green
 
 **Checkpoint**: all seven stories independently functional.
 
