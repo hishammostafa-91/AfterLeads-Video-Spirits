@@ -118,11 +118,11 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 4
 
-- [ ] T019 [P] [US4] Create `crates/alvs-store/tests/t_set_003.rs`: out-of-range `alvs.general.autosaveIntervalSec=5` → default 60 + exactly one E8002 notice; unknown keys survive load→write; corrupt file with `.bak` restores it; corrupt without `.bak` → defaults + E8002; rapid changes coalesce to one debounced write (injected clock)
+- [X] T019 [P] [US4] Create `crates/alvs-store/tests/t_set_003.rs`: out-of-range `alvs.general.autosaveIntervalSec=5` → default 60 + exactly one E8002 notice; unknown keys survive load→write; corrupt file with `.bak` restores it; corrupt without `.bak` → defaults + E8002; rapid changes coalesce to one debounced write (injected clock)
 
 ### Implementation for User Story 4
 
-- [ ] T020 [US4] Create `crates/alvs-store/src/settings.rs`: `BTreeMap` document + `settingsVersion=1` gate + validation walk against keys.rs (invalid → default, one notice) + writer thread (500 ms debounce, injected clock in tests) + `flush()` + `settings.json.bak` refresh on every successful write + corrupt-recovery ladder (03 §3.6; research D7); typed getters for the consumed keys (autosaveIntervalSec, backupsKeep, recentLimit, logLevel, redactDiagnostics, cacheFolder, defaultProjectFolder); make T019 green
+- [X] T020 [US4] Create `crates/alvs-store/src/settings.rs`: `BTreeMap` document + `settingsVersion=1` gate + validation walk against keys.rs (invalid → default, one notice) + writer thread (500 ms debounce, injected clock in tests) + `flush()` + `settings.json.bak` refresh on every successful write + corrupt-recovery ladder (03 §3.6; research D7); typed getters for the consumed keys (autosaveIntervalSec, backupsKeep, recentLimit, logLevel, redactDiagnostics, cacheFolder, defaultProjectFolder); make T019 green
 
 **Checkpoint**: US1–US4 independently functional.
 

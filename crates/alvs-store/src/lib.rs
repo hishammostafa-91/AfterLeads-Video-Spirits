@@ -28,4 +28,5 @@ pub mod paths;
 pub mod project;
 pub mod recent;
 pub mod session;
+pub mod settings;
 pub mod utc;

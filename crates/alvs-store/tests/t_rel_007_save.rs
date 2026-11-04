@@ -185,3 +185,114 @@ fn t_rel_007_missing_folder_reports_save_failure() {
     assert_eq!(err.code(), alvs_core::error::ErrorCode::E1008);
     std::fs::remove_dir_all(&dir).unwrap_or(());
 }
+
+// --- Autosave and settings writer rows (T010's full writer coverage) ---
+
+use alvs_store::autosave::{AutosaveDriver, Clock as AutoClock, SnapshotWriter};
+use alvs_store::settings::Settings;
+use std::sync::atomic::{AtomicI64 as Writes, Ordering as CountOrdering};
+
+struct ClockAt(std::sync::atomic::AtomicI64);
+
+impl AutoClock for ClockAt {
+    fn now_ms(&self) -> i64 {
+        self.0.load(CountOrdering::SeqCst)
+    }
+}
+
+struct SidecarWriter {
+    sidecar: PathBuf,
+    writes: Writes,
+}
+
+impl SnapshotWriter for SidecarWriter {
+    fn write_snapshot(&self) -> Result<(), alvs_store::error::StoreError> {
+        self.writes.fetch_add(1, CountOrdering::SeqCst);
+        alvs_store::atomic::atomic_write(&self.sidecar, b"snapshot")
+    }
+}
+
+#[test]
+fn t_rel_007_autosave_permission_failure_keeps_files_intact() {
+    let dir = scratch("autosave-ro");
+    let project = dir.join("a.alvs");
+    std::fs::write(&project, b"main").unwrap_or(());
+    let sidecar = alvs_store::project::autosave_path(&project);
+    // Pre-existing read-only sidecar: the autosave's atomic replace fails
+    // (ERROR_ACCESS_DENIED) while the main file stays untouched.
+    std::fs::write(&sidecar, b"previous-sidecar").unwrap_or(());
+    let mut perms = std::fs::metadata(&sidecar)
+        .unwrap_or_else(|e| panic!("meta: {e}"))
+        .permissions();
+    perms.set_readonly(true);
+    std::fs::set_permissions(&sidecar, perms).unwrap_or(());
+
+    let clock = Arc::new(ClockAt(std::sync::atomic::AtomicI64::new(0)));
+    let writer = Arc::new(SidecarWriter {
+        sidecar: sidecar.clone(),
+        writes: Writes::new(0),
+    });
+    let driver = AutosaveDriver::new(1, clock.clone(), writer.clone());
+    clock.0.fetch_add(5_000, CountOrdering::SeqCst);
+    let err = match driver.tick(true) {
+        Ok(_) => panic!("must fail"),
+        Err(e) => e,
+    };
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E8004);
+    assert_eq!(
+        std::fs::read_to_string(&project).unwrap_or_default(),
+        "main",
+        "the main file is never touched by autosave (REQ-PRJ-003)"
+    );
+    assert_eq!(
+        std::fs::read_to_string(&sidecar).unwrap_or_default(),
+        "previous-sidecar",
+        "the previous sidecar survives"
+    );
+    let mut perms = std::fs::metadata(&sidecar)
+        .unwrap_or_else(|e| panic!("meta: {e}"))
+        .permissions();
+    // Test cleanup on Windows (the lint's concern is Unix-only).
+    #[allow(clippy::permissions_set_readonly_false)]
+    perms.set_readonly(false);
+    std::fs::set_permissions(&sidecar, perms).unwrap_or(());
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
+fn t_rel_007_settings_write_failure_keeps_previous_file() {
+    let dir = scratch("settings-ro");
+    let path = dir.join("settings.json");
+    let backup = dir.join("settings.json.bak");
+    let clock = Arc::new(ClockAt(std::sync::atomic::AtomicI64::new(0)));
+    let writer = alvs_store::settings::SettingsWriter::new(&path, &backup, clock.clone(), 500);
+    let mut settings = Settings::defaults();
+    writer
+        .flush(settings.document())
+        .unwrap_or_else(|e| panic!("first flush: {e}"));
+    let before = std::fs::read(&path).unwrap_or_default();
+    let mut perms = std::fs::metadata(&path)
+        .unwrap_or_else(|e| panic!("meta: {e}"))
+        .permissions();
+    perms.set_readonly(true);
+    std::fs::set_permissions(&path, perms).unwrap_or(());
+
+    settings.set("alvs.general.backupsKeep", serde_json::json!(5));
+    writer.note_change();
+    clock.0.fetch_add(5_000, CountOrdering::SeqCst);
+    let err = match writer.maybe_flush(settings.document()) {
+        Ok(_) => panic!("must fail"),
+        Err(e) => e,
+    };
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E8004);
+    assert_eq!(std::fs::read(&path).unwrap_or_default(), before);
+
+    let mut perms = std::fs::metadata(&path)
+        .unwrap_or_else(|e| panic!("meta: {e}"))
+        .permissions();
+    // Test cleanup on Windows (the lint's concern is Unix-only).
+    #[allow(clippy::permissions_set_readonly_false)]
+    perms.set_readonly(false);
+    std::fs::set_permissions(&path, perms).unwrap_or(());
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
