@@ -46,22 +46,24 @@ impl Cache {
         Ok((cache, false))
     }
 
-    /// Open and integrity-check an existing database; a failed
-    /// `quick_check` yields [`StoreError::CacheRebuilt`] semantics (the
-    /// caller rebuilds).
+    /// Open and integrity-check an existing database. The §3.7 corrupt
+    /// contract is unconditional: corruption surfacing at ANY open-path
+    /// statement — the WAL pragma (bad header), `quick_check`, or a
+    /// later schema/meta query (damaged body pages with an intact
+    /// header) — yields [`StoreError::CacheRebuilt`] semantics and the
+    /// caller rebuilds. The integrity check runs BEFORE migrations so a
+    /// damaged database is never migrated into.
     fn try_open(db_path: &Path) -> Result<Self, StoreError> {
         let conn = Self::connect(db_path)?;
-        Self::run_migrations(&conn)?;
         let check: String = conn
             .query_row("PRAGMA quick_check", [], |row| row.get(0))
-            .map_err(|e| StoreError::SaveFailed {
-                detail: format!("quick_check failed: {e}"),
-            })?;
+            .map_err(|e| corrupt_or_err("quick_check", e))?;
         if check != "ok" {
             return Err(StoreError::CacheRebuilt {
                 detail: "integrity check failed".into(),
             });
         }
+        Self::run_migrations(&conn)?;
         Ok(Self {
             conn: Arc::new(Mutex::new(conn)),
         })
@@ -131,21 +133,24 @@ impl Cache {
     }
 
     /// Run pending migrations inside one transaction; the version is
-    /// recorded in `meta.schema_version` (03 §3.7).
+    /// recorded in `meta.schema_version` (03 §3.7). A corruption error
+    /// here (quick_check can miss pages a later statement touches)
+    /// routes to the rebuild path, not a migration failure.
     fn run_migrations(conn: &Connection) -> Result<(), StoreError> {
         let current = read_schema_version(conn)?;
         let tx = conn
             .unchecked_transaction()
-            .map_err(|e| StoreError::SaveFailed {
-                detail: format!("cannot begin migration transaction: {e}"),
-            })?;
+            .map_err(|e| corrupt_or_err("migration transaction", e))?;
         for (version, sql) in MIGRATIONS {
             if *version <= current {
                 continue;
             }
             tx.execute_batch(sql)
-                .map_err(|e| StoreError::MigrationFailed {
-                    detail: format!("migration {version} failed: {e}"),
+                .map_err(|e| match sqlite_corrupt_kind(&e) {
+                    Some(detail) => StoreError::CacheRebuilt { detail },
+                    None => StoreError::MigrationFailed {
+                        detail: format!("migration {version} failed: {e}"),
+                    },
                 })?;
         }
         tx.execute(
@@ -153,11 +158,17 @@ impl Cache {
              ON CONFLICT(key) DO UPDATE SET value = excluded.value",
             [SCHEMA_VERSION.to_string()],
         )
-        .map_err(|e| StoreError::MigrationFailed {
-            detail: format!("cannot record schema version: {e}"),
+        .map_err(|e| match sqlite_corrupt_kind(&e) {
+            Some(detail) => StoreError::CacheRebuilt { detail },
+            None => StoreError::MigrationFailed {
+                detail: format!("cannot record schema version: {e}"),
+            },
         })?;
-        tx.commit().map_err(|e| StoreError::MigrationFailed {
-            detail: format!("cannot commit migrations: {e}"),
+        tx.commit().map_err(|e| match sqlite_corrupt_kind(&e) {
+            Some(detail) => StoreError::CacheRebuilt { detail },
+            None => StoreError::MigrationFailed {
+                detail: format!("cannot commit migrations: {e}"),
+            },
         })
     }
 
@@ -229,6 +240,16 @@ fn sqlite_err(what: &str, e: rusqlite::Error) -> StoreError {
     }
 }
 
+/// Map a rusqlite failure per the unconditional §3.7 corrupt contract:
+/// corruption codes (11/26) take the rebuild path; everything else is a
+/// plain save failure of `what`.
+fn corrupt_or_err(what: &str, e: rusqlite::Error) -> StoreError {
+    match sqlite_corrupt_kind(&e) {
+        Some(detail) => StoreError::CacheRebuilt { detail },
+        None => sqlite_err(what, e),
+    }
+}
+
 /// Whether a rusqlite failure is database corruption (`SQLITE_NOTADB`
 /// extended code 26 or `SQLITE_CORRUPT` 11); returns the rebuild detail.
 fn sqlite_corrupt_kind(e: &rusqlite::Error) -> Option<String> {
@@ -241,6 +262,8 @@ fn sqlite_corrupt_kind(e: &rusqlite::Error) -> Option<String> {
 }
 
 /// Read `meta.schema_version` (0 when the table does not exist yet).
+/// Corruption here (damaged body pages behind an intact header) routes
+/// to the §3.7 rebuild path.
 fn read_schema_version(conn: &Connection) -> Result<u32, StoreError> {
     let exists: bool = conn
         .query_row(
@@ -248,9 +271,7 @@ fn read_schema_version(conn: &Connection) -> Result<u32, StoreError> {
             [],
             |row| row.get(0),
         )
-        .map_err(|e| StoreError::SaveFailed {
-            detail: format!("cannot inspect meta: {e}"),
-        })?;
+        .map_err(|e| corrupt_or_err("meta inspection", e))?;
     if !exists {
         return Ok(0);
     }
@@ -260,9 +281,7 @@ fn read_schema_version(conn: &Connection) -> Result<u32, StoreError> {
             [],
             |row| row.get(0),
         )
-        .map_err(|e| StoreError::SaveFailed {
-            detail: format!("cannot read schema version: {e}"),
-        })?;
+        .map_err(|e| corrupt_or_err("schema version read", e))?;
     version
         .and_then(|v| v.parse().ok())
         .ok_or(StoreError::SaveFailed {

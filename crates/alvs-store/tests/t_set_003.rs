@@ -113,6 +113,27 @@ fn t_set_003_invalid_values_revert_to_defaults_with_one_notice() {
 }
 
 #[test]
+fn t_set_003_first_run_missing_file_is_defaults_with_no_notice() {
+    // Review F-02: a missing settings file is a first run, not damage —
+    // defaults apply silently (03 §3.6 "absent keys take the defaults"),
+    // and no E8002 surfaces on a pristine install.
+    let dir = scratch("first-run");
+    let path = dir.join("settings.json");
+    let backup = dir.join("settings.json.bak");
+    let settings = Settings::load(&path, &backup);
+    assert!(
+        settings.notices().is_empty(),
+        "a first run is not damage: {:?}",
+        settings.notices()
+    );
+    assert_eq!(settings.autosave_interval_sec(), 60);
+    assert!(settings.restoration_envelope().is_none());
+    assert!(!path.exists(), "nothing is written until the first set");
+    assert!(!backup.exists());
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
 fn t_set_003_corrupt_file_restores_from_the_last_good_backup() {
     let dir = scratch("corrupt-bak");
     let path = dir.join("settings.json");

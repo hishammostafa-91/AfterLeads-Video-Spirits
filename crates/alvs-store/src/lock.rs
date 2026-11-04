@@ -30,7 +30,8 @@ pub enum LockOutcome {
     TakeoverAvailable,
 }
 
-/// The lock file body (03 §3.9.4).
+/// The lock file body (03 §3.9.4) — exactly the five pinned fields;
+/// age comparisons parse `startedUtc` back (no extra machine field).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {
     /// Holder process id.
@@ -42,9 +43,6 @@ pub struct LockInfo {
     /// Start time, ISO-8601 UTC (03 §3.9.4).
     #[serde(rename = "startedUtc")]
     pub started_utc: String,
-    /// Epoch milliseconds of `started_utc` for age comparisons.
-    #[serde(rename = "startedMs")]
-    pub started_ms: i64,
     /// Application version of the holder.
     #[serde(rename = "appVersion")]
     pub app_version: String,
@@ -77,39 +75,30 @@ fn holder_info() -> LockInfo {
         host: std::env::var("COMPUTERNAME").unwrap_or_default(),
         user: std::env::var("USERNAME").unwrap_or_default(),
         started_utc: utc::iso_utc(now).unwrap_or_default(),
-        started_ms: now,
         app_version: env!("CARGO_PKG_VERSION").to_string(),
     }
-}
-
-/// Write the lock body with an immediate flush (visible to a colliding
-/// opener right away).
-fn write_info(path: &Path, info: &LockInfo) -> Result<(), StoreError> {
-    let bytes = serde_json::to_vec_pretty(info).map_err(|e| StoreError::SaveFailed {
-        detail: format!("lock serialization failed: {e}"),
-    })?;
-    let mut file = match OpenOptions::new().write(true).open(path) {
-        Ok(f) => f,
-        Err(e) => return Err(StoreError::from_io(&e)),
-    };
-    if let Err(e) = file.write_all(&bytes) {
-        return Err(StoreError::from_io(&e));
-    }
-    let _ = file.flush();
-    Ok(())
 }
 
 impl LockFile {
     /// Acquire the lock exclusively (03 §3.9.4). `Ok((lock, Acquired))`
     /// means we created it; an existing lock is read back and classified
     /// by [`lock_decision`] (dead process / host age rules, T022 refines
-    /// the liveness probe).
+    /// the liveness probe). The body is written through the exclusive
+    /// `create_new` handle itself — no reopen, so no torn window for a
+    /// colliding opener to read (review F-18).
     pub fn acquire(project: &Path) -> Result<(Self, LockOutcome, Option<LockInfo>), StoreError> {
         let path = lock_path(project);
         let info = holder_info();
         match OpenOptions::new().write(true).create_new(true).open(&path) {
-            Ok(_) => {
-                write_info(&path, &info)?;
+            Ok(mut file) => {
+                let bytes =
+                    serde_json::to_vec_pretty(&info).map_err(|e| StoreError::SaveFailed {
+                        detail: format!("lock serialization failed: {e}"),
+                    })?;
+                if let Err(e) = file.write_all(&bytes) {
+                    return Err(StoreError::from_io(&e));
+                }
+                let _ = file.flush();
                 Ok((Self { path }, LockOutcome::Acquired, None))
             }
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -148,10 +137,14 @@ impl LockFile {
     }
 }
 
-/// Read a lock's body; a torn/unreadable lock is reported as a save
-/// failure rather than guessed at.
+/// Read a lock's body. A zero-length lock (an opener that crashed
+/// between creating and writing) reads as `None` — the caller treats it
+/// conservatively as held, never a take-over candidate; a torn
+/// (unparseable, non-empty) body is reported as a save failure rather
+/// than guessed at.
 pub fn read_info(path: &Path) -> Result<Option<LockInfo>, StoreError> {
     match std::fs::read(path) {
+        Ok(bytes) if bytes.is_empty() => Ok(None),
         Ok(bytes) => {
             let info = serde_json::from_slice(&bytes).map_err(|e| StoreError::SaveFailed {
                 detail: format!("lock file is unreadable: {e}"),
@@ -178,12 +171,29 @@ pub fn lock_decision_with(info: &LockInfo, holder_alive: bool, now_ms: i64) -> L
     if same_host {
         return LockOutcome::ReadOnlyHeld;
     }
-    let age = Duration::from_millis((now_ms - info.started_ms).max(0) as u64);
+    // The age parses from the canonical `startedUtc` (no extra field in
+    // the §3.9.4 body); an unparseable stamp is unproven age — read-only,
+    // never a take-over on a guess.
+    let Some(started_ms) = utc::parse_iso_utc(&info.started_utc) else {
+        return LockOutcome::ReadOnlyHeld;
+    };
+    let age = Duration::from_millis((now_ms - started_ms).max(0) as u64);
     if age >= Duration::from_secs(24 * 60 * 60) {
         LockOutcome::TakeoverAvailable
     } else {
         LockOutcome::ReadOnlyHeld
     }
+}
+
+/// Classify an `OpenProcess` failure by its Win32 code (carried in the
+/// low word of `HRESULT_FROM_WIN32`): only `ERROR_INVALID_PARAMETER`
+/// (87 — the documented result for a pid that does not exist) proves
+/// the holder is dead. `ERROR_ACCESS_DENIED` (5) means a live process
+/// we may not query (another session's or user's); anything else is
+/// equally unproven — both stay conservatively "alive" so a lock is
+/// never taken over on a false death verdict (03 §3.9.4).
+fn open_process_error_is_no_such_process(win32_code: u32) -> bool {
+    win32_code == 87 // ERROR_INVALID_PARAMETER
 }
 
 /// Probe whether a process is alive (03 §3.9.4): open with query-only
@@ -199,17 +209,28 @@ pub fn process_alive(pid: u32) -> bool {
     // QUERY_LIMITED_INFORMATION only — no handle duplication, no process
     // manipulation — on a raw u32 pid. The returned handle is used only
     // for a zero-timeout wait on ourselves and closed on every path.
-    let Ok(handle) = (unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) }) else {
-        return false; // cannot be opened: no such process (or no access)
-    };
-    // SAFETY: the handle comes from our own OpenProcess above and is valid
-    // until CloseHandle; the wait never blocks (timeout 0).
-    let wait = unsafe { WaitForSingleObject(handle, 0) };
-    let alive = wait != WAIT_OBJECT_0; // signaled = terminated
-    // SAFETY: closing the handle we opened above; the result is
-    // deliberately ignored (the liveness verdict is already known).
-    let _ = unsafe { CloseHandle(handle) };
-    alive
+    match unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) } {
+        Ok(handle) => {
+            // SAFETY: the handle comes from our own OpenProcess above and
+            // is valid until CloseHandle; the wait never blocks (timeout
+            // 0).
+            let wait = unsafe { WaitForSingleObject(handle, 0) };
+            let alive = wait != WAIT_OBJECT_0; // signaled = terminated
+            // SAFETY: closing the handle we opened above; the result is
+            // deliberately ignored (the liveness verdict is already
+            // known).
+            let _ = unsafe { CloseHandle(handle) };
+            alive
+        }
+        Err(e) => {
+            // HRESULT_FROM_WIN32 carries the Win32 code in the low word:
+            // only a proven no-such-process reads as dead (review F-03)
+            // — e.g. ACCESS_DENIED against a live process of another
+            // user/session must not offer take-over.
+            let win32_code = (e.code().0 & 0xFFFF) as u32;
+            !open_process_error_is_no_such_process(win32_code)
+        }
+    }
 }
 
 /// Non-Windows development fallback (the product ships Windows-only):
@@ -221,11 +242,13 @@ pub fn process_alive(_pid: u32) -> bool {
 }
 
 /// Classify an existing lock per 03 §3.9.4 with the real liveness probe
-/// and the 24-hour other-host rule.
+/// and the 24-hour other-host rule. A missing/empty body (the lock
+/// vanished, or its opener crashed mid-write) is conservatively
+/// **held** — a lock is never taken over on a guess (review F-18).
 fn lock_decision(info: Option<&LockInfo>) -> LockOutcome {
     match info {
         Some(info) => lock_decision_with(info, process_alive(info.pid), utc::epoch_ms_now()),
-        None => LockOutcome::TakeoverAvailable,
+        None => LockOutcome::ReadOnlyHeld,
     }
 }
 
@@ -308,10 +331,10 @@ mod tests {
             host: "OTHER-HOST".into(),
             user: "u".into(),
             started_utc: "2026-01-01T00:00:00.000Z".into(),
-            started_ms: 0,
             app_version: "0.1.0".into(),
         };
-        let now = 25 * 60 * 60 * 1000; // 25 h later
+        let started = utc::parse_iso_utc(&info.started_utc).unwrap_or_default();
+        let now = started + 25 * 60 * 60 * 1000; // 25 h later
         // Dead process: take-over regardless of host.
         assert_eq!(
             lock_decision_with(&info, false, now),
@@ -324,18 +347,55 @@ mod tests {
         );
         // Live other host, < 24 h: read-only.
         assert_eq!(
-            lock_decision_with(&info, true, 60_000),
+            lock_decision_with(&info, true, started + 60_000),
             LockOutcome::ReadOnlyHeld
         );
         // Live same host: read-only at any age.
         let mine = LockInfo {
             host: std::env::var("COMPUTERNAME").unwrap_or_default(),
-            started_ms: 0,
             ..info.clone()
         };
         assert_eq!(
             lock_decision_with(&mine, true, 100 * 24 * 60 * 60 * 1000),
             LockOutcome::ReadOnlyHeld
         );
+        // An unparseable stamp is unproven age: read-only, never a
+        // take-over on a guess (review F-08).
+        let torn = LockInfo {
+            started_utc: "not a timestamp".into(),
+            ..info
+        };
+        assert_eq!(
+            lock_decision_with(&torn, true, 100 * 24 * 60 * 60 * 1000),
+            LockOutcome::ReadOnlyHeld
+        );
+    }
+
+    #[test]
+    fn open_process_error_classification_proves_death_only_for_no_such_pid() {
+        // Review F-03: only ERROR_INVALID_PARAMETER (87) — the documented
+        // no-such-process result — proves death; ACCESS_DENIED (5) and
+        // anything else read as (conservatively) alive.
+        assert!(open_process_error_is_no_such_process(87));
+        assert!(!open_process_error_is_no_such_process(5));
+        assert!(!open_process_error_is_no_such_process(0));
+        assert!(!open_process_error_is_no_such_process(6));
+    }
+
+    #[test]
+    fn an_empty_lock_is_conservatively_held_never_a_takeover() {
+        // Review F-18: an opener that crashed between create and write
+        // leaves a zero-length lock; a collider must see read-only, not
+        // an error and not a take-over.
+        let dir = scratch("empty-lock");
+        let project = dir.join("p.alvs");
+        std::fs::write(lock_path(&project), b"").unwrap_or(());
+        let (_, outcome, info) = match LockFile::acquire(&project) {
+            Ok(v) => v,
+            Err(e) => panic!("acquire: {e}"),
+        };
+        assert_eq!(outcome, LockOutcome::ReadOnlyHeld);
+        assert!(info.is_none());
+        std::fs::remove_dir_all(&dir).unwrap_or(());
     }
 }

@@ -32,7 +32,6 @@ fn foreign_info(pid: u32, host: &str, started_ms: i64) -> LockInfo {
         host: host.into(),
         user: "someone".into(),
         started_utc: alvs_store::utc::iso_utc(started_ms).unwrap_or_default(),
-        started_ms,
         app_version: "0.1.0".into(),
     }
 }

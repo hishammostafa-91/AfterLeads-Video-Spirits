@@ -14,14 +14,13 @@ use crate::error::StoreError;
 use crate::paths::AppPaths;
 use crate::utc;
 
-/// The `session.marker` body (03 §3.8; §3.9.5).
+/// The `session.marker` body (03 §3.8; §3.9.5) — exactly the canonical
+/// fields.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct MarkerBody {
     pid: u32,
     #[serde(rename = "startedUtc")]
     started_utc: String,
-    #[serde(rename = "startedMs")]
-    started_ms: i64,
 }
 
 /// A live session marker (03 §3.9.5).
@@ -41,7 +40,6 @@ impl SessionMarker {
         let body = MarkerBody {
             pid: std::process::id(),
             started_utc: utc::iso_utc(now).unwrap_or_default(),
-            started_ms: now,
         };
         let bytes = serde_json::to_vec_pretty(&body).map_err(|e| StoreError::SaveFailed {
             detail: format!("marker serialization failed: {e}"),
@@ -70,25 +68,34 @@ impl SessionMarker {
 pub struct RecoveryOffer {
     /// When the autosave sidecar was written.
     pub autosave_utc: String,
-    /// When the main file was last saved.
+    /// When the main file was last saved; empty when the crash happened
+    /// before the first save (no main file ever existed).
     pub saved_utc: String,
 }
 
 /// The §3.9.5 predicate: an offer exists only when the previous session
 /// ended abnormally (the marker was left behind) **and** the autosave is
 /// newer than the main file — timestamps are compared, never existence.
+/// A crash **before the first save** (no main file at all) still offers
+/// recovery: the sidecar is trivially the newest state (G-16), and
+/// `saved_utc` is empty — "never saved" (review F-06).
 pub fn evaluate(marker_present: bool, main: &Path, autosave: &Path) -> Option<RecoveryOffer> {
     if !marker_present {
         return None;
     }
     let autosave_ms = modified_ms(autosave)?;
-    let saved_ms = modified_ms(main)?;
+    let main_exists = main.exists();
+    let saved_ms = if main_exists { modified_ms(main)? } else { 0 };
     if autosave_ms <= saved_ms {
         return None;
     }
     Some(RecoveryOffer {
         autosave_utc: utc::iso_utc(autosave_ms)?,
-        saved_utc: utc::iso_utc(saved_ms)?,
+        saved_utc: if main_exists {
+            utc::iso_utc(saved_ms)?
+        } else {
+            String::new()
+        },
     })
 }
 
@@ -128,6 +135,16 @@ mod tests {
         // Marker + newer sidecar: both timestamps.
         let offer = evaluate(true, &main, &sidecar);
         assert!(offer.is_some());
+        // A crash before the FIRST save (no main file): the sidecar is
+        // trivially newest — the offer exists with an empty `saved_utc`
+        // (review F-06).
+        std::fs::remove_file(&main).unwrap_or(());
+        let offer = match evaluate(true, &main, &sidecar) {
+            Some(o) => o,
+            None => panic!("a never-saved session still offers recovery"),
+        };
+        assert!(!offer.autosave_utc.is_empty());
+        assert!(offer.saved_utc.is_empty(), "never saved");
         std::fs::remove_dir_all(&dir).unwrap_or(());
     }
 }

@@ -167,6 +167,65 @@ fn cache_corrupt_database_is_renamed_and_rebuilt() {
 }
 
 #[test]
+fn cache_corrupt_body_with_intact_header_is_rebuilt() {
+    // Review F-01: a realistic power-loss shape — the 100-byte header
+    // (and the WAL pragma that reads it) is intact, but body pages are
+    // damaged. The §3.7 corrupt-rebuild contract is unconditional, so
+    // the damage must route to the rebuild path wherever it surfaces
+    // (quick_check here runs BEFORE migrations), never a hard failure.
+    let dir = scratch("corrupt-body");
+    let db = dir.join("cache.sqlite");
+    {
+        let cache = open(&db);
+        drop(cache); // checkpoint on close
+    }
+    // Destroy the schema btree / body pages while keeping the header:
+    // overwrite everything from byte 200 (past the 100-byte header and
+    // its reserved area) with garbage.
+    let mut bytes = std::fs::read(&db).unwrap_or_default();
+    assert!(bytes.len() > 200, "the fresh database has body pages");
+    for b in bytes.iter_mut().skip(200) {
+        *b = 0xA5;
+    }
+    std::fs::write(&db, &bytes).unwrap_or(());
+    for sibling in ["cache.sqlite-wal", "cache.sqlite-shm"] {
+        let p = dir.join(sibling);
+        if p.exists() {
+            std::fs::remove_file(p).unwrap_or(());
+        }
+    }
+
+    let (cache, rebuilt) = match Cache::open(&db) {
+        Ok(v) => v,
+        Err(e) => panic!("open must rebuild, not fail: {e}"),
+    };
+    assert!(rebuilt, "an intact header does not excuse a corrupt body");
+    assert_eq!(
+        match cache.schema_version() {
+            Ok(v) => v,
+            Err(e) => panic!("version: {e}"),
+        },
+        1,
+        "the rebuilt database carries the current schema"
+    );
+    let evidence = std::fs::read_dir(&dir)
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .map(|e| e.file_name().to_string_lossy().into_owned())
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    assert!(
+        evidence
+            .iter()
+            .any(|n| n.starts_with("cache.sqlite.corrupt-")),
+        "the damaged original is kept as evidence: {evidence:?}"
+    );
+    drop(cache);
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
 fn cache_recent_records_lists_trims_and_pins() {
     let dir = scratch("recent");
     let db = dir.join("cache.sqlite");

@@ -53,11 +53,14 @@ impl Settings {
     /// The load ladder (REQ-SET-003): read `path` → validate against the
     /// table (invalid → default + notice, unknown preserved) → on an
     /// unreadable/wrong-version document, restore `backup` → on no usable
-    /// backup, defaults with a notice.
+    /// backup, defaults with a notice. A **missing** file is a first
+    /// run, not damage (03 §3.6: absent keys take defaults) — no notice.
     pub fn load(path: &Path, backup: &Path) -> Self {
         let mut notices = Vec::new();
+        let file_present = path.exists();
         match read_document(path) {
             Some(doc) => Self::validated(doc, &mut notices),
+            None if !file_present => Self::defaults(),
             None => {
                 // Corrupt (or wrong version): the last good file recovers.
                 match read_document(backup) {
