@@ -100,11 +100,11 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 3
 
-- [ ] T017 [P] [US3] Create `crates/alvs-store/tests/t_prj_004.rs`: backup written per save named `<Name>_<yyyyMMdd-HHmmss>.alvs`, pruned to `backupsKeep` (default 20; boundaries 1 and 100), listing exposes time+size, restore copies into a new file and leaves the backup untouched
+- [X] T017 [P] [US3] Create `crates/alvs-store/tests/t_prj_004.rs`: backup written per save named `<Name>_<yyyyMMdd-HHmmss>.alvs`, pruned to `backupsKeep` (default 20; boundaries 1 and 100), listing exposes time+size, restore copies into a new file and leaves the backup untouched
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Create `crates/alvs-store/src/backup.rs`: write via the atomic primitive with utc.rs stamps, prune newest-keep, list, restore-to-new-file; make T017 green
+- [X] T018 [US3] Create `crates/alvs-store/src/backup.rs`: write via the atomic primitive with utc.rs stamps, prune newest-keep, list, restore-to-new-file; make T017 green
 
 **Checkpoint**: US1–US3 independently functional.
 
