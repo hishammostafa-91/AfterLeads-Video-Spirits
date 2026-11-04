@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Document set | AfterLeads-Video-Spirits implementation documentation |
-| Set version | 1.0.4 |
+| Set version | 1.1.1 |
 | Baseline date | 2026-11-01 |
 | Status | Approved baseline for implementation (v1.0 scope) |
 | Owner | AfterLeads (afterleadseg@gmail.com) |
@@ -266,6 +266,8 @@ Versions below were verified against the official registries on the baseline dat
 | OD-08 | Plan checkpoint per work package | **Default:** the owner approves each Spec Kit `plan.md` before `/speckit.implement` (06 §6.12). The owner may waive it per work package. | — |
 | OD-09 | Default speech-to-text model | **Decided:** MDL-03 (small, quantized) | — |
 | OD-10 | Merge authority | **Decided:** the owner merges pull requests. Agents may merge only when told to in the current session (G-18). | — |
+| OD-11 | `unsafe` scope for `alvs-store` (WP-03) | **Decided:** docs/02 §2.14's allowlist gains `alvs-store`, narrowed to the two Win32 FFI groups canonical storage requires — `MoveFileExW` (03 §3.9.1 atomic replace) and `OpenProcess`/`WaitForSingleObject`/`CloseHandle` (03 §3.9.4 lock liveness) — each block with a `// SAFETY:` comment and a test (02 §2.14). | Any further `unsafe` in `alvs-store` needs a new owner decision. |
+| OD-12 | Portable-mode default project folder (WP-03) | **Decided:** in portable mode the default project folder is `<exe folder>\data\Projects` (03 §3.8); the installed default `%USERPROFILE%\Videos\AfterLeads-Video-Spirits` applies otherwise. Clarification of 03 §3.6/§3.8 (set patch 1.1.1). | A different folder name needs a new owner decision. |
 
 ---
 

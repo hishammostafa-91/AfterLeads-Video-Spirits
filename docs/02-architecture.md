@@ -378,7 +378,7 @@ AfterLeads-Video-Spirits/
 **Rust**
 
 - `rustfmt` default style; `clippy -D warnings` with `pedantic` warnings reviewed per crate (`#![warn(clippy::pedantic)]` in core crates).
-- Errors per 2.11; no `unsafe` outside `alvs-media` (FFmpeg FFI), `alvs-render` (buffer casts), and CMP-12 (WebView2/Win32); every `unsafe` block has a `// SAFETY:` comment and a test.
+- Errors per 2.11; no `unsafe` outside `alvs-media` (FFmpeg FFI), `alvs-render` (buffer casts), `alvs-store` (Win32 `MoveFileExW` for the 3.9.1 atomic replace and `OpenProcess`/`WaitForSingleObject`/`CloseHandle` for the 3.9.4 lock-liveness probe only — OD-11), and CMP-12 (WebView2/Win32); every `unsafe` block has a `// SAFETY:` comment and a test.
 - Public functions document panics, errors, and units (flicks, normalized coordinates).
 - Tests next to code (`#[cfg(test)]`) plus integration tests in `tests/`.
 
