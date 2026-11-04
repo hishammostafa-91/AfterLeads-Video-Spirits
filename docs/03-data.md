@@ -530,7 +530,7 @@ Eviction: when total cache size exceeds `alvs.media.cacheMaxGB`, delete least-re
 
 ## 3.8 File locations
 
-Tauri resolves base folders from the identifier `com.afterleads.videospirits`. In portable mode (a file `portable.flag` next to the executable) every app folder below is replaced by `<exe folder>\data\…`.
+Tauri resolves base folders from the identifier `com.afterleads.videospirits`. In portable mode (a file `portable.flag` next to the executable) every app folder below is replaced by `<exe folder>\data\…`, and the default project folder (`alvs.general.defaultProjectFolder`) becomes `<exe folder>\data\Projects` — the installed default `%USERPROFILE%\Videos\AfterLeads-Video-Spirits` applies otherwise (OD-12).
 
 | Data | Location |
 |---|---|
@@ -544,7 +544,7 @@ Tauri resolves base folders from the identifier `com.afterleads.videospirits`. I
 | Session marker | `%LOCALAPPDATA%\com.afterleads.videospirits\session.marker` |
 | Previous installer (rollback) | `%LOCALAPPDATA%\com.afterleads.videospirits\updates\` |
 | Temporary | `%TEMP%\AfterLeads-Video-Spirits\<pid>\` |
-| Project folder | User-chosen; default under `alvs.general.defaultProjectFolder` |
+| Project folder | User-chosen; default under `alvs.general.defaultProjectFolder` (`%USERPROFILE%\Videos\AfterLeads-Video-Spirits`; `<exe folder>\data\Projects` in portable mode, OD-12) |
 
 Project folder layout:
 
