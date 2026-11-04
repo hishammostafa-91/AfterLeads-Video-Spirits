@@ -111,6 +111,20 @@ enum MediaGate {
 /// canonicalized and lands on [`MediaGate::Offline`], exactly matching
 /// the plain existence probe this gate replaces.
 fn gate_media_path(candidate: &Path) -> MediaGate {
+    // Verbatim spellings slip check_path's prelude — its UNC rule
+    // excludes every `\\?\` prefix, and its GLOBALROOT device test is
+    // case-sensitive — so the gate recognizes them first, before any
+    // delegation: canonicalizing `\\?\UNC\host\share\…` is itself the
+    // SMB probe (THR-13), and `\\?\GLOBALROOT\…` in any case is a
+    // device path (T033). The matching hardening inside
+    // `alvs-core::path` is WP-01's surface and the owner's call.
+    let upper = candidate.to_string_lossy().to_ascii_uppercase();
+    if upper.starts_with(r"\\?\UNC\") {
+        return MediaGate::NeedsConfirmation(candidate.to_path_buf());
+    }
+    if upper.starts_with(r"\\?\GLOBALROOT") {
+        return MediaGate::Offline;
+    }
     let root = candidate
         .parent()
         .map(Path::to_path_buf)
@@ -506,6 +520,50 @@ mod tests {
         let r = resolve_media_entry(&missing.to_string_lossy(), "CON", &dir);
         assert_eq!(PathBuf::from(r.path), missing);
         assert!(r.needs_confirmation.is_none());
+        std::fs::remove_dir_all(&dir).unwrap_or(());
+    }
+
+    #[test]
+    fn media_gate_blocks_verbatim_unc_and_globalroot_spellings() {
+        // T033: verbatim spellings slip check_path's prelude (its UNC
+        // rule excludes `\\?\` prefixes; its GLOBALROOT test is
+        // case-sensitive), and canonicalizing `\\?\UNC\…` is itself the
+        // SMB probe — so the gate must recognize them before any
+        // delegation, whatever the case, in either position.
+        let dir = scratch("verbatim");
+        for spelling in [
+            r"\\?\UNC\alvs-host\share\a.mp4",
+            r"\\?\unc\alvs-host\share\a.mp4",
+        ] {
+            let r = resolve_media_entry(spelling, "", &dir);
+            assert_eq!(r.path, spelling, "never probed, keeps its own path");
+            assert_eq!(r.needs_confirmation.as_deref(), Some(Path::new(spelling)));
+        }
+        // The same spelling as the rel_path (join-base escape).
+        let missing = dir.join("gone").join("b.mp4");
+        let r = resolve_media_entry(
+            &missing.to_string_lossy(),
+            r"\\?\UNC\alvs-host\share\b.mp4",
+            &dir,
+        );
+        assert_eq!(PathBuf::from(r.path), missing);
+        assert_eq!(
+            r.needs_confirmation.as_deref(),
+            Some(Path::new(r"\\?\UNC\alvs-host\share\b.mp4"))
+        );
+        // GLOBALROOT in any case, either position: a device path —
+        // offline, never probed, never a confirmation candidate.
+        for spelling in [
+            r"\\?\GLOBALROOT\Device\Harddisk0",
+            r"\\?\globalroot\Device\X",
+        ] {
+            let r = resolve_media_entry(spelling, "", &dir);
+            assert_eq!(r.path, spelling);
+            assert!(r.needs_confirmation.is_none());
+            let r = resolve_media_entry(&missing.to_string_lossy(), spelling, &dir);
+            assert_eq!(PathBuf::from(r.path), missing);
+            assert!(r.needs_confirmation.is_none());
+        }
         std::fs::remove_dir_all(&dir).unwrap_or(());
     }
 

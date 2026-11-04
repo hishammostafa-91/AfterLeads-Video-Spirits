@@ -264,3 +264,9 @@ Each story lands with its suite green and a commit (Conventional Commits + DCO);
 ## Phase 11: Convergence
 
 - [X] T032 Gate the media-path probes in `fixup_media_paths` per SEC-04: before any filesystem access on a document-controlled candidate (`item.path`, and the `project_dir.join(rel_path)` resolution — note `join` with an absolute or UNC `rel_path` replaces the base), route the candidate through `alvs_core::path::check_path` with `PathOrigin::ProjectFile` semantics — device paths and reserved names must be denied without a probe (the item stays offline), UNC paths must never be probed and must surface as `NeedsConfirmation` data for the caller (THR-13: an SMB stat leaks NTLM credentials; the confirmation dialog itself is WP-05 per FR-019), while legitimate local absolute media outside the project folder must still resolve (containment is the write rule; the read gate is device/reserved/UNC) — with tests covering a UNC `item.path`, a UNC/absolute `rel_path` join escape, a device path, and a reserved name (FR-017; plan data-model validation rule 3; 05 §5.7 SEC-04; constitution VII) (partial)
+
+---
+
+## Phase 12: Convergence
+
+- [X] T033 Close the verbatim-spelling bypass in the SEC-04 media gate: `gate_media_path` must apply a case-insensitive store-side prelude before delegating to `check_path` — `\\?\UNC\server\share\…` (any case) is a UNC path from the project file and must map to `NeedsConfirmation` unprobed (the `canonicalize` inside `check_path` is itself the SMB probe; THR-13), and `\\?\GLOBALROOT\…` (any case) must map to `Offline` as a device path (check_path's `is_unc` excludes all `\\?\` prefixes and its GLOBALROOT test is case-sensitive) — with tests for both spellings in both the absolute and `rel_path` join-escape positions, and a note to the owner that the same case/verbatim hardening belongs in `alvs-core::path` itself (WP-01 surface, owner decision; not this package's scope) (FR-017; 05 §5.7 SEC-04; THR-13) (partial)

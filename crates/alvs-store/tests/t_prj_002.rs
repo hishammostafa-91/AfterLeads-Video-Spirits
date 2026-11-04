@@ -284,6 +284,10 @@ fn t_prj_002_media_paths_are_sec04_gated_before_any_access() {
         &dir.join("gone").join("d.mp4").to_string_lossy(),
         "ok.mp4",
     ));
+    // Verbatim-UNC spelling (T033): the same SMB target in the `\\?\`
+    // namespace — must surface exactly like the plain spelling.
+    doc.media
+        .push(media_item(r"\\?\UNC\alvs-t-prj-002-host\share\v.mp4", ""));
 
     let store = ProjectStore::new(&project_path, 20);
     store
@@ -294,16 +298,17 @@ fn t_prj_002_media_paths_are_sec04_gated_before_any_access() {
         Err(e) => panic!("open: {e}"),
     };
 
-    // The two UNC paths — and only those — surface, sorted and
+    // The three UNC paths — and only those — surface, sorted and
     // deduplicated; the probe-free open returns promptly (a probe would
     // stall on the nonexistent SMB host).
-    assert_eq!(
-        opened.media_needs_confirmation,
-        vec![
-            PathBuf::from(r"\\alvs-t-prj-002-host\share\a.mp4"),
-            PathBuf::from(r"\\alvs-t-prj-002-host\share\b.mp4"),
-        ]
-    );
+    let list = &opened.media_needs_confirmation;
+    assert_eq!(list.len(), 3, "three UNC spellings, deduplicated: {list:?}");
+    assert!(list.contains(&PathBuf::from(r"\\alvs-t-prj-002-host\share\a.mp4")));
+    assert!(list.contains(&PathBuf::from(r"\\alvs-t-prj-002-host\share\b.mp4")));
+    assert!(list.contains(&PathBuf::from(r"\\?\UNC\alvs-t-prj-002-host\share\v.mp4")));
+    let mut sorted = list.clone();
+    sorted.sort();
+    assert_eq!(list, &sorted, "sorted");
     assert_eq!(
         opened.doc.media[0].path,
         r"\\alvs-t-prj-002-host\share\a.mp4"
@@ -326,6 +331,10 @@ fn t_prj_002_media_paths_are_sec04_gated_before_any_access() {
         PathBuf::from(&opened.doc.media[5].path),
         dir.join("ok.mp4"),
         "the in-folder relative resolution still works"
+    );
+    assert_eq!(
+        opened.doc.media[6].path, r"\\?\UNC\alvs-t-prj-002-host\share\v.mp4",
+        "the verbatim spelling is never probed, keeps its own path"
     );
     if let Some(lock) = opened.lock {
         lock.release().unwrap_or(());
