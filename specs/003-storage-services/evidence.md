@@ -8,7 +8,7 @@ All commands run on the `feat/003-storage-services` branch (workstation: Windows
 |---|---|
 | `pwsh -File tools/verify.ps1` | **All available gates PASS** — docs, commits, rust-format, rust-lint, dependency-policy, crate-rules, placeholders, rust-test, bindings-drift (UI gates SKIPPED: scripts arrive with WP-04) |
 | `python tools/git/check_commits.py origin/main..HEAD` | **all commits OK** |
-| `cargo nextest run --workspace --locked` | **286/286 pass** (31 alvs-core + 251 alvs-store + 4 app backend; +5 from the T032/T033 convergence gates) |
+| `cargo nextest run --workspace --locked` | **294/294 pass** (33 alvs-core + 257 alvs-store + 4 app backend; +5 convergence gates, +8 review-fix tests) |
 | `cargo test --workspace --locked` (the `rust-test` gate) | **PASS** — 40 test binaries ok |
 | `cargo clippy --workspace --all-targets --locked -- -D warnings` | **clean** |
 | `cargo fmt --all -- --check` | **clean** |
@@ -47,6 +47,17 @@ All commands run on the `feat/003-storage-services` branch (workstation: Windows
 - **Test-name filters**: nextest matches test names, so every suite test carries its prefix (`t_prj_002_…`) — the documented filters select them exactly.
 - **Convergence T032 (SEC-04 media gate)**: `fixup_media_paths`'s bare `.exists()` probes were document-controlled path accesses outside the SEC-04 policy (plan data-model rule 3; FR-017). The fix routes every candidate through `alvs_core::path::check_path` with `PathOrigin::ProjectFile` semantics via the store-owned `resolve_media_entry` (the candidate's own folder as the containment root, so local media anywhere resolves while a missing path lands offline — matching the old probe's semantics); `DocumentHooks::fixup_media_paths` now returns a `MediaFixup` whose UNC list `ProjectStore::open` sorts, deduplicates, and surfaces as `Opened.media_needs_confirmation` for the WP-05 confirmation dialog. Model validation never inspects path strings (verified in `alvs-model`), so the gate is the only barrier between a document and an SMB probe.
 - **Convergence T033 (verbatim spellings)**: `check_path`'s UNC rule excludes every `\\?\` prefix and its GLOBALROOT device test is case-sensitive, so `\\?\UNC\host\share\…` (any case) reached the canonicalize *inside* the gate — itself an SMB probe — and lowercase `\\?\globalroot\…` reached the device path. `gate_media_path` now applies a case-insensitive store-side prelude (`\\?\UNC\` → NeedsConfirmation unprobed; `\\?\GLOBALROOT` → Offline) before any delegation. The matching hardening inside `alvs-core::path` itself is WP-01's delivered surface — **flagged for the owner**, not changed here (G-17).
+
+## Review round (independent reviewer agent, 2026-11-04)
+
+Verdict REQUEST CHANGES with 19 findings (1 HIGH, 5 MEDIUM, 13 LOW) — **all 19 fixed** in commits `6e349c6`, `7760a89`, `13fc067`; 294/294 workspace, all gates PASS:
+
+- **F-01 (HIGH)** corrupt-rebuild made unconditional (corruption at *any* open-path statement routes to rebuild; `quick_check` now runs before migrations) + intact-header/corrupt-body test.
+- **F-02** first run (missing `settings.json`) loads defaults with no E8002 notice; corrupt files keep the `.bak` ladder. **F-03** `OpenProcess` failures classify by Win32 code — only ERROR_INVALID_PARAMETER proves death; ACCESS_DENIED reads alive (no take-over against a live other-session holder). **F-04** corrupt/versionless documents surface E1003 (not E1005). **F-05** E1008 recovery is the real catalog command KB-004 `file.saveAs`; the remaining ids are documented dialog actions per 04 §4.9's `media.relink` convention. **F-06** a crash before the first save still offers recovery (missing main = epoch 0, empty `saved_utc`).
+- **F-08** lock/marker bodies are exactly the canonical fields (`startedUtc` parsed for age; unparseable stamp → read-only). **F-18** lock body written through the exclusive handle; zero-length lock reads as conservatively held.
+- **F-09** unused `proptest` dev-dep removed. **F-10** serialize-thread hand-off documented. **F-11** `atomic_write` pub(crate) + public `atomic_write_contained` backed by the new `alvs_core::path::check_write_path` (same prelude; containment via canonical parent for not-yet-existing targets — `check_path`'s canonicalize would deny every first write). **F-12** rotation rejects `keep < 2`. **F-13** recent-list failure is best-effort (warn, never a failed save/open). **F-14** poll loops log write failures. **F-15** `MemoryRecent` preserves pins on re-record. **F-17** one shared `tests/common/mod.rs` hooks impl (three suites rewired; app module stays the single production copy). **F-19** `redact_paths` spans spaced paths (`C:\a b\c.mp4` is one token). **F-16** STATUS refreshed.
+
+**Open owner decisions (not code):** F-07 — the portable-mode default project folder name `<exe>\data\Projects` appears in no canonical doc (03 §3.6 pins `%USERPROFILE%\Videos\…` for installed mode); ratify or rename. F-05 — if `retry` / `disk.freeSpace` / `chooseLocation` / `project.openReadOnly` / `project.takeOverLock` should be IPC commands, they need 12 §12.10 rows (G-19). Plus the T033 flag: the verbatim-UNC/GLOBALROOT case-insensitivity hardening belongs in `alvs-core::path` itself (WP-01's surface).
 
 ## Honesty ledger (not verified / deferred)
 
