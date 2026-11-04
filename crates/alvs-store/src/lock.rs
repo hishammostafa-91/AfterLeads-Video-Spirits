@@ -186,12 +186,45 @@ pub fn lock_decision_with(info: &LockInfo, holder_alive: bool, now_ms: i64) -> L
     }
 }
 
-/// [`lock_decision_with`] with the liveness probe still pending (T022
-/// wires the Win32 `OpenProcess`/`WaitForSingleObject` check); until then
-/// a readable lock is treated as held, which is the conservative verdict.
+/// Probe whether a process is alive (03 §3.9.4): open with query-only
+/// access and wait with a zero timeout — a signaled process handle means
+/// the process has terminated.
+#[cfg(windows)]
+pub fn process_alive(pid: u32) -> bool {
+    use windows::Win32::Foundation::{CloseHandle, WAIT_OBJECT_0};
+    use windows::Win32::System::Threading::{
+        OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION, WaitForSingleObject,
+    };
+    // SAFETY: (OD-11, docs/02 §2.14) OpenProcess is called with
+    // QUERY_LIMITED_INFORMATION only — no handle duplication, no process
+    // manipulation — on a raw u32 pid. The returned handle is used only
+    // for a zero-timeout wait on ourselves and closed on every path.
+    let Ok(handle) = (unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) }) else {
+        return false; // cannot be opened: no such process (or no access)
+    };
+    // SAFETY: the handle comes from our own OpenProcess above and is valid
+    // until CloseHandle; the wait never blocks (timeout 0).
+    let wait = unsafe { WaitForSingleObject(handle, 0) };
+    let alive = wait != WAIT_OBJECT_0; // signaled = terminated
+    // SAFETY: closing the handle we opened above; the result is
+    // deliberately ignored (the liveness verdict is already known).
+    let _ = unsafe { CloseHandle(handle) };
+    alive
+}
+
+/// Non-Windows development fallback (the product ships Windows-only):
+/// conservatively reports unknown pids as alive so a lock is never
+/// taken over on a false death verdict.
+#[cfg(not(windows))]
+pub fn process_alive(_pid: u32) -> bool {
+    true
+}
+
+/// Classify an existing lock per 03 §3.9.4 with the real liveness probe
+/// and the 24-hour other-host rule.
 fn lock_decision(info: Option<&LockInfo>) -> LockOutcome {
     match info {
-        Some(_) => LockOutcome::ReadOnlyHeld,
+        Some(info) => lock_decision_with(info, process_alive(info.pid), utc::epoch_ms_now()),
         None => LockOutcome::TakeoverAvailable,
     }
 }

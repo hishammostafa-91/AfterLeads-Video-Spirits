@@ -13,7 +13,7 @@ use std::sync::Arc;
 use crate::atomic::atomic_write;
 use crate::backup;
 use crate::error::StoreError;
-use crate::lock::LockFile;
+use crate::lock::{LockFile, LockOutcome};
 use crate::recent::RecentProjects;
 
 /// The model-aware halves of the pipeline (research D2). Every method is
@@ -62,6 +62,42 @@ pub enum ReadOnlyReason {
         /// The version found in the file.
         found: u32,
     },
+    /// The project is open in another window or computer (E1007;
+    /// §3.9.4). When `takeover_available` holds, the holder is gone or
+    /// expired and the caller may confirm a take-over
+    /// ([`crate::lock::LockFile::take_over`]) and re-open writable.
+    Locked {
+        /// The holder's process id.
+        pid: u32,
+        /// The holder's host.
+        host: String,
+        /// Whether a take-over is offered (dead holder, or another host
+        /// with a lock older than 24 h).
+        takeover_available: bool,
+    },
+}
+
+impl ReadOnlyReason {
+    /// The store error to surface for this reason (E1004/E1007).
+    pub fn store_error(&self) -> StoreError {
+        match self {
+            ReadOnlyReason::NewerSchema { found } => StoreError::ReadOnlyNewer { found: *found },
+            ReadOnlyReason::Locked {
+                pid,
+                host,
+                takeover_available,
+            } => StoreError::Locked {
+                detail: format!(
+                    "pid {pid} on {host}{}",
+                    if *takeover_available {
+                        " (take-over available)"
+                    } else {
+                        ""
+                    }
+                ),
+            },
+        }
+    }
 }
 
 /// A successfully opened project (§3.9.2/§3.9.6 outcomes).
@@ -225,7 +261,38 @@ impl ProjectStore {
 
         let mut doc = H::parse(&bytes)?;
         H::validate(&doc)?;
-        let (lock, _outcome, _existing) = LockFile::acquire(&self.path)?;
+        // §3.9.4: a live same-host holder offers read-only (E1007); a
+        // dead or expired holder offers take-over — both as data for the
+        // caller's confirmation, never a silent seizure.
+        let (lock, read_only) = match LockFile::acquire(&self.path)? {
+            (lock, LockOutcome::Acquired, _) => (Some(lock), None),
+            (_, LockOutcome::ReadOnlyHeld, Some(info)) => (
+                None,
+                Some(ReadOnlyReason::Locked {
+                    pid: info.pid,
+                    host: info.host,
+                    takeover_available: false,
+                }),
+            ),
+            (_, LockOutcome::TakeoverAvailable, Some(info)) => (
+                None,
+                Some(ReadOnlyReason::Locked {
+                    pid: info.pid,
+                    host: info.host,
+                    takeover_available: true,
+                }),
+            ),
+            // acquire always reads the info on the existing-lock path;
+            // unreachable in practice, treated conservatively as held.
+            (_, outcome, None) => (
+                None,
+                Some(ReadOnlyReason::Locked {
+                    pid: 0,
+                    host: String::new(),
+                    takeover_available: outcome == LockOutcome::TakeoverAvailable,
+                }),
+            ),
+        };
         let project_dir = self
             .path
             .parent()
@@ -236,8 +303,8 @@ impl ProjectStore {
         Ok(Opened {
             doc,
             path: self.path.clone(),
-            lock: Some(lock),
-            read_only: None,
+            lock,
+            read_only,
             migrated_from,
         })
     }

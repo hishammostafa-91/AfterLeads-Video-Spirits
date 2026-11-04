@@ -136,11 +136,11 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 5
 
-- [ ] T021 [P] [US5] Create `crates/alvs-store/tests/t_prj_008.rs`: exclusive create; live same-host lock → ReadOnly + E1007; dead pid (spawn a real sleeping child via `std::process::Command`, kill and reap it, then probe its pid) → TakeoverAvailable; other host with startedUtc < 24 h → no takeover; ≥ 24 h → takeover; release removes the file
+- [X] T021 [P] [US5] Create `crates/alvs-store/tests/t_prj_008.rs`: exclusive create; live same-host lock → ReadOnly + E1007; dead pid (spawn a real sleeping child via `std::process::Command`, kill and reap it, then probe its pid) → TakeoverAvailable; other host with startedUtc < 24 h → no takeover; ≥ 24 h → takeover; release removes the file
 
 ### Implementation for User Story 5
 
-- [ ] T022 [US5] Complete `crates/alvs-store/src/lock.rs`: liveness via `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` + `WaitForSingleObject(handle, 0)` + `CloseHandle` with `// SAFETY:` comment + test (OD-11); `LockOutcome` rules from 03 §3.9.4; age from startedUtc epoch-ms; wire full semantics into `ProjectStore::open`; make T021 green
+- [X] T022 [US5] Complete `crates/alvs-store/src/lock.rs`: liveness via `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` + `WaitForSingleObject(handle, 0)` + `CloseHandle` with `// SAFETY:` comment + test (OD-11); `LockOutcome` rules from 03 §3.9.4; age from startedUtc epoch-ms; wire full semantics into `ProjectStore::open`; make T021 green
 
 **Checkpoint**: US1–US5 independently functional.
 
