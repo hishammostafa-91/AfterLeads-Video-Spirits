@@ -12,7 +12,7 @@ use std::sync::Arc;
 use alvs_model::project::new_project;
 use alvs_model::sequence::{new_sequence, sqp02_fallback_format};
 use alvs_store::backup;
-use alvs_store::project::{DocumentHooks, ProjectStore};
+use alvs_store::project::{DocumentHooks, MediaFixup, ProjectStore};
 
 struct ProjectHooks;
 
@@ -79,8 +79,8 @@ impl DocumentHooks for ProjectHooks {
     fn fixup_media_paths(
         _doc: &mut Self::Doc,
         _project_dir: &std::path::Path,
-    ) -> Result<(), alvs_store::error::StoreError> {
-        Ok(())
+    ) -> Result<MediaFixup, alvs_store::error::StoreError> {
+        Ok(MediaFixup::default())
     }
 }
 

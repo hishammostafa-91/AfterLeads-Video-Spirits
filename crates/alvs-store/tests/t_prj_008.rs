@@ -8,7 +8,7 @@
 use std::path::{Path, PathBuf};
 
 use alvs_store::lock::{LockFile, LockInfo, LockOutcome, process_alive};
-use alvs_store::project::{DocumentHooks, ProjectStore, ReadOnlyReason};
+use alvs_store::project::{DocumentHooks, MediaFixup, ProjectStore, ReadOnlyReason};
 
 fn scratch(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
@@ -188,8 +188,8 @@ impl DocumentHooks for ValueHooks {
     fn fixup_media_paths(
         _doc: &mut Self::Doc,
         _project_dir: &std::path::Path,
-    ) -> Result<(), alvs_store::error::StoreError> {
-        Ok(())
+    ) -> Result<MediaFixup, alvs_store::error::StoreError> {
+        Ok(MediaFixup::default())
     }
 }
 

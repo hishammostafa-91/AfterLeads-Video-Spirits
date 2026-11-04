@@ -258,3 +258,9 @@ Each story lands with its suite green and a commit (Conventional Commits + DCO);
 - No `time`/`chrono`/`tempfile`/`dirs` direct deps (G-11; research D1/D5)
 - Determinism: fake `Clock`, injectable `Fs`, seeded proptest (constitution III)
 - Commit after each task or logical group; stop at any checkpoint to validate a story independently
+
+---
+
+## Phase 11: Convergence
+
+- [X] T032 Gate the media-path probes in `fixup_media_paths` per SEC-04: before any filesystem access on a document-controlled candidate (`item.path`, and the `project_dir.join(rel_path)` resolution — note `join` with an absolute or UNC `rel_path` replaces the base), route the candidate through `alvs_core::path::check_path` with `PathOrigin::ProjectFile` semantics — device paths and reserved names must be denied without a probe (the item stays offline), UNC paths must never be probed and must surface as `NeedsConfirmation` data for the caller (THR-13: an SMB stat leaks NTLM credentials; the confirmation dialog itself is WP-05 per FR-019), while legitimate local absolute media outside the project folder must still resolve (containment is the write rule; the read gate is device/reserved/UNC) — with tests covering a UNC `item.path`, a UNC/absolute `rel_path` join escape, a device path, and a reserved name (FR-017; plan data-model validation rule 3; 05 §5.7 SEC-04; constitution VII) (partial)

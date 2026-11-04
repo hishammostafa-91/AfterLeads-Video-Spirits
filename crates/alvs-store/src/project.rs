@@ -10,6 +10,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use alvs_core::path::{PathDecision, PathOrigin, check_path};
+
 use crate::atomic::atomic_write;
 use crate::backup;
 use crate::error::StoreError;
@@ -50,8 +52,122 @@ pub trait DocumentHooks {
     fn migrate(bytes: &[u8]) -> Result<Vec<u8>, StoreError>;
 
     /// Resolve media paths after parsing: when an item's absolute path is
-    /// missing, its project-relative path is tried first (REQ-PRJ-002).
-    fn fixup_media_paths(doc: &mut Self::Doc, project_dir: &Path) -> Result<(), StoreError>;
+    /// missing, its project-relative path is tried first (REQ-PRJ-002),
+    /// with every candidate gated per SEC-04 *before* any filesystem
+    /// access — device paths and reserved names are never probed, and a
+    /// UNC path from the document is never probed, surfacing instead as
+    /// [`MediaFixup::needs_confirmation`] data for the caller (05 §5.7;
+    /// THR-13; the confirmation dialog itself is WP-05).
+    fn fixup_media_paths(doc: &mut Self::Doc, project_dir: &Path)
+    -> Result<MediaFixup, StoreError>;
+}
+
+/// What the media-path fixup found (T032): the document's UNC paths,
+/// untouched, that the caller must confirm before any access.
+#[derive(Debug, Default, Clone)]
+pub struct MediaFixup {
+    /// UNC paths from the document (05 §5.7 SEC-04; THR-13: touching a
+    /// `\\server\share` path would send NTLM credentials to the SMB
+    /// server). They were **not** accessed during the fixup; the shell
+    /// (WP-05) asks the user and re-resolves on confirmation.
+    pub needs_confirmation: Vec<PathBuf>,
+}
+
+/// One media item's path resolution under the SEC-04 gate (T032;
+/// REQ-PRJ-002; 05 §5.7).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MediaEntryResolution {
+    /// The absolute path the item should carry: the original, or the
+    /// project-relative candidate when it resolved.
+    pub path: String,
+    /// A UNC path from the document that was **not** accessed and awaits
+    /// the user's confirmation (THR-13); `None` when the item has no
+    /// UNC path. Still set when the relative candidate resolved, so the
+    /// caller can ask about the UNC reference anyway.
+    pub needs_confirmation: Option<PathBuf>,
+}
+
+/// The SEC-04 verdict for one document-controlled media candidate,
+/// decided *before* any filesystem access (05 §5.7; T032).
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum MediaGate {
+    /// An ordinary local path that exists: safe to read as-is.
+    Exists,
+    /// Missing, or rejected by the device/reserved rules: the candidate
+    /// is not used (the item stays with its current path).
+    Offline,
+    /// A UNC path from the project file (THR-13): never accessed; the
+    /// caller must confirm with the user first (the dialog is WP-05).
+    NeedsConfirmation(PathBuf),
+}
+
+/// Gate one media candidate per SEC-04's project-file rules (05 §5.7):
+/// device paths and reserved names are rejected, UNC paths demand
+/// confirmation before access, and an ordinary local path is usable
+/// when it exists. Containment ("never write outside …") governs
+/// writes, not media reads, so the candidate's own folder stands in as
+/// the containment root — an existing local path is contained by its
+/// parent wherever the media lives, and a missing path cannot be
+/// canonicalized and lands on [`MediaGate::Offline`], exactly matching
+/// the plain existence probe this gate replaces.
+fn gate_media_path(candidate: &Path) -> MediaGate {
+    let root = candidate
+        .parent()
+        .map(Path::to_path_buf)
+        .unwrap_or_default();
+    match check_path(candidate, PathOrigin::ProjectFile, &[root]) {
+        PathDecision::Allowed => MediaGate::Exists,
+        PathDecision::NeedsConfirmation { path } => MediaGate::NeedsConfirmation(path),
+        PathDecision::Denied(_) => MediaGate::Offline,
+    }
+}
+
+/// Resolve one media item (REQ-PRJ-002 behind the SEC-04 gate, T032):
+/// an existing non-UNC absolute path wins; otherwise the
+/// project-relative candidate is tried. Every candidate is gated before
+/// any probe — a `rel_path` that is itself absolute or UNC replaces the
+/// join base and is gated as the document-controlled path it is.
+pub fn resolve_media_entry(
+    absolute: &str,
+    rel_path: &str,
+    project_dir: &Path,
+) -> MediaEntryResolution {
+    let mut needs_confirmation = None;
+    if !absolute.is_empty() {
+        match gate_media_path(Path::new(absolute)) {
+            MediaGate::Exists => {
+                return MediaEntryResolution {
+                    path: absolute.to_string(),
+                    needs_confirmation: None,
+                };
+            }
+            // Never probed (THR-13); still try the relative candidate so
+            // the item can work through it.
+            MediaGate::NeedsConfirmation(path) => needs_confirmation = Some(path),
+            MediaGate::Offline => {}
+        }
+    }
+    if !rel_path.is_empty() {
+        let candidate = project_dir.join(rel_path);
+        match gate_media_path(&candidate) {
+            MediaGate::Exists => {
+                return MediaEntryResolution {
+                    path: candidate.to_string_lossy().into_owned(),
+                    needs_confirmation,
+                };
+            }
+            MediaGate::NeedsConfirmation(path) => {
+                if needs_confirmation.is_none() {
+                    needs_confirmation = Some(path);
+                }
+            }
+            MediaGate::Offline => {}
+        }
+    }
+    MediaEntryResolution {
+        path: absolute.to_string(),
+        needs_confirmation,
+    }
 }
 
 /// Why an opened project is read-only.
@@ -112,6 +228,11 @@ pub struct Opened<Doc> {
     pub read_only: Option<ReadOnlyReason>,
     /// The version a successful migration started from (§3.9.6).
     pub migrated_from: Option<u32>,
+    /// UNC media paths found in the document, never accessed during
+    /// this open: the caller confirms them with the user before any
+    /// access (05 §5.7 SEC-04; THR-13; the dialog is WP-05). Sorted and
+    /// deduplicated; empty when none.
+    pub media_needs_confirmation: Vec<PathBuf>,
 }
 
 /// What a manual save did (§3.9.2), for evidence and the recent list.
@@ -245,6 +366,9 @@ impl ProjectStore {
                 lock: None,
                 read_only: Some(ReadOnlyReason::NewerSchema { found: version }),
                 migrated_from: None,
+                // Media resolution is the fixup's job; the newer-schema
+                // read-only path leaves the document untouched (§3.9.6).
+                media_needs_confirmation: Vec::new(),
             });
         }
 
@@ -298,7 +422,10 @@ impl ProjectStore {
             .parent()
             .map(Path::to_path_buf)
             .unwrap_or_else(|| PathBuf::from("."));
-        H::fixup_media_paths(&mut doc, &project_dir)?;
+        let fixup = H::fixup_media_paths(&mut doc, &project_dir)?;
+        let mut media_needs_confirmation = fixup.needs_confirmation;
+        media_needs_confirmation.sort();
+        media_needs_confirmation.dedup();
         self.record_recent()?;
         Ok(Opened {
             doc,
@@ -306,6 +433,7 @@ impl ProjectStore {
             lock,
             read_only,
             migrated_from,
+            media_needs_confirmation,
         })
     }
 }
@@ -328,5 +456,93 @@ mod tests {
             with_suffix(Path::new("bare.alvs"), ".x"),
             PathBuf::from("bare.alvs.x")
         );
+    }
+
+    fn scratch(tag: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "alvs-project-{tag}-{}",
+            uuid::Uuid::now_v7().simple()
+        ));
+        std::fs::create_dir_all(&dir).unwrap_or(());
+        dir
+    }
+
+    #[test]
+    fn media_gate_leaves_unc_unprobed_and_surfaces_it() {
+        let dir = scratch("unc");
+        // A UNC absolute is never probed (THR-13); it surfaces for
+        // confirmation and the item keeps its own path.
+        let r = resolve_media_entry(r"\\alvs-host\share\a.mp4", "", &dir);
+        assert_eq!(r.path, r"\\alvs-host\share\a.mp4");
+        assert_eq!(
+            r.needs_confirmation.as_deref(),
+            Some(Path::new(r"\\alvs-host\share\a.mp4"))
+        );
+        // A UNC rel_path replaces the join base — same treatment.
+        let missing = dir.join("gone").join("b.mp4");
+        let r = resolve_media_entry(&missing.to_string_lossy(), r"\\alvs-host\share\b.mp4", &dir);
+        assert_eq!(
+            PathBuf::from(r.path),
+            missing,
+            "the item keeps its own path, untouched"
+        );
+        assert_eq!(
+            r.needs_confirmation.as_deref(),
+            Some(Path::new(r"\\alvs-host\share\b.mp4"))
+        );
+        std::fs::remove_dir_all(&dir).unwrap_or(());
+    }
+
+    #[test]
+    fn media_gate_rejects_device_and_reserved_without_probing() {
+        let dir = scratch("device-reserved");
+        // A device path is denied before any canonicalize; it is NOT a
+        // confirmation candidate, just offline.
+        let r = resolve_media_entry(r"\\.\PhysicalDrive1", "", &dir);
+        assert_eq!(r.path, r"\\.\PhysicalDrive1");
+        assert!(r.needs_confirmation.is_none());
+        // A reserved name as the relative candidate: same silent denial.
+        let missing = dir.join("gone").join("c.mp4");
+        let r = resolve_media_entry(&missing.to_string_lossy(), "CON", &dir);
+        assert_eq!(PathBuf::from(r.path), missing);
+        assert!(r.needs_confirmation.is_none());
+        std::fs::remove_dir_all(&dir).unwrap_or(());
+    }
+
+    #[test]
+    fn media_gate_resolves_local_media_anywhere_and_keeps_rel_fallback() {
+        let base = scratch("local");
+        let dir = base.join("proj");
+        std::fs::create_dir_all(&dir).unwrap_or(());
+        let elsewhere = base.join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).unwrap_or(());
+        std::fs::write(dir.join("ok.mp4"), b"x").unwrap_or(());
+        std::fs::write(elsewhere.join("e.mp4"), b"x").unwrap_or(());
+
+        // Containment is the write rule (05 §5.7): local media outside
+        // the project folder still resolves.
+        let outside = elsewhere.join("e.mp4");
+        let r = resolve_media_entry(&outside.to_string_lossy(), "", &dir);
+        assert_eq!(PathBuf::from(r.path), outside);
+        assert!(r.needs_confirmation.is_none());
+
+        // Missing absolute + in-folder relative: the relative takes over
+        // (REQ-PRJ-002).
+        let missing = dir.join("gone").join("f.mp4");
+        let r = resolve_media_entry(&missing.to_string_lossy(), "ok.mp4", &dir);
+        assert_eq!(PathBuf::from(r.path), dir.join("ok.mp4"));
+        assert!(r.needs_confirmation.is_none());
+
+        // UNC absolute + resolving relative: the item works through the
+        // relative AND the UNC is still reported for confirmation.
+        let r = resolve_media_entry(r"\\alvs-host\share\g.mp4", "ok.mp4", &dir);
+        assert_eq!(PathBuf::from(r.path), dir.join("ok.mp4"));
+        assert!(r.needs_confirmation.is_some());
+
+        // Both missing: unchanged, offline, nothing to confirm.
+        let r = resolve_media_entry(&missing.to_string_lossy(), "nope.mp4", &dir);
+        assert_eq!(PathBuf::from(r.path), missing);
+        assert!(r.needs_confirmation.is_none());
+        std::fs::remove_dir_all(&base).unwrap_or(());
     }
 }

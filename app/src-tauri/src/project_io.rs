@@ -10,7 +10,7 @@ use std::path::Path;
 use alvs_model::migrate;
 use alvs_model::project::Project;
 use alvs_store::error::StoreError;
-use alvs_store::project::DocumentHooks;
+use alvs_store::project::{DocumentHooks, MediaFixup, resolve_media_entry};
 
 /// `DocumentHooks` over the real project model.
 pub struct ProjectHooks;
@@ -78,22 +78,25 @@ impl DocumentHooks for ProjectHooks {
         })
     }
 
-    fn fixup_media_paths(doc: &mut Self::Doc, project_dir: &Path) -> Result<(), StoreError> {
+    fn fixup_media_paths(
+        doc: &mut Self::Doc,
+        project_dir: &Path,
+    ) -> Result<MediaFixup, StoreError> {
         // REQ-PRJ-002: the relative path is tried first when the absolute
-        // path is missing; both-missing items stay offline (E2001 is the
-        // model's concern) without blocking the open.
+        // path is missing; every candidate is SEC-04-gated before any
+        // access (T032; 05 §5.7) — UNC paths from the document are never
+        // touched (THR-13) and surface for the caller's confirmation
+        // (dialog: WP-05); device paths and reserved names stay offline;
+        // both-missing items stay offline (E2001 is the model's concern)
+        // without blocking the open.
+        let mut fixup = MediaFixup::default();
         for item in &mut doc.media {
-            if !item.path.is_empty() && Path::new(&item.path).exists() {
-                continue;
-            }
-            if item.rel_path.is_empty() {
-                continue;
-            }
-            let candidate = project_dir.join(&item.rel_path);
-            if candidate.exists() {
-                item.path = candidate.to_string_lossy().into_owned();
+            let resolution = resolve_media_entry(&item.path, &item.rel_path, project_dir);
+            item.path = resolution.path;
+            if let Some(path) = resolution.needs_confirmation {
+                fixup.needs_confirmation.push(path);
             }
         }
-        Ok(())
+        Ok(fixup)
     }
 }

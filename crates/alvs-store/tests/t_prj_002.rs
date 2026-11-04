@@ -13,7 +13,9 @@ use alvs_model::migrate::{self, MigrationStep};
 use alvs_model::project::new_project;
 use alvs_model::sequence::{new_sequence, sqp02_fallback_format};
 use alvs_store::error::StoreError;
-use alvs_store::project::{DocumentHooks, ProjectStore, ReadOnlyReason};
+use alvs_store::project::{
+    DocumentHooks, MediaFixup, ProjectStore, ReadOnlyReason, resolve_media_entry,
+};
 use alvs_store::recent::{MemoryRecent, RecentProjects};
 
 /// The production-shaped hooks over the real model (the app backend's
@@ -82,23 +84,23 @@ impl DocumentHooks for ProjectHooks {
         })
     }
 
-    fn fixup_media_paths(doc: &mut Self::Doc, project_dir: &Path) -> Result<(), StoreError> {
-        // REQ-PRJ-002: when the absolute path is missing, the relative path
-        // is tried first; an item whose both paths miss stays offline
-        // (E2001 is the model's later concern), never blocking the open.
+    fn fixup_media_paths(
+        doc: &mut Self::Doc,
+        project_dir: &Path,
+    ) -> Result<MediaFixup, StoreError> {
+        // Mirrors the app backend's production hooks: REQ-PRJ-002
+        // relative-first resolution with every candidate SEC-04-gated
+        // before any access (T032; 05 §5.7) — UNC is never probed
+        // (THR-13) and surfaces for the caller's confirmation.
+        let mut fixup = MediaFixup::default();
         for item in &mut doc.media {
-            if !item.path.is_empty() && Path::new(&item.path).exists() {
-                continue;
-            }
-            if item.rel_path.is_empty() {
-                continue;
-            }
-            let candidate = project_dir.join(&item.rel_path);
-            if candidate.exists() {
-                item.path = candidate.to_string_lossy().into_owned();
+            let resolution = resolve_media_entry(&item.path, &item.rel_path, project_dir);
+            item.path = resolution.path;
+            if let Some(path) = resolution.needs_confirmation {
+                fixup.needs_confirmation.push(path);
             }
         }
-        Ok(())
+        Ok(fixup)
     }
 }
 
@@ -242,6 +244,96 @@ fn t_prj_002_relative_path_tried_first_when_absolute_missing() {
 }
 
 #[test]
+fn t_prj_002_media_paths_are_sec04_gated_before_any_access() {
+    // T032 (convergence): document-controlled media candidates pass the
+    // SEC-04 gate before any probe — UNC is never touched (THR-13) and
+    // surfaces on the open; device paths and reserved names stay
+    // offline; local media anywhere on disk still resolves.
+    let base = scratch("sec04");
+    let dir = base.join("proj");
+    std::fs::create_dir_all(&dir).unwrap_or(());
+    let elsewhere = base.join("elsewhere");
+    std::fs::create_dir_all(&elsewhere).unwrap_or(());
+    std::fs::write(dir.join("ok.mp4"), b"x").unwrap_or(());
+    std::fs::write(elsewhere.join("e.mp4"), b"x").unwrap_or(());
+
+    let project_path = dir.join("gated.alvs");
+    let mut doc = sample_project();
+    // UNC absolute: reported, never probed.
+    doc.media
+        .push(media_item(r"\\alvs-t-prj-002-host\share\a.mp4", ""));
+    // Missing absolute + UNC rel_path (the join-base escape): reported,
+    // never probed, the item keeps its own path.
+    doc.media.push(media_item(
+        &dir.join("gone").join("b.mp4").to_string_lossy(),
+        r"\\alvs-t-prj-002-host\share\b.mp4",
+    ));
+    // Device path: silently offline, not a confirmation candidate.
+    doc.media.push(media_item(r"\\.\PhysicalDrive1", ""));
+    // Reserved name as the relative candidate: stays offline.
+    doc.media.push(media_item(
+        &dir.join("gone").join("c.mp4").to_string_lossy(),
+        "CON",
+    ));
+    // Local media outside the project folder resolves (containment is
+    // the write rule; 05 §5.7).
+    doc.media
+        .push(media_item(&elsewhere.join("e.mp4").to_string_lossy(), ""));
+    // Missing absolute + in-folder relative: the relative takes over.
+    doc.media.push(media_item(
+        &dir.join("gone").join("d.mp4").to_string_lossy(),
+        "ok.mp4",
+    ));
+
+    let store = ProjectStore::new(&project_path, 20);
+    store
+        .save::<ProjectHooks>(Arc::new(doc))
+        .unwrap_or_else(|e| panic!("save: {e}"));
+    let opened = match store.open::<ProjectHooks>() {
+        Ok(o) => o,
+        Err(e) => panic!("open: {e}"),
+    };
+
+    // The two UNC paths — and only those — surface, sorted and
+    // deduplicated; the probe-free open returns promptly (a probe would
+    // stall on the nonexistent SMB host).
+    assert_eq!(
+        opened.media_needs_confirmation,
+        vec![
+            PathBuf::from(r"\\alvs-t-prj-002-host\share\a.mp4"),
+            PathBuf::from(r"\\alvs-t-prj-002-host\share\b.mp4"),
+        ]
+    );
+    assert_eq!(
+        opened.doc.media[0].path,
+        r"\\alvs-t-prj-002-host\share\a.mp4"
+    );
+    assert_eq!(
+        PathBuf::from(&opened.doc.media[1].path),
+        dir.join("gone").join("b.mp4"),
+        "the join-escape item keeps its own path"
+    );
+    assert_eq!(opened.doc.media[2].path, r"\\.\PhysicalDrive1");
+    assert_eq!(
+        PathBuf::from(&opened.doc.media[3].path),
+        dir.join("gone").join("c.mp4")
+    );
+    assert_eq!(
+        PathBuf::from(&opened.doc.media[4].path),
+        elsewhere.join("e.mp4")
+    );
+    assert_eq!(
+        PathBuf::from(&opened.doc.media[5].path),
+        dir.join("ok.mp4"),
+        "the in-folder relative resolution still works"
+    );
+    if let Some(lock) = opened.lock {
+        lock.release().unwrap_or(());
+    }
+    std::fs::remove_dir_all(&base).unwrap_or(());
+}
+
+#[test]
 fn t_prj_002_oversized_document_rejected_before_parsing() {
     let dir = scratch("oversize");
     let project_path = dir.join("huge.alvs");
@@ -367,8 +459,8 @@ impl DocumentHooks for VersionedHooks {
             detail: e.to_string(),
         })
     }
-    fn fixup_media_paths(_doc: &mut Self::Doc, _dir: &Path) -> Result<(), StoreError> {
-        Ok(())
+    fn fixup_media_paths(_doc: &mut Self::Doc, _dir: &Path) -> Result<MediaFixup, StoreError> {
+        Ok(MediaFixup::default())
     }
 }
 
@@ -400,8 +492,8 @@ impl DocumentHooks for FailingMigrationHooks {
             detail: "synthetic step failure".into(),
         })
     }
-    fn fixup_media_paths(_doc: &mut Self::Doc, _dir: &Path) -> Result<(), StoreError> {
-        Ok(())
+    fn fixup_media_paths(_doc: &mut Self::Doc, _dir: &Path) -> Result<MediaFixup, StoreError> {
+        Ok(MediaFixup::default())
     }
 }
 
