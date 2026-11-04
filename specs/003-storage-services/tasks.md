@@ -154,12 +154,12 @@ description: "Task list for WP-03 — Storage and application services"
 
 ### Tests for User Story 6
 
-- [ ] T023 [P] [US6] Create `crates/alvs-store/tests/cache.rs`: `journal_mode=WAL`, `foreign_keys=ON`, `synchronous=NORMAL`, `busy_timeout=5000` after open; `meta.schema_version` advances through migrations; simulated corrupt file → renamed `cache.sqlite.corrupt-<timestamp>` (with `-wal`/`-shm` handled) → rebuilt + E8003; recent upsert/list newest-first/trim to `recentLimit`/pin toggle
+- [X] T023 [P] [US6] Create `crates/alvs-store/tests/cache.rs`: `journal_mode=WAL`, `foreign_keys=ON`, `synchronous=NORMAL`, `busy_timeout=5000` after open; `meta.schema_version` advances through migrations; simulated corrupt file → renamed `cache.sqlite.corrupt-<timestamp>` (with `-wal`/`-shm` handled) → rebuilt + E8003; recent upsert/list newest-first/trim to `recentLimit`/pin toggle
 
 ### Implementation for User Story 6
 
-- [ ] T024 [US6] Create `crates/alvs-store/src/cache.rs`: `Connection` with the four §3.7 pragmas, `include_str!` migration runner (files sorted by `NNN_`, one transaction, version in `meta`), `PRAGMA quick_check` → rename+rebuild path (research D8)
-- [ ] T025 [US6] Create `crates/alvs-store/src/recent.rs`: the SQLite `RecentProjects` implementation for `recent_projects` (03 §3.7) with trim to `alvs.general.recentLimit` (research D9); make T023 green
+- [X] T024 [US6] Create `crates/alvs-store/src/cache.rs`: `Connection` with the four §3.7 pragmas, `include_str!` migration runner (files sorted by `NNN_`, one transaction, version in `meta`), `PRAGMA quick_check` → rename+rebuild path (research D8)
+- [X] T025 [US6] Create `crates/alvs-store/src/recent.rs`: the SQLite `RecentProjects` implementation for `recent_projects` (03 §3.7) with trim to `alvs.general.recentLimit` (research D9); make T023 green
 
 **Checkpoint**: US1–US6 independently functional.
 

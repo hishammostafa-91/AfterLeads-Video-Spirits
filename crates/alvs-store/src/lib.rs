@@ -21,6 +21,7 @@
 pub mod atomic;
 pub mod autosave;
 pub mod backup;
+pub mod cache;
 pub mod error;
 pub mod keys;
 pub mod lock;

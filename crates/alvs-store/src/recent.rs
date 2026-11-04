@@ -43,6 +43,122 @@ pub struct MemoryRecent {
     limit: usize,
 }
 
+/// The SQLite-backed [`RecentProjects`] over `recent_projects` (03 §3.7;
+/// research D9): upsert on save/open with `opened_utc`, newest-first
+/// listing with pinned entries leading, and trimming to the limit where
+/// pinned entries always survive (the canonical trim names the count, not
+/// the eviction of pins).
+pub struct RecentSqlite {
+    conn: std::sync::Arc<std::sync::Mutex<rusqlite::Connection>>,
+    limit: u32,
+}
+
+impl RecentSqlite {
+    /// Crate constructor: the connection comes from [`crate::cache::Cache`].
+    pub(crate) fn new(
+        conn: std::sync::Arc<std::sync::Mutex<rusqlite::Connection>>,
+        limit: u32,
+    ) -> Self {
+        Self { conn, limit }
+    }
+}
+
+impl RecentProjects for RecentSqlite {
+    fn record(&self, path: &Path, name: &str, thumb: Option<&Path>) -> Result<(), StoreError> {
+        let opened = crate::utc::iso_utc(crate::utc::epoch_ms_now()).unwrap_or_default();
+        let conn = self.conn.lock().map_err(|_| StoreError::SaveFailed {
+            detail: "recent-projects lock poisoned".into(),
+        })?;
+        conn.execute(
+            "INSERT INTO recent_projects (path, name, thumbnail_file, opened_utc, pinned)
+             VALUES (?1, ?2, ?3, ?4, 0)
+             ON CONFLICT(path) DO UPDATE
+               SET name = excluded.name,
+                   thumbnail_file = excluded.thumbnail_file,
+                   opened_utc = excluded.opened_utc",
+            rusqlite::params![
+                path.to_string_lossy(),
+                name,
+                thumb.map(|t| t.to_string_lossy().into_owned()),
+                opened,
+            ],
+        )
+        .map_err(|e| StoreError::SaveFailed {
+            detail: format!("recent insert failed: {e}"),
+        })?;
+        // Trim to the newest `limit` rows overall; pinned entries lead
+        // the ordering, so they always survive (03 §3.6
+        // `alvs.general.recentLimit`).
+        conn.execute(
+            "DELETE FROM recent_projects
+             WHERE path NOT IN (
+               SELECT path FROM recent_projects
+                ORDER BY pinned DESC, opened_utc DESC, rowid DESC
+                LIMIT ?1
+             )",
+            [self.limit.max(1) as i64],
+        )
+        .map_err(|e| StoreError::SaveFailed {
+            detail: format!("recent trim failed: {e}"),
+        })?;
+        Ok(())
+    }
+
+    fn list(&self) -> Result<Vec<RecentEntry>, StoreError> {
+        let conn = self.conn.lock().map_err(|_| StoreError::SaveFailed {
+            detail: "recent-projects lock poisoned".into(),
+        })?;
+        let mut stmt = conn
+            .prepare(
+                "SELECT path, name, thumbnail_file, opened_utc, pinned
+                 FROM recent_projects
+                 ORDER BY pinned DESC, opened_utc DESC, rowid DESC",
+            )
+            .map_err(|e| StoreError::SaveFailed {
+                detail: format!("recent select failed: {e}"),
+            })?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok(RecentEntry {
+                    path: PathBuf::from(row.get::<_, String>(0).unwrap_or_default()),
+                    name: row.get::<_, String>(1).unwrap_or_default(),
+                    thumbnail: row
+                        .get::<_, Option<String>>(2)
+                        .ok()
+                        .flatten()
+                        .map(PathBuf::from),
+                    opened_utc: row.get::<_, String>(3).unwrap_or_default(),
+                    pinned: row.get::<_, i64>(4).unwrap_or(0) != 0,
+                })
+            })
+            .map_err(|e| StoreError::SaveFailed {
+                detail: format!("recent query failed: {e}"),
+            })?;
+        let mut entries = Vec::new();
+        for row in rows {
+            let entry = row.map_err(|e| StoreError::SaveFailed {
+                detail: format!("recent row failed: {e}"),
+            })?;
+            entries.push(entry);
+        }
+        Ok(entries)
+    }
+
+    fn set_pinned(&self, path: &Path, pinned: bool) -> Result<(), StoreError> {
+        let conn = self.conn.lock().map_err(|_| StoreError::SaveFailed {
+            detail: "recent-projects lock poisoned".into(),
+        })?;
+        conn.execute(
+            "UPDATE recent_projects SET pinned = ?2 WHERE path = ?1",
+            rusqlite::params![path.to_string_lossy(), i64::from(pinned)],
+        )
+        .map_err(|e| StoreError::SaveFailed {
+            detail: format!("recent pin failed: {e}"),
+        })?;
+        Ok(())
+    }
+}
+
 impl MemoryRecent {
     /// A memory store holding at most `limit` entries.
     pub fn new(limit: usize) -> Self {
