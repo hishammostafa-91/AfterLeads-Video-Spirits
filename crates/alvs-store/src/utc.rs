@@ -96,6 +96,41 @@ pub fn compact_utc(ms: i64) -> Option<String> {
     Some(format!("{y:04}{mo:02}{d:02}-{h:02}{mi:02}{s:02}"))
 }
 
+/// Parse the strict form produced by [`compact_utc`] (`yyyyMMdd-HHmmss`).
+/// Returns `None` for any deviation or invalid date/time component.
+pub fn parse_compact_utc(text: &str) -> Option<i64> {
+    let bytes = text.as_bytes();
+    if bytes.len() != 15 || bytes[8] != b'-' {
+        return None;
+    }
+    let num = |range: std::ops::Range<usize>| -> Option<i64> {
+        let mut v: i64 = 0;
+        for b in bytes.get(range)? {
+            if !b.is_ascii_digit() {
+                return None;
+            }
+            v = v * 10 + i64::from(b - b'0');
+        }
+        Some(v)
+    };
+    let y = num(0..4)?;
+    let mo = num(4..6)? as u32;
+    let d = num(6..8)? as u32;
+    let h = num(9..11)?;
+    let mi = num(11..13)?;
+    let s = num(13..15)?;
+    if !(1..=12).contains(&mo) || d == 0 || d > days_in_month(y, mo) || h > 23 || mi > 59 || s > 59
+    {
+        return None;
+    }
+    Some(
+        days_from_civil(y, mo, d) * MS_PER_DAY
+            + h * MS_PER_HOUR
+            + mi * MS_PER_MINUTE
+            + s * MS_PER_SECOND,
+    )
+}
+
 /// Parse the strict form produced by [`iso_utc`]. Returns `None` for any
 /// deviation (wrong length, non-digits, bad separators, invalid date).
 pub fn parse_iso_utc(text: &str) -> Option<i64> {
@@ -174,6 +209,40 @@ mod tests {
             Some("20240229-235959")
         );
         assert_eq!(compact_utc(-1).as_deref(), Some("19691231-235959"));
+    }
+
+    #[test]
+    fn compact_round_trips_and_rejects_malformed() {
+        // `compact_utc` carries no milliseconds: round-trip exactly on
+        // second-aligned values and truncate below that.
+        for ms in [0i64, 1_700_000_000_000, 1_709_251_199_000, -86_400_000] {
+            let stamp = compact_utc(ms);
+            let stamp = match stamp {
+                Some(s) => s,
+                None => panic!("compact of {ms}"),
+            };
+            assert_eq!(parse_compact_utc(&stamp), Some(ms), "round-trip {stamp}");
+        }
+        assert_eq!(
+            parse_compact_utc(&compact_utc(1_709_251_199_999).unwrap_or_default()),
+            Some(1_709_251_199_000),
+            "sub-second precision truncates"
+        );
+        for bad in [
+            "",
+            "19700101-00000",    // too short
+            "19700101 000000",   // wrong separator
+            "1970-01-01-000000", // ISO form
+            "19701301-000000",   // month 13
+            "20230229-000000",   // not a leap year
+            "21000229-000000",   // ÷100 not ÷400
+            "19700101-240000",   // hour 24
+            "19700101-006000",   // minute 60
+            "19700101-000060",   // second 60
+            "abcd0101-000000",   // non-digits
+        ] {
+            assert_eq!(parse_compact_utc(bad), None, "should reject {bad:?}");
+        }
     }
 
     #[test]

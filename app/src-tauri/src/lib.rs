@@ -2,6 +2,8 @@
 // Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
 //! AfterLeads-Video-Spirits application backend (CMP-12, docs/02 §2.4).
 
+pub mod project_io;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), tauri::Error> {
     tauri::Builder::default().run(tauri::generate_context!())

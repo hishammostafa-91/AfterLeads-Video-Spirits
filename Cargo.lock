@@ -12,6 +12,11 @@ checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 name = "afterleads-video-spirits"
 version = "0.1.0"
 dependencies = [
+ "alvs-core",
+ "alvs-model",
+ "alvs-store",
+ "serde",
+ "serde_json",
  "tauri",
  "tauri-build",
 ]

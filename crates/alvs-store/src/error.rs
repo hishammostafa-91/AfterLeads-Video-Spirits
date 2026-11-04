@@ -22,6 +22,13 @@ pub enum StoreError {
         /// Which step failed and why.
         detail: String,
     },
+    /// E1003 — the project file failed validation (03 §3.5; the raw size
+    /// gate of rule 15 surfaces here on open).
+    #[error("validation failed: {detail}")]
+    ValidationFailed {
+        /// The validation issues (or size-gate reason).
+        detail: String,
+    },
     /// E1007 — the project is open in another window or computer (03 §3.9.4).
     #[error("locked: {detail}")]
     Locked {
@@ -79,6 +86,7 @@ impl StoreError {
         match self {
             StoreError::ReadOnlyNewer { .. } => ErrorCode::E1004,
             StoreError::MigrationFailed { .. } => ErrorCode::E1005,
+            StoreError::ValidationFailed { .. } => ErrorCode::E1003,
             StoreError::Locked { .. } => ErrorCode::E1007,
             StoreError::SaveFailed { .. } => ErrorCode::E1008,
             StoreError::DiskFull { .. } => ErrorCode::E8001,
@@ -164,6 +172,7 @@ mod tests {
         let errors = [
             StoreError::ReadOnlyNewer { found: 2 },
             StoreError::MigrationFailed { detail: "x".into() },
+            StoreError::ValidationFailed { detail: "x".into() },
             StoreError::Locked { detail: "x".into() },
             StoreError::SaveFailed { detail: "x".into() },
             StoreError::DiskFull { detail: "x".into() },
@@ -176,11 +185,12 @@ mod tests {
         let mut codes: Vec<ErrorCode> = errors.iter().map(|e| e.code()).collect();
         codes.sort_by_key(|c| c.as_str());
         codes.dedup();
-        // All ten variants map to ten distinct codes (02 §2.11).
+        // All eleven variants map to eleven distinct codes (02 §2.11).
         assert_eq!(codes.len(), errors.len());
         assert_eq!(errors[0].code().as_str(), "E1004");
-        assert_eq!(errors[2].code().as_str(), "E1007");
-        assert_eq!(errors[8].code().as_str(), "E5003");
+        assert_eq!(errors[2].code().as_str(), "E1003");
+        assert_eq!(errors[3].code().as_str(), "E1007");
+        assert_eq!(errors[9].code().as_str(), "E5003");
     }
 
     #[test]

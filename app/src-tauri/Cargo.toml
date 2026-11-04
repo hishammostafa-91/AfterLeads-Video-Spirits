@@ -19,3 +19,8 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2.12.5", features = [] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+alvs-core = { path = "../../crates/alvs-core" }
+alvs-model = { path = "../../crates/alvs-model" }
+alvs-store = { path = "../../crates/alvs-store" }
