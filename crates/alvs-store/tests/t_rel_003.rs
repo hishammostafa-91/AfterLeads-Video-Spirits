@@ -10,7 +10,9 @@
 use std::io::Write;
 use std::path::PathBuf;
 
-use alvs_store::logging::{KEEP_LOG_FILES, MAX_LOG_BYTES, SizeRotatingWriter, init_logging};
+use alvs_store::logging::{
+    KEEP_LOG_FILES, MAX_LOG_BYTES, SizeRotatingWriter, init_logging, subscriber_for,
+};
 
 fn scratch(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
@@ -69,20 +71,24 @@ fn t_rel_003_rotation_at_10mb_keeps_ten_files() {
 fn t_rel_003_json_lines_carry_the_canonical_fields() {
     let dir = scratch("fields");
     let logs = dir.join("logs");
-    let guard = match init_logging(&logs, "info") {
-        Ok(g) => g,
-        Err(e) => panic!("init: {e}"),
+    // The composable form + a thread-local default: no global subscriber
+    // collision when the binary's tests share a process (cargo test).
+    let (worker, subscriber) = match subscriber_for(&logs, "info") {
+        Ok(v) => v,
+        Err(e) => panic!("subscriber: {e}"),
     };
-    tracing::info!(
-        job_id = "J-7",
-        project_id = "P-1",
-        code = "E8003",
-        "cache rebuilt"
-    );
-    let redacted = alvs_core::redact::redact_paths(r"opened C:\Users\me\p.alvs");
-    tracing::info!("path {redacted}");
-    tracing::trace!("this level is filtered out");
-    drop(guard); // flush the non-blocking writer
+    tracing::subscriber::with_default(subscriber, || {
+        tracing::info!(
+            job_id = "J-7",
+            project_id = "P-1",
+            code = "E8003",
+            "cache rebuilt"
+        );
+        let redacted = alvs_core::redact::redact_paths(r"opened C:\Users\me\p.alvs");
+        tracing::info!("path {redacted}");
+        tracing::trace!("this level is filtered out");
+    });
+    drop(worker); // flush the non-blocking writer
 
     let content = std::fs::read_to_string(logs.join("app.log")).unwrap_or_default();
     let mut saw_canonical = false;
@@ -130,13 +136,34 @@ fn t_rel_003_json_lines_carry_the_canonical_fields() {
 fn t_rel_003_level_debug_emits_debug_lines() {
     let dir = scratch("debug");
     let logs = dir.join("logs");
-    let guard = match init_logging(&logs, "debug") {
+    let (worker, subscriber) = match subscriber_for(&logs, "debug") {
+        Ok(v) => v,
+        Err(e) => panic!("subscriber: {e}"),
+    };
+    tracing::subscriber::with_default(subscriber, || {
+        tracing::debug!("detail line");
+    });
+    drop(worker);
+    let content = std::fs::read_to_string(logs.join("app.log")).unwrap_or_default();
+    assert!(content.contains("detail line"), "debug is emitted at debug");
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
+fn t_rel_003_global_init_smoke() {
+    // The one global install in this binary (the production path).
+    let dir = scratch("global");
+    let logs = dir.join("logs");
+    let guard = match init_logging(&logs, "info") {
         Ok(g) => g,
         Err(e) => panic!("init: {e}"),
     };
-    tracing::debug!("detail line");
+    tracing::info!("global line");
     drop(guard);
     let content = std::fs::read_to_string(logs.join("app.log")).unwrap_or_default();
-    assert!(content.contains("detail line"), "debug is emitted at debug");
+    assert!(
+        content.contains("global line"),
+        "the global subscriber writes"
+    );
     std::fs::remove_dir_all(&dir).unwrap_or(());
 }

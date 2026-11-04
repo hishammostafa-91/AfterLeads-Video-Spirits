@@ -189,8 +189,8 @@ description: "Task list for WP-03 — Storage and application services"
 **Purpose**: Cross-story wiring, evidence, and gates.
 
 - [X] T029 [P] Wire settings consumption across services (autosave interval, backup keep-count, recent limit, log level, redaction flag) and add the SEC-04 containment test covering every writer path (contracts guarantee G7)
-- [ ] T030 Run the full `specs/003-storage-services/quickstart.md` validation (all seven filters + the §3 integration run + `pwsh -File tools/verify.ps1` all available gates + `python tools/git/check_commits.py origin/main..HEAD`) and record commands/results into `specs/003-storage-services/evidence.md` (constitution III; G-09)
-- [ ] T031 [P] Final sweep: `cargo fmt --all`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, no placeholders (`python tools/check_placeholders.py`), crate docs complete, `python tools/docs/check_docs.py` green (docs/00 at 1.1.0 + OD-11 carried)
+- [X] T030 Run the full `specs/003-storage-services/quickstart.md` validation (all seven filters + the §3 integration run + `pwsh -File tools/verify.ps1` all available gates + `python tools/git/check_commits.py origin/main..HEAD`) and record commands/results into `specs/003-storage-services/evidence.md` (constitution III; G-09)
+- [X] T031 [P] Final sweep: `cargo fmt --all`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, no placeholders (`python tools/check_placeholders.py`), crate docs complete, `python tools/docs/check_docs.py` green (docs/00 at 1.1.0 + OD-11 carried)
 
 ---
 

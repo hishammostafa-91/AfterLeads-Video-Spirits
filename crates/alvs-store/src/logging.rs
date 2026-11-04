@@ -238,12 +238,21 @@ pub struct LogGuard {
     _worker: tracing_appender::non_blocking::WorkerGuard,
 }
 
-/// Install the global JSON-lines subscriber with rotation and the level
-/// from `alvs.advanced.logLevel` (03 §3.6: `info` | `debug` | `trace`).
-///
-/// One call per process (the global default); tests rely on nextest's
-/// per-test processes.
-pub fn init_logging(logs_dir: &Path, level: &str) -> Result<LogGuard, StoreError> {
+/// Build the JSON-lines subscriber with rotation and the level from
+/// `alvs.advanced.logLevel` (03 §3.6: `info` | `debug` | `trace`), plus
+/// the guard that flushes the non-blocking writer. Composable: tests
+/// drive it with [`tracing::subscriber::with_default`] without touching
+/// the global default.
+pub fn subscriber_for(
+    logs_dir: &Path,
+    level: &str,
+) -> Result<
+    (
+        tracing_appender::non_blocking::WorkerGuard,
+        impl tracing::Subscriber,
+    ),
+    StoreError,
+> {
     let filter = match level {
         "debug" => tracing::Level::DEBUG,
         "trace" => tracing::Level::TRACE,
@@ -256,6 +265,13 @@ pub fn init_logging(logs_dir: &Path, level: &str) -> Result<LogGuard, StoreError
         .event_format(CanonicalJson::new())
         .with_writer(non_blocking)
         .finish();
+    Ok((worker, subscriber))
+}
+
+/// Install the global JSON-lines subscriber (one call per process; 02
+/// §2.5 startup). See [`subscriber_for`] for the composable form.
+pub fn init_logging(logs_dir: &Path, level: &str) -> Result<LogGuard, StoreError> {
+    let (worker, subscriber) = subscriber_for(logs_dir, level)?;
     tracing::subscriber::set_global_default(subscriber).map_err(|e| StoreError::SaveFailed {
         detail: format!("cannot install the log subscriber: {e}"),
     })?;
