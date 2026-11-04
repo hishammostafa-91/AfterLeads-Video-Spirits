@@ -100,6 +100,15 @@ impl StoreError {
 
     /// The docs/04 §4.9 envelope for crossing to the UI; the message key is
     /// always `error.<code>` and the recovery action uses the catalog row.
+    ///
+    /// `recovery[].commandId` is "a command ID from 12 §12.10 or a
+    /// dialog action" (04 §4.9): `file.saveAs` below is the real
+    /// catalog row KB-004; the others (`retry`, `disk.freeSpace`,
+    /// `chooseLocation`, `project.openReadOnly`, `project.takeOverLock`)
+    /// are dialog actions in the `media.relink` style of §4.9's own
+    /// example — verbs the shell renders as recovery UI. If the owner
+    /// later registers them as IPC commands they move to 12 §12.10
+    /// (G-19); nothing here may invent catalog rows (review F-05).
     pub fn envelope(self) -> ErrorEnvelope {
         let code = self.code();
         let detail = self.to_string();
@@ -115,7 +124,7 @@ impl StoreError {
                 },
             ],
             ErrorCode::E1008 => vec![RecoveryAction {
-                command_id: "project.saveAs".into(),
+                command_id: "file.saveAs".into(),
                 label_key: "action.saveAs".into(),
             }],
             ErrorCode::E5003 => vec![RecoveryAction {
@@ -205,6 +214,10 @@ mod tests {
         let envelope = StoreError::WriteFailed { detail: "d".into() }.envelope();
         assert_eq!(envelope.code, ErrorCode::E5003);
         assert!(envelope.retryable);
+        // E1008's recovery is the real catalog command (KB-004, review F-05).
+        let envelope = StoreError::SaveFailed { detail: "d".into() }.envelope();
+        assert_eq!(envelope.code, ErrorCode::E1008);
+        assert_eq!(envelope.recovery[0].command_id, "file.saveAs");
         let envelope = StoreError::SettingsRestored { keys: "k".into() }.envelope();
         assert_eq!(envelope.code, ErrorCode::E8002);
         assert!(envelope.recovery.is_empty());

@@ -13,96 +13,12 @@ use alvs_model::migrate::{self, MigrationStep};
 use alvs_model::project::new_project;
 use alvs_model::sequence::{new_sequence, sqp02_fallback_format};
 use alvs_store::error::StoreError;
-use alvs_store::project::{
-    DocumentHooks, MediaFixup, ProjectStore, ReadOnlyReason, resolve_media_entry,
-};
+use alvs_store::project::{DocumentHooks, MediaFixup, ProjectStore, ReadOnlyReason};
 use alvs_store::recent::{MemoryRecent, RecentProjects};
 
-/// The production-shaped hooks over the real model (the app backend's
-/// `project_io.rs` implements the same contract).
-struct ProjectHooks;
+mod common;
 
-impl DocumentHooks for ProjectHooks {
-    type Doc = alvs_model::project::Project;
-
-    fn current_version() -> u32 {
-        migrate::CURRENT_SCHEMA_VERSION
-    }
-
-    fn serialize(doc: &Self::Doc) -> Result<Vec<u8>, StoreError> {
-        serde_json::to_vec_pretty(doc).map_err(|e| StoreError::SaveFailed {
-            detail: format!("serialization failed: {e}"),
-        })
-    }
-
-    fn parse(bytes: &[u8]) -> Result<Self::Doc, StoreError> {
-        serde_json::from_slice(bytes).map_err(|e| StoreError::ValidationFailed {
-            detail: format!("parse failed: {e}"),
-        })
-    }
-
-    fn validate(doc: &Self::Doc) -> Result<(), StoreError> {
-        let issues = alvs_model::validate::validate(doc);
-        if issues.is_empty() {
-            Ok(())
-        } else {
-            Err(StoreError::ValidationFailed {
-                detail: format!("{issues:?}"),
-            })
-        }
-    }
-
-    fn check_size(len_bytes: u64) -> Option<String> {
-        alvs_model::validate::check_file_size(len_bytes).map(|i| format!("{i:?}"))
-    }
-
-    fn schema_version(bytes: &[u8]) -> Result<u32, StoreError> {
-        let value: serde_json::Value =
-            serde_json::from_slice(bytes).map_err(|e| StoreError::MigrationFailed {
-                detail: format!("unreadable document: {e}"),
-            })?;
-        value
-            .get("schemaVersion")
-            .and_then(serde_json::Value::as_u64)
-            .and_then(|v| u32::try_from(v).ok())
-            .ok_or_else(|| StoreError::MigrationFailed {
-                detail: "missing schemaVersion".into(),
-            })
-    }
-
-    fn migrate(bytes: &[u8]) -> Result<Vec<u8>, StoreError> {
-        let mut value: serde_json::Value =
-            serde_json::from_slice(bytes).map_err(|e| StoreError::MigrationFailed {
-                detail: format!("unreadable document: {e}"),
-            })?;
-        // The shipped registry is empty at schemaVersion = 1 (03 §3.4.1).
-        migrate::migrate(&mut value, &[]).map_err(|e| StoreError::MigrationFailed {
-            detail: e.to_string(),
-        })?;
-        serde_json::to_vec_pretty(&value).map_err(|e| StoreError::MigrationFailed {
-            detail: format!("reserialization failed: {e}"),
-        })
-    }
-
-    fn fixup_media_paths(
-        doc: &mut Self::Doc,
-        project_dir: &Path,
-    ) -> Result<MediaFixup, StoreError> {
-        // Mirrors the app backend's production hooks: REQ-PRJ-002
-        // relative-first resolution with every candidate SEC-04-gated
-        // before any access (T032; 05 §5.7) — UNC is never probed
-        // (THR-13) and surfaces for the caller's confirmation.
-        let mut fixup = MediaFixup::default();
-        for item in &mut doc.media {
-            let resolution = resolve_media_entry(&item.path, &item.rel_path, project_dir);
-            item.path = resolution.path;
-            if let Some(path) = resolution.needs_confirmation {
-                fixup.needs_confirmation.push(path);
-            }
-        }
-        Ok(fixup)
-    }
-}
+use common::ProjectHooks;
 
 fn scratch(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
@@ -240,6 +156,76 @@ fn t_prj_002_relative_path_tried_first_when_absolute_missing() {
     if let Some(lock) = opened.lock {
         lock.release().unwrap_or(());
     }
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
+fn t_prj_002_recent_failure_never_fails_save_or_open() {
+    // Review F-13: the recent list is the LAST step of both pipelines
+    // and best-effort by construction — the file is already saved (or
+    // opened) when it runs, so a cache-table failure rides the logs and
+    // never surfaces as a failed save/open.
+    struct FailingRecent;
+    impl RecentProjects for FailingRecent {
+        fn record(
+            &self,
+            _path: &Path,
+            _name: &str,
+            _thumb: Option<&Path>,
+        ) -> Result<(), StoreError> {
+            Err(StoreError::SaveFailed {
+                detail: "recent table unavailable".into(),
+            })
+        }
+        fn list(&self) -> Result<Vec<alvs_store::recent::RecentEntry>, StoreError> {
+            Ok(Vec::new())
+        }
+        fn set_pinned(&self, _path: &Path, _pinned: bool) -> Result<(), StoreError> {
+            Ok(())
+        }
+    }
+
+    let dir = scratch("recent-fail");
+    let project_path = dir.join("rf.alvs");
+    let store = ProjectStore::new(&project_path, 20).with_recent(Arc::new(FailingRecent));
+    let receipt = match store.save::<ProjectHooks>(Arc::new(sample_project())) {
+        Ok(r) => r,
+        Err(e) => panic!("save must succeed: {e}"),
+    };
+    assert!(receipt.bytes > 0, "the save itself completed");
+    let opened = match store.open::<ProjectHooks>() {
+        Ok(o) => o,
+        Err(e) => panic!("open must succeed: {e}"),
+    };
+    assert!(opened.read_only.is_none());
+    if let Some(lock) = opened.lock {
+        lock.release().unwrap_or(());
+    }
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
+fn t_prj_002_corrupt_document_reports_e1003_not_e1005() {
+    // Review F-04: `open` consults the schema version before parsing, so
+    // a corrupt document must surface the validation verdict (E1003,
+    // "restore from backup") — not the migration verdict (E1005,
+    // "report a problem").
+    let dir = scratch("corrupt-e1003");
+    let project_path = dir.join("broken.alvs");
+    std::fs::write(&project_path, b"\x00not json at all").unwrap_or(());
+    let store = ProjectStore::new(&project_path, 20);
+    let err = match store.open::<ProjectHooks>() {
+        Ok(_) => panic!("must reject"),
+        Err(e) => e,
+    };
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1003);
+    // A parseable document without a schemaVersion is equally corrupt.
+    std::fs::write(&project_path, b"{ \"name\": \"no version\" }").unwrap_or(());
+    let err = match store.open::<ProjectHooks>() {
+        Ok(_) => panic!("must reject"),
+        Err(e) => e,
+    };
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1003);
     std::fs::remove_dir_all(&dir).unwrap_or(());
 }
 

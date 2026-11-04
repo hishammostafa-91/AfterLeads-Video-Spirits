@@ -13,78 +13,12 @@ use std::sync::Arc;
 use alvs_model::project::new_project;
 use alvs_model::sequence::{new_sequence, sqp02_fallback_format};
 use alvs_store::backup;
-use alvs_store::project::{DocumentHooks, MediaFixup, ProjectStore};
+use alvs_store::project::ProjectStore;
 use alvs_store::recent::{MemoryRecent, RecentProjects};
 
-struct ProjectHooks;
+mod common;
 
-impl DocumentHooks for ProjectHooks {
-    type Doc = alvs_model::project::Project;
-
-    fn current_version() -> u32 {
-        alvs_model::migrate::CURRENT_SCHEMA_VERSION
-    }
-    fn serialize(doc: &Self::Doc) -> Result<Vec<u8>, alvs_store::error::StoreError> {
-        serde_json::to_vec_pretty(doc).map_err(|e| alvs_store::error::StoreError::SaveFailed {
-            detail: e.to_string(),
-        })
-    }
-    fn parse(bytes: &[u8]) -> Result<Self::Doc, alvs_store::error::StoreError> {
-        serde_json::from_slice(bytes).map_err(|e| alvs_store::error::StoreError::ValidationFailed {
-            detail: e.to_string(),
-        })
-    }
-    fn validate(doc: &Self::Doc) -> Result<(), alvs_store::error::StoreError> {
-        let issues = alvs_model::validate::validate(doc);
-        if issues.is_empty() {
-            Ok(())
-        } else {
-            Err(alvs_store::error::StoreError::ValidationFailed {
-                detail: format!("{issues:?}"),
-            })
-        }
-    }
-    fn check_size(len_bytes: u64) -> Option<String> {
-        alvs_model::validate::check_file_size(len_bytes).map(|i| format!("{i:?}"))
-    }
-    fn schema_version(bytes: &[u8]) -> Result<u32, alvs_store::error::StoreError> {
-        let value: serde_json::Value = serde_json::from_slice(bytes).map_err(|e| {
-            alvs_store::error::StoreError::MigrationFailed {
-                detail: e.to_string(),
-            }
-        })?;
-        value
-            .get("schemaVersion")
-            .and_then(serde_json::Value::as_u64)
-            .and_then(|v| u32::try_from(v).ok())
-            .ok_or_else(|| alvs_store::error::StoreError::MigrationFailed {
-                detail: "missing schemaVersion".into(),
-            })
-    }
-    fn migrate(bytes: &[u8]) -> Result<Vec<u8>, alvs_store::error::StoreError> {
-        let mut value: serde_json::Value = serde_json::from_slice(bytes).map_err(|e| {
-            alvs_store::error::StoreError::MigrationFailed {
-                detail: e.to_string(),
-            }
-        })?;
-        alvs_model::migrate::migrate(&mut value, &[]).map_err(|e| {
-            alvs_store::error::StoreError::MigrationFailed {
-                detail: e.to_string(),
-            }
-        })?;
-        serde_json::to_vec_pretty(&value).map_err(|e| {
-            alvs_store::error::StoreError::MigrationFailed {
-                detail: e.to_string(),
-            }
-        })
-    }
-    fn fixup_media_paths(
-        _doc: &mut Self::Doc,
-        _project_dir: &std::path::Path,
-    ) -> Result<MediaFixup, alvs_store::error::StoreError> {
-        Ok(MediaFixup::default())
-    }
-}
+use common::ProjectHooks;
 
 fn scratch(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
@@ -208,7 +142,12 @@ struct SidecarWriter {
 impl SnapshotWriter for SidecarWriter {
     fn write_snapshot(&self) -> Result<(), alvs_store::error::StoreError> {
         self.writes.fetch_add(1, CountOrdering::SeqCst);
-        alvs_store::atomic::atomic_write(&self.sidecar, b"snapshot")
+        let roots = [self
+            .sidecar
+            .parent()
+            .map(std::path::Path::to_path_buf)
+            .unwrap_or_default()];
+        alvs_store::atomic::atomic_write_contained(&self.sidecar, b"snapshot", &roots)
     }
 }
 

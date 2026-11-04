@@ -51,14 +51,19 @@ impl DocumentHooks for ProjectHooks {
 
     fn schema_version(bytes: &[u8]) -> Result<u32, StoreError> {
         let value: serde_json::Value =
-            serde_json::from_slice(bytes).map_err(|e| StoreError::MigrationFailed {
+            serde_json::from_slice(bytes).map_err(|e| StoreError::ValidationFailed {
+                // An unparseable document is corrupt, not unupgradable:
+                // E1003, the same verdict `parse` gives (review F-04) —
+                // `open` consults the version before parsing, so a
+                // corrupt file must surface the restore-from-backup
+                // action, not "report a problem".
                 detail: format!("unreadable document: {e}"),
             })?;
         value
             .get("schemaVersion")
             .and_then(serde_json::Value::as_u64)
             .and_then(|v| u32::try_from(v).ok())
-            .ok_or_else(|| StoreError::MigrationFailed {
+            .ok_or_else(|| StoreError::ValidationFailed {
                 detail: "missing schemaVersion".into(),
             })
     }
