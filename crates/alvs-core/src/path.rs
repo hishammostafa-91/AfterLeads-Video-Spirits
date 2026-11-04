@@ -38,17 +38,17 @@ const RESERVED_NAMES: [&str; 22] = [
     "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
 ];
 
-/// Check `candidate` per SEC-04: device-path and reserved-name rejection
-/// first, then canonicalization, UNC confirmation for project-file origins,
-/// and containment within `roots`.
-pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> PathDecision {
+/// The shared SEC-04 prelude: device paths and reserved names are
+/// rejected; a UNC path from a project file demands confirmation
+/// (THR-13). `None` means the candidate passed the prelude.
+fn prelude(candidate: &Path, origin: PathOrigin) -> Option<PathDecision> {
     let raw = candidate.to_string_lossy();
 
     // Device paths are rejected outright (SEC-04).
     if raw.starts_with(r"\\.\") || raw.starts_with(r"\\?\GLOBALROOT") {
-        return PathDecision::Denied(AppError::PathRejected {
+        return Some(PathDecision::Denied(AppError::PathRejected {
             detail: format!("device path rejected: {}", redact(&raw)),
-        });
+        }));
     }
 
     // Reserved Windows names apply to the final component, with or without an
@@ -59,9 +59,9 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
     {
         let stem = name.split('.').next().unwrap_or(&name);
         if RESERVED_NAMES.contains(&stem) {
-            return PathDecision::Denied(AppError::PathRejected {
+            return Some(PathDecision::Denied(AppError::PathRejected {
                 detail: format!("reserved name rejected: {}", redact(&raw)),
-            });
+            }));
         }
     }
 
@@ -69,9 +69,21 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
     // THR-13: Windows would leak NTLM credentials to the SMB server).
     let is_unc = raw.starts_with(r"\\") && !raw.starts_with(r"\\?\");
     if is_unc && origin == PathOrigin::ProjectFile {
-        return PathDecision::NeedsConfirmation {
+        return Some(PathDecision::NeedsConfirmation {
             path: candidate.to_path_buf(),
-        };
+        });
+    }
+
+    None
+}
+
+/// Check `candidate` per SEC-04: device-path and reserved-name rejection
+/// first, then canonicalization, UNC confirmation for project-file origins,
+/// and containment within `roots`.
+pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> PathDecision {
+    let raw = candidate.to_string_lossy();
+    if let Some(decision) = prelude(candidate, origin) {
+        return decision;
     }
 
     // Canonicalize; a path that does not exist cannot be verified as contained.
@@ -79,6 +91,58 @@ pub fn check_path(candidate: &Path, origin: PathOrigin, roots: &[PathBuf]) -> Pa
         return PathDecision::Denied(AppError::PathRejected {
             detail: format!("path cannot be canonicalized: {}", redact(&raw)),
         });
+    };
+
+    let canonical_roots: Vec<PathBuf> = roots
+        .iter()
+        .filter_map(|r| std::fs::canonicalize(r).ok())
+        .collect();
+    if canonical_roots.is_empty() {
+        return PathDecision::Denied(AppError::PathRejected {
+            detail: "no accessible root to contain the path".into(),
+        });
+    }
+    if canonical_roots
+        .iter()
+        .any(|root| canonical.starts_with(root))
+    {
+        return PathDecision::Allowed;
+    }
+    PathDecision::Denied(AppError::PathRejected {
+        detail: format!("path outside allowed roots: {}", redact(&raw)),
+    })
+}
+
+/// SEC-04 for a **write target** (05 §5.7): the same prelude as
+/// [`check_path`] under writer semantics (the writer's own choice —
+/// `UserPicked`-equivalent, so no UNC confirmation), then containment.
+/// A target that does not exist yet — the normal case for an atomic
+/// first write — is contained through its canonicalized parent plus the
+/// final component, so creating a file inside an allowed root passes
+/// while the parent is still verified to exist.
+pub fn check_write_path(candidate: &Path, roots: &[PathBuf]) -> PathDecision {
+    let raw = candidate.to_string_lossy();
+    if let Some(decision) = prelude(candidate, PathOrigin::UserPicked) {
+        return decision;
+    }
+
+    // An existing target canonicalizes directly; a missing one (an
+    // atomic first write) is anchored by its canonical parent.
+    let canonical: PathBuf = match std::fs::canonicalize(candidate) {
+        Ok(c) => c,
+        Err(_) => {
+            let Some(parent) = candidate.parent() else {
+                return PathDecision::Denied(AppError::PathRejected {
+                    detail: format!("write target has no parent: {}", redact(&raw)),
+                });
+            };
+            let Ok(canonical_parent) = std::fs::canonicalize(parent) else {
+                return PathDecision::Denied(AppError::PathRejected {
+                    detail: format!("parent cannot be canonicalized: {}", redact(&raw)),
+                });
+            };
+            canonical_parent.join(candidate.file_name().unwrap_or_default())
+        }
     };
 
     let canonical_roots: Vec<PathBuf> = roots
@@ -203,5 +267,57 @@ mod tests {
             &[PathBuf::from(r"C:\definitely")],
         );
         assert!(matches!(d, PathDecision::Denied(_)));
+    }
+
+    #[test]
+    fn write_path_contains_missing_targets_through_their_parent() {
+        // An atomic first write's target does not exist yet; the write
+        // gate anchors containment on the canonical parent (review
+        // F-11/F-05 fix).
+        let base = std::env::temp_dir().join("alvs-write-policy-test");
+        let root = base.join("root");
+        let elsewhere = base.join("elsewhere");
+        fs::create_dir_all(&root).unwrap_or(());
+        fs::create_dir_all(&elsewhere).unwrap_or(());
+
+        // Missing inside the root: allowed.
+        assert!(matches!(
+            check_write_path(&root.join("project.alvs"), std::slice::from_ref(&root)),
+            PathDecision::Allowed
+        ));
+        // Missing outside the root: denied.
+        assert!(matches!(
+            check_write_path(&elsewhere.join("project.alvs"), std::slice::from_ref(&root)),
+            PathDecision::Denied(_)
+        ));
+        // An existing inside target matches check_path's verdict.
+        fs::write(root.join("project.alvs"), b"{}").unwrap_or(());
+        assert!(matches!(
+            check_write_path(&root.join("project.alvs"), std::slice::from_ref(&root)),
+            PathDecision::Allowed
+        ));
+        // The prelude applies unchanged: reserved final component and
+        // device paths are denied even inside the root.
+        assert!(matches!(
+            check_write_path(&root.join("CON.tmp"), std::slice::from_ref(&root)),
+            PathDecision::Denied(_)
+        ));
+        assert!(matches!(
+            check_write_path(
+                Path::new(r"\\.\PhysicalDrive0"),
+                std::slice::from_ref(&root)
+            ),
+            PathDecision::Denied(_)
+        ));
+        // A target whose parent does not exist cannot be verified:
+        // denied, never guessed at.
+        assert!(matches!(
+            check_write_path(
+                &root.join("no-such-dir").join("x.alvs"),
+                std::slice::from_ref(&root)
+            ),
+            PathDecision::Denied(_)
+        ));
+        fs::remove_dir_all(&base).unwrap_or(());
     }
 }

@@ -179,6 +179,14 @@ impl RecentProjects for MemoryRecent {
                 });
             }
         };
+        // Preserve the pinned flag on re-record, mirroring the SQL
+        // upsert (the two trait implementations share one semantics;
+        // review F-15).
+        let pinned = entries
+            .iter()
+            .find(|e| e.path == path)
+            .map(|e| e.pinned)
+            .unwrap_or(false);
         entries.retain(|e| e.path != path);
         entries.insert(
             0,
@@ -187,7 +195,7 @@ impl RecentProjects for MemoryRecent {
                 name: name.to_string(),
                 thumbnail: thumb.map(Path::to_path_buf),
                 opened_utc: crate::utc::iso_utc(crate::utc::epoch_ms_now()).unwrap_or_default(),
-                pinned: false,
+                pinned,
             },
         );
         entries.truncate(self.limit.max(1));
@@ -273,6 +281,18 @@ mod tests {
             Err(e) => panic!("list: {e}"),
         };
         assert!(list[0].pinned);
+        // Re-recording (a new open/save) must NOT drop the pin — the SQL
+        // upsert preserves it, so the memory implementation does too
+        // (review F-15).
+        recent
+            .record(Path::new("/p/x.alvs"), "X2", None)
+            .unwrap_or(());
+        let list = match recent.list() {
+            Ok(l) => l,
+            Err(e) => panic!("list: {e}"),
+        };
+        assert_eq!(list[0].name, "X2");
+        assert!(list[0].pinned, "re-record preserves the pin");
         recent
             .set_pinned(Path::new("/p/x.alvs"), false)
             .unwrap_or(());

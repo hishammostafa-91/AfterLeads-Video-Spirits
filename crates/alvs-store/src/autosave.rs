@@ -123,10 +123,13 @@ impl AutosaveHandle {
                 if thread_stop.load(Ordering::Relaxed) {
                     break;
                 }
-                // A failing writer is reported by the tick result; the
-                // loop retries on the next evaluation (§3.9.3 — losing at
-                // most the interval, NFR-REL-02).
-                let _ = driver.tick(dirty.load(Ordering::Relaxed));
+                // A failing writer is retried on the next evaluation
+                // (§3.9.3 — losing at most the interval, NFR-REL-02),
+                // but never silently: the failure rides the logs this
+                // package ships (02 §2.11; review F-14).
+                if let Err(e) = driver.tick(dirty.load(Ordering::Relaxed)) {
+                    tracing::warn!("autosave write failed; retrying next interval: {e}");
+                }
             }
         });
         Self {

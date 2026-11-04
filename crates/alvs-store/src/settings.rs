@@ -340,7 +340,12 @@ impl SettingsWriter {
                     Ok(g) => g,
                     Err(_) => continue,
                 };
-                let _ = writer.maybe_flush(&doc);
+                // A failing flush retries on the next poll; the logs
+                // carry it (02 §2.11; review F-14) — a settings write is
+                // never lost silently.
+                if let Err(e) = writer.maybe_flush(&doc) {
+                    tracing::warn!("settings flush failed; retrying: {e}");
+                }
             }
         });
         SettingsWriterHandle {

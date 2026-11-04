@@ -10,6 +10,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use alvs_core::path::{PathDecision, check_write_path};
+
 use crate::error::StoreError;
 
 /// The filesystem steps of §3.9.1, as a seam for step-wise failure
@@ -104,8 +106,37 @@ fn replace_file(tmp: &Path, target: &Path) -> io::Result<()> {
 /// On any failure the previous content of `target` is intact, the
 /// temporary file is removed best-effort, and the error is one of
 /// E8001/E8004/E1008 (REQ-REL-007; research D12).
-pub fn atomic_write(target: &Path, bytes: &[u8]) -> Result<(), StoreError> {
+///
+/// Crate-internal: callers inside `alvs-store` construct targets from
+/// the §3.8 roots or the project folder (SEC-04 containment by
+/// construction, proven by the G7 suite). External callers must use
+/// [`atomic_write_contained`], which enforces the SEC-04 gate (review
+/// F-11).
+pub(crate) fn atomic_write(target: &Path, bytes: &[u8]) -> Result<(), StoreError> {
     atomic_write_with(&StdFs, target, bytes)
+}
+
+/// The SEC-04-checked public form (05 §5.7; FR-017; review F-11): the
+/// target must be contained by one of `roots` (the project folder, an
+/// app folder, or a user-picked folder) before anything is written;
+/// a rejected target yields E9005 and touches nothing.
+pub fn atomic_write_contained(
+    target: &Path,
+    bytes: &[u8],
+    roots: &[PathBuf],
+) -> Result<(), StoreError> {
+    match check_write_path(target, roots) {
+        PathDecision::Allowed => atomic_write(target, bytes),
+        // Unreachable under writer semantics (the prelude confirms only
+        // ProjectFile-origin UNC); kept for exhaustiveness and treated
+        // conservatively.
+        PathDecision::NeedsConfirmation { path } => Err(StoreError::PathRejected {
+            detail: format!("UNC target needs confirmation: {}", path.display()),
+        }),
+        PathDecision::Denied(e) => Err(StoreError::PathRejected {
+            detail: format!("write target rejected by SEC-04: {e}"),
+        }),
+    }
 }
 
 /// The seam-driven core (research D13); unit tests inject failures here.

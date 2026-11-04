@@ -26,7 +26,6 @@ windows = { version = "=0.62.2", features = [
 
 [dev-dependencies]
 alvs-model = { path = "../alvs-model" }
-proptest = "=1.12.0"
 
 [lints]
 workspace = true

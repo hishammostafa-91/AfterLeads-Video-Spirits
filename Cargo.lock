@@ -102,7 +102,6 @@ version = "0.1.0"
 dependencies = [
  "alvs-core",
  "alvs-model",
- "proptest",
  "rusqlite",
  "serde",
  "serde_json",

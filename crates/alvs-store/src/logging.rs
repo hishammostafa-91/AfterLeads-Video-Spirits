@@ -41,14 +41,21 @@ pub struct SizeRotatingWriter {
 
 impl SizeRotatingWriter {
     /// A writer for `<dir>/<prefix>.log` rotating at `max_bytes` keeping
-    /// `keep` files.
+    /// `keep` files. `keep` must be at least 2 (`app.log` plus one
+    /// rotated file) — rotation with a single file has nothing to
+    /// rotate into (review F-12).
     pub fn new(dir: &Path, prefix: &str, max_bytes: u64, keep: u32) -> Result<Self, StoreError> {
+        if keep < 2 {
+            return Err(StoreError::SaveFailed {
+                detail: format!("log rotation needs keep >= 2, got {keep}"),
+            });
+        }
         std::fs::create_dir_all(dir).map_err(|e| StoreError::from_io(&e))?;
         let mut writer = Self {
             dir: dir.to_path_buf(),
             prefix: prefix.to_string(),
             max_bytes,
-            keep: keep.max(1),
+            keep,
             inner: None,
             current_size: 0,
         };
@@ -339,6 +346,19 @@ mod tests {
         writer.flush().unwrap_or(());
         let current = std::fs::read(dir.join("app.log")).unwrap_or_default();
         assert_eq!(current.len(), 50, "the big line is kept whole");
+        std::fs::remove_dir_all(&dir).unwrap_or(());
+    }
+
+    #[test]
+    fn keep_below_two_is_rejected() {
+        // Review F-12: rotation with a single file would still produce
+        // `app.log.1` + `app.log` — two files — so the guard rejects it.
+        let dir = scratch("keep-one");
+        let err = match SizeRotatingWriter::new(&dir, "app", 10, 1) {
+            Err(e) => e,
+            Ok(_) => panic!("keep=1 must be rejected"),
+        };
+        assert_eq!(err.code(), alvs_core::error::ErrorCode::E1008);
         std::fs::remove_dir_all(&dir).unwrap_or(());
     }
 }

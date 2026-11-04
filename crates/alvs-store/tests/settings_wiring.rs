@@ -31,7 +31,12 @@ struct CountingWriter {
 impl SnapshotWriter for CountingWriter {
     fn write_snapshot(&self) -> Result<(), StoreError> {
         self.writes.fetch_add(1, Ordering::SeqCst);
-        alvs_store::atomic::atomic_write(&self.sidecar, b"s")
+        let roots = [self
+            .sidecar
+            .parent()
+            .map(std::path::Path::to_path_buf)
+            .unwrap_or_default()];
+        alvs_store::atomic::atomic_write_contained(&self.sidecar, b"s", &roots)
     }
 }
 

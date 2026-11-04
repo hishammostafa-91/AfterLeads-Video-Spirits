@@ -326,7 +326,11 @@ impl ProjectStore {
     /// update recent projects.
     pub fn save<H: DocumentHooks>(&self, snapshot: Arc<H::Doc>) -> Result<SaveReceipt, StoreError> {
         // Serialization happens on a background thread (§3.9.2); the Arc
-        // snapshot keeps the caller editing meanwhile.
+        // snapshot keeps the caller editing the same document. WP-03
+        // joins at the API boundary — the operative §3.9.2 property is
+        // that a serializer panic surfaces as E1008 and never a torn
+        // file; WP-05's shell may defer the join to keep editing
+        // through serialization (review F-10).
         let handle = std::thread::spawn(move || H::serialize(&snapshot));
         let bytes = match handle.join() {
             Ok(result) => result?,
@@ -347,7 +351,13 @@ impl ProjectStore {
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => return Err(StoreError::from_io(&e)),
         }
-        self.record_recent()?;
+        // The recent list is best-effort: the file is already saved, so
+        // a cache-table failure is logged, never a failed save (the
+        // §3.9.2 pipeline defines no failure semantics for this step;
+        // review F-13).
+        if let Err(e) = self.record_recent() {
+            tracing::warn!("recent-projects update after save failed: {e}");
+        }
         Ok(SaveReceipt {
             path: self.path.clone(),
             bytes: bytes.len(),
@@ -373,7 +383,9 @@ impl ProjectStore {
         // Newer file: read-only, unknown fields kept (§3.9.6; E1004).
         if version > current {
             let doc = H::parse(&bytes)?;
-            self.record_recent()?;
+            if let Err(e) = self.record_recent() {
+                tracing::warn!("recent-projects update after open failed: {e}");
+            }
             return Ok(Opened {
                 doc,
                 path: self.path.clone(),
@@ -440,7 +452,9 @@ impl ProjectStore {
         let mut media_needs_confirmation = fixup.needs_confirmation;
         media_needs_confirmation.sort();
         media_needs_confirmation.dedup();
-        self.record_recent()?;
+        if let Err(e) = self.record_recent() {
+            tracing::warn!("recent-projects update after open failed: {e}");
+        }
         Ok(Opened {
             doc,
             path: self.path.clone(),

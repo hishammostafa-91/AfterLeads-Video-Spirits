@@ -48,7 +48,12 @@ struct BytesWriter {
 impl SnapshotWriter for BytesWriter {
     fn write_snapshot(&self) -> Result<(), StoreError> {
         self.writes.fetch_add(1, Ordering::SeqCst);
-        alvs_store::atomic::atomic_write(&self.sidecar, &self.bytes)
+        let roots = [self
+            .sidecar
+            .parent()
+            .map(std::path::Path::to_path_buf)
+            .unwrap_or_default()];
+        alvs_store::atomic::atomic_write_contained(&self.sidecar, &self.bytes, &roots)
     }
 }
 
