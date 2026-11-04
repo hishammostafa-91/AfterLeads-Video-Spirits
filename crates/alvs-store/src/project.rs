@@ -102,15 +102,6 @@ enum MediaGate {
 }
 
 /// Gate one media candidate per SEC-04's project-file rules (05 §5.7):
-/// device paths and reserved names are rejected, UNC paths demand
-/// confirmation before access, and an ordinary local path is usable
-/// when it exists. Containment ("never write outside …") governs
-/// writes, not media reads, so the candidate's own folder stands in as
-/// the containment root — an existing local path is contained by its
-/// parent wherever the media lives, and a missing path cannot be
-/// canonicalized and lands on [`MediaGate::Offline`], exactly matching
-/// the plain existence probe this gate replaces.
-/// Gate one media candidate per SEC-04's project-file rules (05 §5.7):
 /// device paths (verbatim GLOBALROOT included, any case) and reserved
 /// names are rejected, UNC paths — plain or verbatim `\\?\UNC\`, any
 /// case (owner decision 2026-11-04, review T033) — demand confirmation

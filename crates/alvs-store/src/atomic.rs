@@ -129,9 +129,10 @@ pub fn atomic_write_contained(
         PathDecision::Allowed => atomic_write(target, bytes),
         // Unreachable under writer semantics (the prelude confirms only
         // ProjectFile-origin UNC); kept for exhaustiveness and treated
-        // conservatively.
-        PathDecision::NeedsConfirmation { path } => Err(StoreError::PathRejected {
-            detail: format!("UNC target needs confirmation: {}", path.display()),
+        // conservatively — a fixed detail, no path (04 §4.9: details
+        // never carry full user paths; review R2-03).
+        PathDecision::NeedsConfirmation { .. } => Err(StoreError::PathRejected {
+            detail: "UNC write target needs confirmation before access".into(),
         }),
         PathDecision::Denied(e) => Err(StoreError::PathRejected {
             detail: format!("write target rejected by SEC-04: {e}"),
