@@ -5,3 +5,11 @@
 .container {
   min-block-size: 100vh;
 }
+
+/* Application zoom 80–200% (REQ-APP-010; research D3): the theme
+ * store writes --app-zoom on <html>; the app root scales through the
+ * standardized `zoom` property (multiplication — percentage division
+ * is invalid CSS calc). Per-monitor DPI stays native (WebView2). */
+#root {
+  zoom: calc(var(--app-zoom, 100) * 1%);
+}

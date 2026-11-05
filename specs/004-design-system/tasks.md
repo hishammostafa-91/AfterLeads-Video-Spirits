@@ -61,12 +61,12 @@ description: "Task list for WP-04 — Design system and UI foundation"
 
 ### Tests for User Story 1 (write first; must fail before implementation)
 
-- [ ] T009 [P] [US1] Create `app/src/design/theme.test.ts` as the `t_ui_001` suite: switching dark↔light↔high-contrast swaps `data-theme` on `<html>` without reload and re-resolves token values; each accent swaps the three accent tokens; `forcedColorsActive()` reflects the media query; and `t_ui_002` assertions: `setZoom` clamps to 80–200 and applies `--app-zoom` (integer) with the root computing `zoom: calc(var(--app-zoom) * 1%)` (research D3 — multiplication, never division)
+- [X] T009 [P] [US1] Create `app/src/design/theme.test.ts` as the `t_ui_001` suite: switching dark↔light↔high-contrast swaps `data-theme` on `<html>` without reload and re-resolves token values; each accent swaps the three accent tokens; `forcedColorsActive()` reflects the media query; and `t_ui_002` assertions: `setZoom` clamps to 80–200 and applies `--app-zoom` (integer) with the root computing `zoom: calc(var(--app-zoom) * 1%)` (research D3 — multiplication, never division)
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create `app/src/design/theme.ts` (Zustand `themeStore` per contracts §1: `theme: 'dark'|'light'|'high-contrast'` default dark, `accent` default `clr-06`, `zoom` default 100, setters applying `data-theme`/`data-accent`/`--app-zoom` on `<html>` immediately, `forcedColorsActive()`, and the swappable persistence seam — harness binds URL params, WP-05 binds `alvs.appearance.*`); make T009 green
-- [ ] T011 [US1] Add the theme/zoom controls to the harness toolbar (`app/src/harness/HarnessApp.tsx`): theme/accent/zoom switchers labeled with locale keys (added to all six catalogs + meta), proving no-restart switching interactively and seeding the T-UI-001 visual path
+- [X] T010 [US1] Create `app/src/design/theme.ts` (Zustand `themeStore` per contracts §1: `theme: 'dark'|'light'|'high-contrast'` default dark, `accent` default `clr-06`, `zoom` default 100, setters applying `data-theme`/`data-accent`/`--app-zoom` on `<html>` immediately, `forcedColorsActive()`, and the swappable persistence seam — harness binds URL params, WP-05 binds `alvs.appearance.*`); make T009 green
+- [X] T011 [US1] Add the theme/zoom controls to the harness toolbar (`app/src/harness/HarnessApp.tsx`): theme/accent/zoom switchers labeled with locale keys (added to all six catalogs + meta), proving no-restart switching interactively and seeding the T-UI-001 visual path
 
 **Checkpoint**: US1 independently functional (MVP: the token/theme/zoom foundation).
 
