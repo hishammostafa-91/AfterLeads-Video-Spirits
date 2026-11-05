@@ -1,0 +1,22 @@
+{
+  "harness.title": "Bancada do sistema de design",
+  "harness.subtitle": "Componentes, temas e idiomas",
+  "harness.toolbar.theme": "Tema",
+  "harness.toolbar.theme.dark": "Escuro",
+  "harness.toolbar.theme.light": "Claro",
+  "harness.toolbar.theme.highContrast": "Alto contraste",
+  "harness.toolbar.accent": "Cor de destaque",
+  "harness.toolbar.accent.blue": "Azul",
+  "harness.toolbar.accent.purple": "Roxo",
+  "harness.toolbar.accent.green": "Verde",
+  "harness.toolbar.accent.orange": "Laranja",
+  "harness.toolbar.accent.pink": "Rosa",
+  "harness.toolbar.zoom": "Zoom: {value}%",
+  "harness.toolbar.density": "Densidade",
+  "harness.toolbar.density.comfortable": "Confortável",
+  "harness.toolbar.density.compact": "Compacta",
+  "harness.stories.title": "Histórias",
+  "harness.stories.empty": "Nenhuma história selecionada.",
+  "a11y.statusRegion": "Status",
+  "a11y.errorsRegion": "Erros"
+}

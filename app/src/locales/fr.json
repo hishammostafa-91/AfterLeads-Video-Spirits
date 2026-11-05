@@ -1,0 +1,22 @@
+{
+  "harness.title": "Banc du système de design",
+  "harness.subtitle": "Composants, thèmes et langues",
+  "harness.toolbar.theme": "Thème",
+  "harness.toolbar.theme.dark": "Sombre",
+  "harness.toolbar.theme.light": "Clair",
+  "harness.toolbar.theme.highContrast": "Contraste élevé",
+  "harness.toolbar.accent": "Couleur d'accentuation",
+  "harness.toolbar.accent.blue": "Bleu",
+  "harness.toolbar.accent.purple": "Violet",
+  "harness.toolbar.accent.green": "Vert",
+  "harness.toolbar.accent.orange": "Orange",
+  "harness.toolbar.accent.pink": "Rose",
+  "harness.toolbar.zoom": "Zoom : {value} %",
+  "harness.toolbar.density": "Densité",
+  "harness.toolbar.density.comfortable": "Confortable",
+  "harness.toolbar.density.compact": "Compacte",
+  "harness.stories.title": "Stories",
+  "harness.stories.empty": "Aucune story sélectionnée.",
+  "a11y.statusRegion": "État",
+  "a11y.errorsRegion": "Erreurs"
+}

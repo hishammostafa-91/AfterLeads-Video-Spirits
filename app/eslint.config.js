@@ -42,4 +42,12 @@ export default tseslint.config(
       "formatjs/enforce-placeholders": "error",
     },
   },
+  {
+    // Node-run files (no @types/node in the baseline): keep the
+    // syntax-level rules, drop the type-aware ones whose node globals
+    // they cannot resolve (vite.config.ts precedent). tokens.test.ts
+    // runs in the node environment and reads the stylesheet via fs.
+    files: ["**/*.mts", "src/design/tokens.test.ts"],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
 );

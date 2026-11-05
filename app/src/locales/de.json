@@ -1,0 +1,22 @@
+{
+  "harness.title": "Designsystem-Testumgebung",
+  "harness.subtitle": "Komponenten, Designs und Sprachen",
+  "harness.toolbar.theme": "Design",
+  "harness.toolbar.theme.dark": "Dunkel",
+  "harness.toolbar.theme.light": "Hell",
+  "harness.toolbar.theme.highContrast": "Hoher Kontrast",
+  "harness.toolbar.accent": "Akzentfarbe",
+  "harness.toolbar.accent.blue": "Blau",
+  "harness.toolbar.accent.purple": "Violett",
+  "harness.toolbar.accent.green": "Grün",
+  "harness.toolbar.accent.orange": "Orange",
+  "harness.toolbar.accent.pink": "Rosa",
+  "harness.toolbar.zoom": "Zoom: {value} %",
+  "harness.toolbar.density": "Dichte",
+  "harness.toolbar.density.comfortable": "Komfortabel",
+  "harness.toolbar.density.compact": "Kompakt",
+  "harness.stories.title": "Stories",
+  "harness.stories.empty": "Keine Story ausgewählt.",
+  "a11y.statusRegion": "Status",
+  "a11y.errorsRegion": "Fehler"
+}

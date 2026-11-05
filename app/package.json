@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "test": "vitest run",
+    "i18n:check": "node src/i18n/i18n-check.mts",
     "harness": "playwright test -c ../tests/ui/playwright.config.ts"
   },
   "dependencies": {

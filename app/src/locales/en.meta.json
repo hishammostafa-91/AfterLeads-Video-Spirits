@@ -1,0 +1,82 @@
+{
+  "harness.title": {
+    "description": "Harness page title.",
+    "maxlength": 40
+  },
+  "harness.subtitle": {
+    "description": "One-line description under the harness title.",
+    "maxlength": 60
+  },
+  "harness.toolbar.theme": {
+    "description": "Label of the theme selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.dark": {
+    "description": "Theme option: dark (the default theme).",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.light": {
+    "description": "Theme option: light.",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.highContrast": {
+    "description": "Theme option: high contrast (follows Windows contrast themes or manual selection).",
+    "maxlength": 20
+  },
+  "harness.toolbar.accent": {
+    "description": "Label of the accent color selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.accent.blue": {
+    "description": "Accent option CLR-06 (default).",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.purple": {
+    "description": "Accent option CLR-07.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.green": {
+    "description": "Accent option CLR-04.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.orange": {
+    "description": "Accent option CLR-02.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.pink": {
+    "description": "Accent option CLR-08.",
+    "maxlength": 12
+  },
+  "harness.toolbar.zoom": {
+    "description": "Current zoom percentage; {value} is the integer 80-200.",
+    "maxlength": 16
+  },
+  "harness.toolbar.density": {
+    "description": "Label of the density selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.density.comfortable": {
+    "description": "Density option: 28 px controls.",
+    "maxlength": 16
+  },
+  "harness.toolbar.density.compact": {
+    "description": "Density option: 24 px controls.",
+    "maxlength": 16
+  },
+  "harness.stories.title": {
+    "description": "Heading of the story grid.",
+    "maxlength": 20
+  },
+  "harness.stories.empty": {
+    "description": "Shown when no story is selected.",
+    "maxlength": 60
+  },
+  "a11y.statusRegion": {
+    "description": "Accessible name of the polite live region (07 s7.13 rule 3).",
+    "maxlength": 20
+  },
+  "a11y.errorsRegion": {
+    "description": "Accessible name of the assertive live region (07 s7.13 rule 3).",
+    "maxlength": 20
+  }
+}

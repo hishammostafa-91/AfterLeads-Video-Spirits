@@ -1,0 +1,22 @@
+{
+  "harness.title": "حاضنة نظام التصميم",
+  "harness.subtitle": "المكونات والسمات واللغات",
+  "harness.toolbar.theme": "السمة",
+  "harness.toolbar.theme.dark": "داكن",
+  "harness.toolbar.theme.light": "فاتح",
+  "harness.toolbar.theme.highContrast": "تباين عالٍ",
+  "harness.toolbar.accent": "لون التمييز",
+  "harness.toolbar.accent.blue": "أزرق",
+  "harness.toolbar.accent.purple": "بنفسجي",
+  "harness.toolbar.accent.green": "أخضر",
+  "harness.toolbar.accent.orange": "برتقالي",
+  "harness.toolbar.accent.pink": "وردي",
+  "harness.toolbar.zoom": "التكبير: {value}٪",
+  "harness.toolbar.density": "الكثافة",
+  "harness.toolbar.density.comfortable": "مريحة",
+  "harness.toolbar.density.compact": "مضغوطة",
+  "harness.stories.title": "القصص",
+  "harness.stories.empty": "لم يتم تحديد أي قصة.",
+  "a11y.statusRegion": "الحالة",
+  "a11y.errorsRegion": "الأخطاء"
+}

@@ -1,0 +1,293 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/*
+ * Design tokens (docs/07 §7.4, verbatim). Components reference tokens
+ * only — never raw colors (FR-001; enforced by review, not by CSS).
+ * Themes select values via [data-theme]; accents via [data-accent];
+ * High Contrast maps to system colors under forced-colors AND for
+ * manual selection via [data-theme="high-contrast"] (§7.4.3; owner
+ * ruling F05) — one shared mapping serves both triggers.
+ */
+
+:root {
+  /* Application zoom (REQ-APP-010): the theme store clamps 80–200 and
+   * the app root applies `zoom: calc(var(--app-zoom) * 1%)` (research
+   * D3 — multiplication; percentage division is invalid CSS calc). */
+  --app-zoom: 100;
+
+  /* Typography (§7.4.5). */
+  --font-ui:
+    "Inter Variable", "Noto Sans Arabic Variable", "Segoe UI Variable",
+    "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", consolas, monospace;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 18px;
+  --fs-2xl: 24px;
+  --line-height: 1.4;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Space (§7.4.6). */
+  --sp-1: 2px;
+  --sp-2: 4px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --control-height: 28px;
+  --control-height-compact: 24px;
+  --target-min: 24px;
+
+  /* Shape (§7.4.6). */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Motion (§7.4.6): reduced motion zeroes the durations except
+   * progress indicators (REQ-A11Y-004) — progress animations do not
+   * consume these tokens. */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 260ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Z-order (§7.4.6): the documented ordering; magnitudes are this
+   * project's convention (07 §3.9.8-style naming freedom). */
+  --z-panel: 100;
+  --z-floating-panel: 200;
+  --z-popover: 300;
+  --z-toast: 400;
+  --z-dialog: 500;
+  --z-drag-ghost: 600;
+
+  /* Label and marker palette (12 §12.17 CLR-01..08) — same in all
+   * themes; text on them uses the contrasting color listed there. */
+  --clr-red: #e5484d;
+  --clr-orange: #f76b15;
+  --clr-yellow: #ffc53d;
+  --clr-green: #30a46c;
+  --clr-cyan: #05a2c2;
+  --clr-blue: #3e63dd;
+  --clr-purple: #8e4ec6;
+  --clr-pink: #d6409f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}
+
+/* Arabic typography adjustment (§7.4.5). */
+:lang(ar) {
+  --line-height: 1.6;
+  --fs-md: 14px;
+}
+
+/* Color — Dark theme (default; §7.4.1). */
+[data-theme="dark"] {
+  --bg-app: #111214;
+  --bg-panel: #17181b;
+  --bg-panel-header: #1c1d21;
+  --bg-raised: #222328;
+  --bg-hover: #2a2b31;
+  --bg-active: #33343b;
+  --border-subtle: #2a2b30;
+  --border-strong: #3a3b42;
+  --text-primary: #eceded;
+  --text-secondary: #a9abb3;
+  --text-tertiary: #83858e;
+  --text-disabled: #5c5e66;
+  --accent-solid: #3e63dd;
+  --accent-text: #8da4ef;
+  --accent-subtle: #1e2a55;
+  --focus-ring: #8da4ef;
+  --danger: #e5484d;
+  --danger-text: #ff9592;
+  --warning: #ffc53d;
+  --warning-text: #ffd885;
+  --success: #30a46c;
+  --success-text: #3dd68c;
+  --info: #05a2c2;
+
+  /* Elevation (§7.4.6). */
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 35%);
+  --shadow-dialog: 0 16px 48px rgb(0 0 0 / 45%);
+
+  /* Timeline and media colors (§7.4.4). */
+  --tl-bg: #0e0f11;
+  --tl-track-alt: #131417;
+  --tl-video: #2f4e8c;
+  --tl-video-border: #4a6fbf;
+  --tl-audio: #2d6b4f;
+  --tl-audio-border: #3e8e69;
+  --tl-title: #5b3e8c;
+  --tl-title-border: #7a58b5;
+  --tl-generator: #8c5a2e;
+  --tl-generator-border: #b57a45;
+  --tl-nested: #2e7480;
+  --tl-nested-border: #46a2b0;
+  --tl-caption: #7a2e5e;
+  --tl-caption-border: #a84a85;
+  --tl-playhead: #f76b15;
+  --tl-inout: rgb(62 99 221 / 18%);
+  --tl-selected: #fff;
+  --tl-offline: #e5484d;
+}
+
+/* Color — Light theme (§7.4.2). */
+[data-theme="light"] {
+  --bg-app: #f3f4f6;
+  --bg-panel: #fff;
+  --bg-panel-header: #f7f8fa;
+  --bg-raised: #fff;
+  --bg-hover: #eef0f3;
+  --bg-active: #e3e6eb;
+  --border-subtle: #e4e6ea;
+  --border-strong: #b9bcc4;
+  --text-primary: #1a1b1e;
+  --text-secondary: #4b4e57;
+  --text-tertiary: #6a6d76;
+  --text-disabled: #a3a6ae;
+  --accent-solid: #3e63dd;
+  --accent-text: #3451c4;
+  --accent-subtle: #e6ecfd;
+  --focus-ring: #3e63dd;
+  --danger: #e5484d;
+  --danger-text: #c62a2f;
+  --warning: #ffc53d;
+  --warning-text: #8a5a00;
+  --success: #30a46c;
+  --success-text: #18794e;
+  --info: #05a2c2;
+
+  /* Elevation: light halves the alpha (§7.4.6). */
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 17.5%);
+  --shadow-dialog: 0 16px 48px rgb(0 0 0 / 22.5%);
+
+  /* Timeline and media colors (§7.4.4). */
+  --tl-bg: #e9ebef;
+  --tl-track-alt: #e2e5ea;
+  --tl-video: #9db4ec;
+  --tl-video-border: #3e63dd;
+  --tl-audio: #9ed9bc;
+  --tl-audio-border: #2c8c5e;
+  --tl-title: #cdb6ee;
+  --tl-title-border: #7a58b5;
+  --tl-generator: #f2c9a5;
+  --tl-generator-border: #b57a45;
+  --tl-nested: #a6dce4;
+  --tl-nested-border: #2e8a99;
+  --tl-caption: #ebb3d5;
+  --tl-caption-border: #a84a85;
+  --tl-playhead: #e5560a;
+  --tl-inout: rgb(62 99 221 / 15%);
+  --tl-selected: #1a1b1e;
+  --tl-offline: #e5484d;
+}
+
+/*
+ * Accent alternatives (§7.4.1; 12 §12.17: CLR-06 default + CLR-07,
+ * CLR-04, CLR-02, CLR-08) swap the three accent tokens. §7.4.1 is the
+ * canonical source for the alternative triples; the default accent's
+ * Light variants are §7.4.2's (light-specific values for the
+ * alternatives are a canonical gap — flagged for the owner in the
+ * evidence notes; the documented triples apply as written).
+ */
+[data-accent="clr-06"] {
+  --accent-solid: #3e63dd;
+  --accent-text: #8da4ef;
+  --accent-subtle: #1e2a55;
+}
+
+[data-theme="light"][data-accent="clr-06"] {
+  --accent-text: #3451c4;
+  --accent-subtle: #e6ecfd;
+}
+
+[data-accent="clr-07"] {
+  --accent-solid: #8e4ec6;
+  --accent-text: #c29feb;
+  --accent-subtle: #2f1e45;
+}
+
+[data-accent="clr-04"] {
+  --accent-solid: #30a46c;
+  --accent-text: #5bd39b;
+  --accent-subtle: #16301f;
+}
+
+[data-accent="clr-02"] {
+  --accent-solid: #f76b15;
+  --accent-text: #ffa066;
+  --accent-subtle: #3a2010;
+}
+
+[data-accent="clr-08"] {
+  --accent-solid: #d6409f;
+  --accent-text: #f08dc6;
+  --accent-subtle: #3a1730;
+}
+
+/*
+ * High Contrast (§7.4.3): one shared mapping for both triggers —
+ * forced-colors (Windows contrast themes, automatic per REQ-APP-009)
+ * and manual selection via [data-theme="high-contrast"] (owner ruling
+ * F05). Clip colors become outlined shapes with labels and meters use
+ * CanvasText fills with patterns (component behavior, §7.4.3).
+ */
+@media (forced-colors: active) {
+  :root {
+    --bg-app: Canvas;
+    --bg-panel: Canvas;
+    --bg-panel-header: Canvas;
+    --bg-raised: ButtonFace;
+    --bg-hover: ButtonFace;
+    --bg-active: Highlight;
+    --border-subtle: CanvasText;
+    --border-strong: CanvasText;
+    --text-primary: CanvasText;
+    --text-secondary: CanvasText;
+    --text-tertiary: CanvasText;
+    --text-disabled: GrayText;
+    --accent-solid: Highlight;
+    --accent-text: Highlight;
+    --accent-subtle: Highlight;
+    --focus-ring: Highlight;
+    --shadow-popover: none;
+    --shadow-dialog: none;
+
+    color-scheme: dark light;
+  }
+}
+
+[data-theme="high-contrast"] {
+  --bg-app: Canvas;
+  --bg-panel: Canvas;
+  --bg-panel-header: Canvas;
+  --bg-raised: ButtonFace;
+  --bg-hover: ButtonFace;
+  --bg-active: Highlight;
+  --border-subtle: CanvasText;
+  --border-strong: CanvasText;
+  --text-primary: CanvasText;
+  --text-secondary: CanvasText;
+  --text-tertiary: CanvasText;
+  --text-disabled: GrayText;
+  --accent-solid: Highlight;
+  --accent-text: Highlight;
+  --accent-subtle: Highlight;
+  --focus-ring: Highlight;
+  --shadow-popover: none;
+  --shadow-dialog: none;
+
+  color-scheme: dark light;
+}

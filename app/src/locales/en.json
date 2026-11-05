@@ -1,0 +1,22 @@
+{
+  "harness.title": "Design system harness",
+  "harness.subtitle": "Components, themes, and locales",
+  "harness.toolbar.theme": "Theme",
+  "harness.toolbar.theme.dark": "Dark",
+  "harness.toolbar.theme.light": "Light",
+  "harness.toolbar.theme.highContrast": "High contrast",
+  "harness.toolbar.accent": "Accent",
+  "harness.toolbar.accent.blue": "Blue",
+  "harness.toolbar.accent.purple": "Purple",
+  "harness.toolbar.accent.green": "Green",
+  "harness.toolbar.accent.orange": "Orange",
+  "harness.toolbar.accent.pink": "Pink",
+  "harness.toolbar.zoom": "Zoom: {value}%",
+  "harness.toolbar.density": "Density",
+  "harness.toolbar.density.comfortable": "Comfortable",
+  "harness.toolbar.density.compact": "Compact",
+  "harness.stories.title": "Stories",
+  "harness.stories.empty": "No story selected.",
+  "a11y.statusRegion": "Status",
+  "a11y.errorsRegion": "Errors"
+}
