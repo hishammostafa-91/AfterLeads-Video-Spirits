@@ -107,6 +107,33 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C app build
       - run: python tools/check_npm_licenses.py
+      # WP-04 (G-08): the verify.ps1 UI gates run in CI too.
+      - run: pnpm -C app typecheck
+      - run: pnpm -C app lint
+      - run: pnpm -C app test
+      - run: pnpm -C app i18n:check
+
+  ui-harness:
+    # WP-04 (research D15): the Playwright harness matrix + axe suite.
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/AppData/Local/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~\AppData\Local\ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: playwright-${{ runner.os }}-
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.16.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C app exec playwright install chromium
+      - run: pnpm -C app harness
 
   build:
     runs-on: windows-2025
