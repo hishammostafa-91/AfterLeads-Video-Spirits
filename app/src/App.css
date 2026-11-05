@@ -2,6 +2,10 @@
  * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
 
 /* Base styling for the application root (WP-00 skeleton). */
+body {
+  margin: 0;
+}
+
 .container {
   min-block-size: 100vh;
 }

@@ -12,11 +12,13 @@
   "harness.toolbar.accent.orange": "برتقالي",
   "harness.toolbar.accent.pink": "وردي",
   "harness.toolbar.zoom": "التكبير: {value}٪",
+  "harness.toolbar.locale": "اللغة",
   "harness.toolbar.density": "الكثافة",
   "harness.toolbar.density.comfortable": "مريحة",
   "harness.toolbar.density.compact": "مضغوطة",
   "harness.stories.title": "القصص",
   "harness.stories.empty": "لم يتم تحديد أي قصة.",
+  "harness.stories.count": "{count, plural, zero {لا قصص} one {قصة واحدة} two {قصتان} few {# قصص} many {# قصة} other {# قصة}}",
   "a11y.statusRegion": "الحالة",
   "a11y.errorsRegion": "الأخطاء"
 }

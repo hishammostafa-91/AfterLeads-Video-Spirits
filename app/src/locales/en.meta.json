@@ -51,6 +51,10 @@
     "description": "Current zoom percentage; {value} is the integer 80-200.",
     "maxlength": 16
   },
+  "harness.toolbar.locale": {
+    "description": "Label of the language selector in the harness toolbar (BCP-47 tags as values).",
+    "maxlength": 16
+  },
   "harness.toolbar.density": {
     "description": "Label of the density selector in the harness toolbar.",
     "maxlength": 20
@@ -70,6 +74,9 @@
   "harness.stories.empty": {
     "description": "Shown when no story is selected.",
     "maxlength": 60
+  },
+  "harness.stories.count": {
+    "description": "Number of stories in the grid; {count} is a non-negative integer. Arabic uses all six plural categories (07 s7.12 rule 3)."
   },
   "a11y.statusRegion": {
     "description": "Accessible name of the polite live region (07 s7.13 rule 3).",

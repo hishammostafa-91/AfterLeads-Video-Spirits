@@ -12,11 +12,13 @@
   "harness.toolbar.accent.orange": "Naranja",
   "harness.toolbar.accent.pink": "Rosa",
   "harness.toolbar.zoom": "Zoom: {value} %",
+  "harness.toolbar.locale": "Idioma",
   "harness.toolbar.density": "Densidad",
   "harness.toolbar.density.comfortable": "Cómoda",
   "harness.toolbar.density.compact": "Compacta",
   "harness.stories.title": "Historias",
   "harness.stories.empty": "Ninguna historia seleccionada.",
+  "harness.stories.count": "{count, plural, one {# historia} other {# historias}}",
   "a11y.statusRegion": "Estado",
   "a11y.errorsRegion": "Errores"
 }

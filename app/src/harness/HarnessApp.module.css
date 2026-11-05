@@ -3,6 +3,7 @@
 
 /* Harness shell layout (tokens only; logical properties only). */
 .shell {
+  box-sizing: border-box;
   display: flex;
   block-size: 100vh;
   flex-direction: column;
@@ -34,6 +35,7 @@
 
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
   min-block-size: var(--control-height);

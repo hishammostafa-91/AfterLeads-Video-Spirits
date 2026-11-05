@@ -10,8 +10,9 @@
  * locale half next. Landmarks per 07 §7.13 rule 2; live regions per
  * rule 3.
  */
-import { FormattedMessage, IntlProvider } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import type { JSX } from "react";
+import { useState } from "react";
 import { LiveRegions } from "../components/a11y";
 import {
   setThemePersistence,
@@ -19,6 +20,13 @@ import {
   type Accent,
   type ThemeName,
 } from "../design/theme";
+import {
+  I18n,
+  LOCALE_TAGS,
+  useLocaleStore,
+  type LocaleTag,
+} from "../i18n/runtime";
+import { pseudoBase, pseudoCatalog } from "../i18n/pseudo";
 import ar from "../locales/ar.json";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
@@ -35,7 +43,7 @@ const ACCENTS = ["clr-06", "clr-07", "clr-04", "clr-02", "clr-08"] as const;
 
 export function harnessParams(): {
   theme: ThemeName;
-  locale: HarnessLocale;
+  locale: LocaleTag | "en-XA" | "ar-XB";
   density: "comfortable" | "compact";
 } {
   const query = new URLSearchParams(window.location.search);
@@ -46,9 +54,12 @@ export function harnessParams(): {
     themeParam === "light" || themeParam === "high-contrast"
       ? themeParam
       : "dark";
-  const locale = (
-    localeParam && localeParam in MESSAGES ? localeParam : "en"
-  ) as HarnessLocale;
+  const locale =
+    localeParam === "en-XA" || localeParam === "ar-XB"
+      ? localeParam
+      : ((localeParam && localeParam in MESSAGES
+          ? localeParam
+          : "en") as LocaleTag);
   const density = densityParam === "compact" ? "compact" : "comfortable";
   return { theme, locale, density };
 }
@@ -85,6 +96,10 @@ function ensureUrlPersistence(initial: { theme: ThemeName }): void {
 
 function ToolbarControls(): JSX.Element {
   const { theme, accent, zoom, setTheme, setAccent, setZoom } = useThemeStore();
+  const { locale, setLocale } = useLocaleStore();
+  const [density, setDensity] = useState<"comfortable" | "compact">(
+    harnessParams().density,
+  );
   return (
     <>
       <label className={styles.control}>
@@ -139,47 +154,97 @@ function ToolbarControls(): JSX.Element {
           }}
         />
       </label>
+      <label className={styles.control}>
+        <span className={styles.controlLabel}>
+          <FormattedMessage id="harness.toolbar.locale" />
+        </span>
+        <select
+          value={locale}
+          onChange={(event) => {
+            setLocale(event.target.value as LocaleTag);
+          }}
+        >
+          {LOCALE_TAGS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className={styles.control}>
+        <span className={styles.controlLabel}>
+          <FormattedMessage id="harness.toolbar.density" />
+        </span>
+        <select
+          value={density}
+          onChange={(event) => {
+            const value = event.target.value as "comfortable" | "compact";
+            document.documentElement.dataset.density = value;
+            setDensity(value);
+          }}
+        >
+          {(["comfortable", "compact"] as const).map((option) => (
+            <option key={option} value={option}>
+              {option === "comfortable" ? (
+                <FormattedMessage id="harness.toolbar.density.comfortable" />
+              ) : (
+                <FormattedMessage id="harness.toolbar.density.compact" />
+              )}
+            </option>
+          ))}
+        </select>
+      </label>
     </>
   );
 }
 
 function themeLabel(theme: ThemeName): JSX.Element {
-  const id =
-    theme === "dark"
-      ? "harness.toolbar.theme.dark"
-      : theme === "light"
-        ? "harness.toolbar.theme.light"
-        : "harness.toolbar.theme.highContrast";
-  return <FormattedMessage id={id} />;
+  switch (theme) {
+    case "dark":
+      return <FormattedMessage id="harness.toolbar.theme.dark" />;
+    case "light":
+      return <FormattedMessage id="harness.toolbar.theme.light" />;
+    case "high-contrast":
+      return <FormattedMessage id="harness.toolbar.theme.highContrast" />;
+  }
 }
 
 function accentLabel(accent: Accent): JSX.Element {
-  const id = `harness.toolbar.accent.${accentToColor(accent)}`;
-  return <FormattedMessage id={id} />;
-}
-
-function accentToColor(accent: Accent): string {
-  return {
-    "clr-06": "blue",
-    "clr-07": "purple",
-    "clr-04": "green",
-    "clr-02": "orange",
-    "clr-08": "pink",
-  }[accent];
+  switch (accent) {
+    case "clr-06":
+      return <FormattedMessage id="harness.toolbar.accent.blue" />;
+    case "clr-07":
+      return <FormattedMessage id="harness.toolbar.accent.purple" />;
+    case "clr-04":
+      return <FormattedMessage id="harness.toolbar.accent.green" />;
+    case "clr-02":
+      return <FormattedMessage id="harness.toolbar.accent.orange" />;
+    case "clr-08":
+      return <FormattedMessage id="harness.toolbar.accent.pink" />;
+  }
 }
 
 export function HarnessApp(): JSX.Element {
   const params = harnessParams();
   ensureUrlPersistence({ theme: params.theme });
-  document.documentElement.lang = params.locale;
-  document.documentElement.dir = params.locale === "ar" ? "rtl" : "ltr";
+  ensureLocaleFromUrl(
+    params.locale === "en-XA" || params.locale === "ar-XB"
+      ? pseudoBase(params.locale)
+      : params.locale,
+  );
   document.documentElement.dataset.density = params.density;
+  // Pseudo-locales render through the override (tests only; 12 §12.14).
+  const override =
+    params.locale === "en-XA"
+      ? { locale: "en" as const, messages: pseudoCatalog("en-XA", MESSAGES.en) }
+      : params.locale === "ar-XB"
+        ? {
+            locale: "ar" as const,
+            messages: pseudoCatalog("ar-XB", MESSAGES.ar),
+          }
+        : undefined;
   return (
-    <IntlProvider
-      locale={params.locale}
-      defaultLocale="en"
-      messages={MESSAGES[params.locale]}
-    >
+    <I18n override={override}>
       <main className={`container ${styles.shell}`}>
         <header className={styles.header} role="banner">
           <h1 className={styles.title}>
@@ -202,6 +267,14 @@ export function HarnessApp(): JSX.Element {
         </section>
         <LiveRegions />
       </main>
-    </IntlProvider>
+    </I18n>
   );
+}
+
+/** Initialize the locale store from the URL once (tests reset it). */
+let localeInitialized = false;
+function ensureLocaleFromUrl(locale: LocaleTag): void {
+  if (localeInitialized) return;
+  localeInitialized = true;
+  useLocaleStore.getState().setLocale(locale);
 }
