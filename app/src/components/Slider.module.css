@@ -1,0 +1,97 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Slider + AngleDial (07 §7.6; tokens only; logical properties only). */
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: var(--weight-medium);
+}
+
+.output {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.track {
+  position: relative;
+  block-size: 1.25rem;
+}
+
+/* The track line, drawn with a pseudo-element-free gradient band. */
+.track::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inline-size: 100%;
+  block-size: 4px;
+  translate: 0 -50%;
+  border-radius: 9999px;
+  background: var(--border-strong);
+}
+
+.fill {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  block-size: 4px;
+  translate: 0 -50%;
+  border-radius: 9999px;
+  background: var(--accent-solid);
+}
+
+.thumb {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 2px solid var(--accent-solid);
+  border-radius: 50%;
+  background: var(--bg-raised);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Angle dial: a disc with a rotating needle. */
+.dial {
+  position: relative;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--bg-raised);
+  cursor: grab;
+  touch-action: none;
+}
+
+.dial:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.dial-needle {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 2px;
+  block-size: 50%;
+  transform-origin: bottom center;
+  translate: -50% -100%;
+  background: var(--accent-solid);
+}

@@ -9,6 +9,7 @@ import type { StoryFile } from "./types";
 import { buttonStories } from "./Button.stories";
 import { fieldsStories } from "./Fields.stories";
 import { menuStories } from "./Menu.stories";
+import { numericStories } from "./Numeric.stories";
 import { overlayStories } from "./Overlays.stories";
 import { selectionStories } from "./Selection.stories";
 import { tabsStories } from "./Tabs.stories";
@@ -20,4 +21,5 @@ export const storyFiles: StoryFile[] = [
   menuStories,
   overlayStories,
   tabsStories,
+  numericStories,
 ];

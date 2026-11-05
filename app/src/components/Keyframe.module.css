@@ -1,0 +1,26 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Keyframe controls (07 §7.6; tokens only; logical properties only). */
+
+.toggle[data-pressed] {
+  color: var(--accent-solid);
+}
+
+.navigator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.nav-button {
+  padding-inline: var(--sp-1);
+}
+
+.nav-button[data-pressed] {
+  color: var(--accent-solid);
+}
+
+.diamond-on {
+  color: var(--accent-solid);
+}

@@ -63,6 +63,22 @@
     "description": "Search field placeholder.",
     "maxlength": 16
   },
+  "components.keyframe.add": {
+    "description": "Accessible name for adding a keyframe.",
+    "maxlength": 24
+  },
+  "components.keyframe.next": {
+    "description": "Accessible name for jumping to the next keyframe.",
+    "maxlength": 28
+  },
+  "components.keyframe.prev": {
+    "description": "Accessible name for jumping to the previous keyframe.",
+    "maxlength": 28
+  },
+  "components.keyframe.remove": {
+    "description": "Accessible name for removing a keyframe.",
+    "maxlength": 24
+  },
   "components.menu.barLabel": {
     "description": "Accessible name of the menu bar.",
     "maxlength": 24
@@ -94,6 +110,14 @@
   "components.menu.undo": {
     "description": "Undo menu item.",
     "maxlength": 12
+  },
+  "components.number.mixedLabel": {
+    "description": "Number-field label shown in the mixed-state story.",
+    "maxlength": 24
+  },
+  "components.number.scaleLabel": {
+    "description": "Number-field label for a scale percentage.",
+    "maxlength": 16
   },
   "components.popover.body": {
     "description": "Sample popover content (harness).",
@@ -139,6 +163,14 @@
     "description": "Switch label for enabling proxy media.",
     "maxlength": 20
   },
+  "components.slider.angleLabel": {
+    "description": "Label for the angle dial and its number field.",
+    "maxlength": 16
+  },
+  "components.slider.opacityLabel": {
+    "description": "Slider label for opacity.",
+    "maxlength": 16
+  },
   "components.tabs.effects": {
     "description": "Effects tab title.",
     "maxlength": 16
@@ -146,6 +178,26 @@
   "components.tabs.properties": {
     "description": "Properties tab title.",
     "maxlength": 16
+  },
+  "components.timecode.label": {
+    "description": "Accessible name of the timecode field.",
+    "maxlength": 16
+  },
+  "components.timecode.segment.ff": {
+    "description": "Accessible name of the frames segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.hh": {
+    "description": "Accessible name of the hours segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.mm": {
+    "description": "Accessible name of the minutes segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.ss": {
+    "description": "Accessible name of the seconds segment.",
+    "maxlength": 12
   },
   "components.toast.region": {
     "description": "Accessible name of the toast region.",

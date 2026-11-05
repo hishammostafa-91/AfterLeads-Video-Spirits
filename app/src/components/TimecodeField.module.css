@@ -1,0 +1,43 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* TimecodeField (07 §7.6; always LTR per §7.11; tokens only;
+   logical properties only — except the pinned text-align center,
+   which is not a directional property). */
+
+.field {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  font-family: var(--font-mono);
+}
+
+.segment-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.colon {
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+}
+
+.segment {
+  inline-size: 2.25rem;
+  min-block-size: var(--control-height);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  text-align: center;
+}
+
+.segment:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--radius-xs, 0.25rem);
+}
