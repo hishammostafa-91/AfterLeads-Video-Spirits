@@ -7,20 +7,86 @@
 .radio {
   display: inline-flex;
   align-items: center;
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+/* The Button components render <label>{input}{children}</label>; the
+   indicator spans sit before the text inside that label (07 s7.6). */
+.checkbox-button,
+.switch-button,
+.radio-button {
+  display: inline-flex;
+  align-items: center;
   gap: var(--sp-2);
   color: var(--text-primary);
   font-size: var(--fs-md);
   cursor: pointer;
 }
 
-.checkbox[data-selected] .indicator,
-.radio[data-selected] .indicator {
+.check-indicator {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs, 0.25rem);
+  background: var(--bg-raised);
+}
+
+.checkbox-button[data-selected] .check-indicator {
+  border-color: var(--accent-solid);
+  background: var(--accent-solid);
+  box-shadow: inset 0 0 0 2px var(--bg-raised);
+}
+
+.radio-indicator {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--bg-raised);
+}
+
+.radio-button[data-selected] .radio-indicator {
+  border-color: var(--accent-solid);
+  background:
+    radial-gradient(circle, var(--accent-solid) 0 30%, transparent 35% 100%),
+    var(--bg-raised);
+}
+
+.switch-track {
+  position: relative;
+  inline-size: 2rem;
+  block-size: 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 9999px;
+  background: var(--bg-raised);
+}
+
+.switch-thumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 15%;
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: inset-inline-start var(--motion-fast, 120ms) ease;
+}
+
+.switch-button[data-selected] .switch-thumb {
+  inset-inline-start: 55%;
+  background: var(--accent-text);
+}
+
+.switch-button[data-selected] .switch-track {
+  border-color: var(--accent-solid);
   background: var(--accent-solid);
 }
 
-.checkbox:focus-visible,
-.switch:focus-visible,
-.radio:focus-visible {
+.checkbox-button:focus-visible,
+.switch-button:focus-visible,
+.radio-button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
@@ -39,7 +105,40 @@
   gap: var(--sp-2);
 }
 
-.combo-box-row input {
+.label {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: var(--weight-medium);
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-block-size: var(--control-height);
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.combo-box-row {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.input {
+  flex: 1;
   min-block-size: var(--control-height);
   padding-inline: var(--sp-3);
   border: 1px solid var(--border-strong);
@@ -50,7 +149,54 @@
   font-size: var(--fs-md);
 }
 
-.combo-box-row input:focus-visible {
+.input:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
+}
+
+.combo-box-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--control-height);
+  inline-size: var(--control-height);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.combo-box-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.popover {
+  min-inline-size: 12rem;
+  padding: var(--sp-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-overlay);
+  box-shadow: var(--shadow-overlay);
+}
+
+.options {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.options [role="option"] {
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.options [role="option"][data-focused] {
+  background: var(--accent-subtle);
+  color: var(--accent-text);
 }

@@ -1,39 +1,182 @@
 {
-  "components.button.ok": {
-    "description": "OK button label.",
-    "maxlength": 8
+  "a11y.errorsRegion": {
+    "description": "Accessible name of the assertive live region (07 s7.13 rule 3).",
+    "maxlength": 20
+  },
+  "a11y.statusRegion": {
+    "description": "Accessible name of the polite live region (07 s7.13 rule 3).",
+    "maxlength": 20
   },
   "components.button.edit": {
     "description": "Edit button label (also used in icon tooltips).",
     "maxlength": 12
   },
+  "components.button.ok": {
+    "description": "OK button label.",
+    "maxlength": 8
+  },
   "components.button.snap": {
     "description": "Snapping toggle label.",
     "maxlength": 16
   },
-  "harness.title": {
-    "description": "Harness page title.",
+  "components.dialog.cancel": {
+    "description": "Cancel button label (dialogs, alert dialogs).",
+    "maxlength": 12
+  },
+  "components.dialog.discard": {
+    "description": "Destructive confirmation action label.",
+    "maxlength": 12
+  },
+  "components.dialog.discardBody": {
+    "description": "One-sentence explanation of a destructive action.",
+    "maxlength": 80
+  },
+  "components.dialog.discardTitle": {
+    "description": "Alert dialog heading for discarding changes.",
     "maxlength": 40
+  },
+  "components.dialog.open": {
+    "description": "Trigger that opens the demo dialog (harness).",
+    "maxlength": 20
+  },
+  "components.fields.nameLabel": {
+    "description": "Text field label for a name.",
+    "maxlength": 16
+  },
+  "components.fields.namePlaceholder": {
+    "description": "Text field placeholder for a name.",
+    "maxlength": 24
+  },
+  "components.fields.notesLabel": {
+    "description": "Text area label for notes.",
+    "maxlength": 16
+  },
+  "components.fields.notesPlaceholder": {
+    "description": "Text area placeholder for notes.",
+    "maxlength": 24
+  },
+  "components.fields.searchLabel": {
+    "description": "Search field label.",
+    "maxlength": 16
+  },
+  "components.fields.searchPlaceholder": {
+    "description": "Search field placeholder.",
+    "maxlength": 16
+  },
+  "components.menu.barLabel": {
+    "description": "Accessible name of the menu bar.",
+    "maxlength": 24
+  },
+  "components.menu.contextArea": {
+    "description": "Instruction shown inside the context-menu story area.",
+    "maxlength": 48
+  },
+  "components.menu.edit": {
+    "description": "Edit menu title.",
+    "maxlength": 12
+  },
+  "components.menu.file": {
+    "description": "File menu title.",
+    "maxlength": 12
+  },
+  "components.menu.newProject": {
+    "description": "New-project menu item.",
+    "maxlength": 20
+  },
+  "components.menu.redo": {
+    "description": "Redo menu item.",
+    "maxlength": 12
+  },
+  "components.menu.rename": {
+    "description": "Rename context-menu item.",
+    "maxlength": 16
+  },
+  "components.menu.undo": {
+    "description": "Undo menu item.",
+    "maxlength": 12
+  },
+  "components.popover.body": {
+    "description": "Sample popover content (harness).",
+    "maxlength": 40
+  },
+  "components.popover.filters": {
+    "description": "Trigger that opens the filters popover (harness).",
+    "maxlength": 16
+  },
+  "components.selection.checkboxLabel": {
+    "description": "Checkbox story label (snapping).",
+    "maxlength": 16
+  },
+  "components.selection.comboLabel": {
+    "description": "ComboBox label for an effect choice.",
+    "maxlength": 16
+  },
+  "components.selection.fillLabel": {
+    "description": "Fill scale-mode radio label.",
+    "maxlength": 8
+  },
+  "components.selection.fitLabel": {
+    "description": "Fit scale-mode radio label.",
+    "maxlength": 8
+  },
+  "components.selection.groupLabel": {
+    "description": "Radio-group label for the scale mode.",
+    "maxlength": 24
+  },
+  "components.selection.optionFirst": {
+    "description": "First demo option in selects.",
+    "maxlength": 24
+  },
+  "components.selection.optionSecond": {
+    "description": "Second demo option in selects.",
+    "maxlength": 24
+  },
+  "components.selection.selectLabel": {
+    "description": "Select label for a mode choice.",
+    "maxlength": 12
+  },
+  "components.selection.switchLabel": {
+    "description": "Switch label for enabling proxy media.",
+    "maxlength": 20
+  },
+  "components.tabs.effects": {
+    "description": "Effects tab title.",
+    "maxlength": 16
+  },
+  "components.tabs.properties": {
+    "description": "Properties tab title.",
+    "maxlength": 16
+  },
+  "components.toast.region": {
+    "description": "Accessible name of the toast region.",
+    "maxlength": 24
+  },
+  "components.toast.saved": {
+    "description": "Toast text after a successful save.",
+    "maxlength": 24
+  },
+  "components.toast.show": {
+    "description": "Button that shows a demo toast (harness).",
+    "maxlength": 20
+  },
+  "components.tooltip.zoomIn": {
+    "description": "Tooltip text for zoom-in.",
+    "maxlength": 16
+  },
+  "harness.stories.count": {
+    "description": "Number of stories in the grid; {count} is a non-negative integer. Arabic uses all six plural categories (07 s7.12 rule 3)."
+  },
+  "harness.stories.title": {
+    "description": "Heading of the story grid.",
+    "maxlength": 20
   },
   "harness.subtitle": {
     "description": "One-line description under the harness title.",
     "maxlength": 60
   },
-  "harness.toolbar.theme": {
-    "description": "Label of the theme selector in the harness toolbar.",
-    "maxlength": 20
-  },
-  "harness.toolbar.theme.dark": {
-    "description": "Theme option: dark (the default theme).",
-    "maxlength": 20
-  },
-  "harness.toolbar.theme.light": {
-    "description": "Theme option: light.",
-    "maxlength": 20
-  },
-  "harness.toolbar.theme.highContrast": {
-    "description": "Theme option: high contrast (follows Windows contrast themes or manual selection).",
-    "maxlength": 20
+  "harness.title": {
+    "description": "Harness page title.",
+    "maxlength": 40
   },
   "harness.toolbar.accent": {
     "description": "Label of the accent color selector in the harness toolbar.",
@@ -41,10 +184,6 @@
   },
   "harness.toolbar.accent.blue": {
     "description": "Accent option CLR-06 (default).",
-    "maxlength": 12
-  },
-  "harness.toolbar.accent.purple": {
-    "description": "Accent option CLR-07.",
     "maxlength": 12
   },
   "harness.toolbar.accent.green": {
@@ -59,13 +198,9 @@
     "description": "Accent option CLR-08.",
     "maxlength": 12
   },
-  "harness.toolbar.zoom": {
-    "description": "Current zoom percentage; {value} is the integer 80-200.",
-    "maxlength": 16
-  },
-  "harness.toolbar.locale": {
-    "description": "Label of the language selector in the harness toolbar (BCP-47 tags as values).",
-    "maxlength": 16
+  "harness.toolbar.accent.purple": {
+    "description": "Accent option CLR-07.",
+    "maxlength": 12
   },
   "harness.toolbar.density": {
     "description": "Label of the density selector in the harness toolbar.",
@@ -79,23 +214,28 @@
     "description": "Density option: 24 px controls.",
     "maxlength": 16
   },
-  "harness.stories.title": {
-    "description": "Heading of the story grid.",
+  "harness.toolbar.locale": {
+    "description": "Label of the language selector in the harness toolbar (BCP-47 tags as values).",
+    "maxlength": 16
+  },
+  "harness.toolbar.theme": {
+    "description": "Label of the theme selector in the harness toolbar.",
     "maxlength": 20
   },
-  "harness.stories.empty": {
-    "description": "Shown when no story is selected.",
-    "maxlength": 60
-  },
-  "harness.stories.count": {
-    "description": "Number of stories in the grid; {count} is a non-negative integer. Arabic uses all six plural categories (07 s7.12 rule 3)."
-  },
-  "a11y.statusRegion": {
-    "description": "Accessible name of the polite live region (07 s7.13 rule 3).",
+  "harness.toolbar.theme.dark": {
+    "description": "Theme option: dark (the default theme).",
     "maxlength": 20
   },
-  "a11y.errorsRegion": {
-    "description": "Accessible name of the assertive live region (07 s7.13 rule 3).",
+  "harness.toolbar.theme.highContrast": {
+    "description": "Theme option: high contrast (follows Windows contrast themes or manual selection).",
     "maxlength": 20
+  },
+  "harness.toolbar.theme.light": {
+    "description": "Theme option: light.",
+    "maxlength": 20
+  },
+  "harness.toolbar.zoom": {
+    "description": "Current zoom percentage; {value} is the integer 80-200.",
+    "maxlength": 16
   }
 }

@@ -1,0 +1,42 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Overlays (07 §7.6; tokens only; logical properties only). */
+
+.dialog {
+  inline-size: min(28rem, 90vi);
+  padding: var(--sp-5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-overlay);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.title {
+  margin-block-end: var(--sp-2);
+  font-size: var(--fs-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.body {
+  margin-block-end: var(--sp-5);
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.popover {
+  padding: var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-overlay);
+  box-shadow: var(--shadow-overlay);
+  color: var(--text-primary);
+}

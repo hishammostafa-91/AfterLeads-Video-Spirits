@@ -7,6 +7,7 @@
  */
 import type { JSX, ReactNode } from "react";
 import {
+  Button as RACButton,
   CheckboxButton,
   CheckboxField,
   type CheckboxFieldProps,
@@ -16,6 +17,7 @@ import {
   Label as RACLabel,
   ListBox as RACListBox,
   ListBoxItem,
+  Popover as RACPopover,
   RadioButton,
   RadioField,
   type RadioFieldProps,
@@ -23,10 +25,12 @@ import {
   type RadioGroupProps,
   Select as RACSelect,
   type SelectProps,
+  SelectValue,
   SwitchButton,
   SwitchField,
   type SwitchFieldProps,
 } from "react-aria-components";
+import { ChevronDown } from "lucide-react";
 import styles from "./Selection.module.css";
 
 function selectionClass(base: string, className: string | undefined): string {
@@ -48,8 +52,10 @@ export function Checkbox({
       {...props}
       className={selectionClass(styles.checkbox, className)}
     >
-      <CheckboxButton className={styles.checkboxButton} />
-      {children}
+      <CheckboxButton className={styles.checkboxButton}>
+        <span className={styles.checkIndicator} aria-hidden="true" />
+        {children}
+      </CheckboxButton>
     </CheckboxField>
   );
 }
@@ -69,8 +75,12 @@ export function Switch({
       {...props}
       className={selectionClass(styles.switch, className)}
     >
-      <SwitchButton className={styles.switchButton} />
-      {children}
+      <SwitchButton className={styles.switchButton}>
+        <span className={styles.switchTrack} aria-hidden="true">
+          <span className={styles.switchThumb} />
+        </span>
+        {children}
+      </SwitchButton>
     </SwitchField>
   );
 }
@@ -110,8 +120,10 @@ export function Radio({
 }: RadioWrapperProps): JSX.Element {
   return (
     <RadioField {...props} className={selectionClass(styles.radio, className)}>
-      <RadioButton />
-      {children}
+      <RadioButton className={styles.radioButton}>
+        <span className={styles.radioIndicator} aria-hidden="true" />
+        {children}
+      </RadioButton>
     </RadioField>
   );
 }
@@ -133,8 +145,14 @@ export function Select({
 }: SelectWrapperProps): JSX.Element {
   return (
     <RACSelect {...props} className={selectionClass(styles.select, className)}>
-      {label && <RACLabel>{label}</RACLabel>}
-      <RACListBox>{children}</RACListBox>
+      {label && <RACLabel className={styles.label}>{label}</RACLabel>}
+      <RACButton className={styles.trigger}>
+        <SelectValue className={styles.triggerValue} />
+        <ChevronDown size={16} aria-hidden="true" />
+      </RACButton>
+      <RACPopover className={styles.popover}>
+        <RACListBox className={styles.options}>{children}</RACListBox>
+      </RACPopover>
     </RACSelect>
   );
 }
@@ -159,11 +177,16 @@ export function ComboBox({
       {...props}
       className={selectionClass(styles.comboBox, className)}
     >
-      {label && <RACLabel>{label}</RACLabel>}
+      {label && <RACLabel className={styles.label}>{label}</RACLabel>}
       <div className={styles.comboBoxRow}>
-        <RACInput />
+        <RACInput className={styles.input} />
+        <RACButton className={styles.comboBoxButton}>
+          <ChevronDown size={16} aria-hidden="true" />
+        </RACButton>
       </div>
-      <RACListBox>{children}</RACListBox>
+      <RACPopover className={styles.popover}>
+        <RACListBox className={styles.options}>{children}</RACListBox>
+      </RACPopover>
     </RACComboBox>
   );
 }

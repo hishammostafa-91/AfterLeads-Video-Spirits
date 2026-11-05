@@ -102,9 +102,9 @@ description: "Task list for WP-04 — Design system and UI foundation"
 ### Implementation for User Story 3 (each task: `<Name>.tsx` + `<Name>.module.css` + `<Name>.test.tsx` in `app/src/components/`, its story file in `app/src/harness/stories/`, and its keys added to all six catalogs + `en.meta.json`; behavior per contracts §3)
 
 - [X] T017 [P] [US3] Buttons: `Button.tsx` (primary/secondary/ghost/danger; primary once per dialog; danger pairs with confirmation semantics), `IconButton.tsx` (icon + 500 ms tooltip carrying label+shortcut + accessible name — REQ-HLP-003), `ToggleButton.tsx`, `SegmentedControl.tsx` (RadioGroup-composed)
-- [ ] T018 [P] [US3] Menu family in `Menu.tsx`: `Menu`/`Submenu`/`ContextMenu` on RAC MenuTrigger and `MenuBar` as a `role="menubar"` composition with the ARIA menubar keyboard pattern (RAC 1.22 ships no MenuBar — research D6); shortcuts right-aligned (left in RTL)
-- [ ] T019 [P] [US3] Overlays in `Dialog.tsx`/`Tooltip.tsx`/`Toast.tsx`: Dialog/AlertDialog (focus trap, initial focus on the safest control, Esc except unsaved-changes prompts, focus return), Popover, Tooltip (500 ms), Toast (region + polite announcement)
-- [ ] T020 [P] [US3] `Tabs.tsx` (panel-tab primitive; dockview integration stays WP-05)
+- [X] T018 [P] [US3] Menu family in `Menu.tsx`: `Menu`/`Submenu`/`ContextMenu` on RAC MenuTrigger and `MenuBar` as a `role="menubar"` composition with the ARIA menubar keyboard pattern (RAC 1.22 ships no MenuBar — research D6); shortcuts right-aligned (left in RTL)
+- [X] T019 [P] [US3] Overlays in `Dialog.tsx`/`Tooltip.tsx`/`Toast.tsx`: Dialog/AlertDialog (focus trap, initial focus on the safest control, Esc except unsaved-changes prompts, focus return), Popover, Tooltip (500 ms), Toast (region + polite announcement)
+- [X] T020 [P] [US3] `Tabs.tsx` (panel-tab primitive; dockview integration stays WP-05)
 - [ ] T021 [P] [US3] `NumberField.tsx` — scrubbable (drag, Shift ×10, Ctrl ×0.1), wheel-when-focused, arrows, typed math (`+10`, `*2`), unit suffix, mixed state "—"
 - [ ] T022 [P] [US3] `Slider.tsx` with `AngleDial` (paired NumberField, double-click reset; dial per 07 §7.6)
 - [ ] T023 [P] [US3] `TimecodeField.tsx` — segmented `HH:MM:SS:FF`, typed + `+`/`−` relative entry, always `dir="ltr"` (§7.11)

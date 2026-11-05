@@ -27,6 +27,7 @@ import {
   type LocaleTag,
 } from "../i18n/runtime";
 import { pseudoBase, pseudoCatalog } from "../i18n/pseudo";
+import { storyFiles } from "./stories";
 import ar from "../locales/ar.json";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
@@ -261,9 +262,16 @@ export function HarnessApp(): JSX.Element {
           <h2 className={styles.storiesTitle}>
             <FormattedMessage id="harness.stories.title" />
           </h2>
-          <p>
-            <FormattedMessage id="harness.stories.empty" />
-          </p>
+          <div className={styles.storyGrid}>
+            {storyFiles.flatMap((file) =>
+              file.stories.map((story) => (
+                <div key={story.id} className={styles.storyCard}>
+                  <span className={styles.storyLabel}>{story.id}</span>
+                  {story.render()}
+                </div>
+              )),
+            )}
+          </div>
         </section>
         <LiveRegions />
       </main>

@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
+/**
+ * The story registry (research D7): the union of all component story
+ * files rendered by the harness grid and captured by the Playwright
+ * matrix (T033).
+ */
+import type { StoryFile } from "./types";
+import { buttonStories } from "./Button.stories";
+import { fieldsStories } from "./Fields.stories";
+import { menuStories } from "./Menu.stories";
+import { overlayStories } from "./Overlays.stories";
+import { selectionStories } from "./Selection.stories";
+import { tabsStories } from "./Tabs.stories";
+
+export const storyFiles: StoryFile[] = [
+  buttonStories,
+  fieldsStories,
+  selectionStories,
+  menuStories,
+  overlayStories,
+  tabsStories,
+];

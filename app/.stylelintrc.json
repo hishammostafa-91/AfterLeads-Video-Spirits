@@ -2,6 +2,12 @@
   "extends": ["stylelint-config-standard"],
   "plugins": ["stylelint-use-logical"],
   "rules": {
-    "csstools/use-logical": true
+    "csstools/use-logical": true,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global", "local"]
+      }
+    ]
   }
 }
