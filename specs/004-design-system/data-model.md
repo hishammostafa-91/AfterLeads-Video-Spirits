@@ -19,7 +19,7 @@ State transitions: none (static sheet); the *active values* change with `data-th
 
 | Field | Type | Rule |
 |---|---|---|
-| `theme` | `"dark" \| "light"` | dark default; switch applies without restart (FR-002) |
+| `theme` | `"dark" \| "light" \| "high-contrast"` | dark default; switch applies without restart; `high-contrast` applies the §7.4.3 system-color mapping for manual selection (owner ruling F05) |
 | `accent` | `"clr-06" \| "clr-07" \| "clr-04" \| "clr-02" \| "clr-08"` | CLR-06 default; swaps the three accent tokens per §7.4.1 values (FR-003) |
 | `zoom` | integer 80–200 | clamped; applied as CSS `zoom` on the root (FR-004, D3) |
 | `forcedColors` | boolean (read-only signal) | follows the OS media query; when active the token mapping of §7.4.3 governs regardless of `theme` |

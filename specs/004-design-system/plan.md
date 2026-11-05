@@ -34,7 +34,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. Canonical documentation first | PASS* | Every FR/decision cites 01 REQ rows, 07 §7.1/§7.4–7.6/§7.11–7.13, 02 ADR-011/§2.14, 12 §12.14/§12.16/§12.17; versions verified against 00 §0.8 rows (G-10). One mild canonical tension escalated to the owner (07 §7.4.3's manual High-Contrast selection vs 01 REQ-APP-009's "activates automatically" — review F05, see research D2); one baseline gap escalated (`@testing-library/dom` peer — F03/D1); one artifact location escalated (notices manifest — F08/D16). |
+| I. Canonical documentation first | PASS | Every FR/decision cites 01 REQ rows, 07 §7.1/§7.4–7.6/§7.11–7.13, 02 ADR-011/§2.14, 12 §12.14/§12.16/§12.17; versions verified against 00 §0.8 rows (G-10). The three review escalations are resolved by owner rulings of 2026-11-05: the `@testing-library/dom ^10` baseline row (F03, set patch 1.1.2), the dual High-Contrast triggers of 07 §7.4.3 (F05), and the notices manifest created by this package (F08). |
 | II. Scope discipline | PASS | FR-018 fences workspace/panels/menus/backend (WP-05), settings pages (WP-24), translation review (WP-25), title fonts (WP-17), custom feature icons (ship with features). |
 | III. Test-first evidence | PASS | Acceptance = T-UI-001/002, T-I18N-003/004, T-A11Y-004 + the snapshot matrix (card); harness snapshots deterministic (D7). |
 | IV. Protected main and clean history | PASS | Work on `feat/004-design-system` from main `1dc6b02`; gates + review before the owner's merge. |
@@ -42,7 +42,7 @@ Deliver the design system exactly as the WP-04 card specifies, inside the existi
 | VI. Global and accessible by default | PASS | The package IS this principle's infrastructure: six locales from day one (G-13), RTL rules, WCAG 2.2 AA, keyboard/ARIA via React Aria (REQ-A11Y-002..004). |
 | VII. Private, secure, local-first | PASS | No network (font files bundled with recorded hashes — no runtime download), no telemetry; fonts from official upstream repositories with OFL licenses recorded in the notices manifest (G-12). |
 | VIII. Simplicity and performance budgets | PASS | Baseline stack per ADR-011; custom windowing instead of a new dependency (D10); no speculative abstractions — stories double as documentation. |
-| IX. Open-source integrity | PASS* | SPDX headers on all new files; Lucide (ISC) base icons; OFL fonts with license files in the bundle; nothing copied from other products (G-20). The formal notices-manifest listing (12 §12.16) is an open owner question (F08, research D16) — the license files ship with this package either way. |
+| IX. Open-source integrity | PASS | SPDX headers on all new files; Lucide (ISC) base icons; OFL fonts with license files in the bundle; the notices manifest (`NOTICES.md`) is created by this package with FNT-01..03 and Lucide recorded (12 §12.16; owner ruling F08, research D16); nothing copied from other products (G-20). |
 | Technology constraints | PASS | Baseline rows only (00 §0.8 UI/lint/test tables); toolchain unchanged. |
 
 ## Project Structure
@@ -97,6 +97,7 @@ app/
     │   └── snapshots/             # Playwright projects: dark/light × en/ar
     └── App.tsx                    # mounts the harness entry (replaced by WP-05's shell)
 assets/fonts/                      # FNT-01..03 files + licenses + fonts.json
+NOTICES.md                         # the notices manifest: FNT-01..03 (OFL-1.1) + Lucide (ISC); later packages extend
 tests/ui/                          # Playwright config + harness/axe specs (repo tests/ dir)
 .github/workflows/ci.yml           # ui job gains the four gates + a ui-harness job (research D15, G-08)
 ```

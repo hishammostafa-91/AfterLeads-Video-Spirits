@@ -5,7 +5,10 @@ TypeScript signatures are the planning sketch; exact names finalize in implement
 ## 1. Theme and zoom (`app/src/design/theme.ts`)
 
 ```ts
-type ThemeName = 'dark' | 'light';               // REQ-APP-009; dark default
+type ThemeName = 'dark' | 'light' | 'high-contrast';  // REQ-APP-009; dark default; 'high-contrast'
+                                                // applies the §7.4.3 system-color mapping for manual
+                                                // selection (owner ruling F05) — forced-colors does the
+                                                // same automatically when Windows contrast themes are on
 type Accent = 'clr-06' | 'clr-07' | 'clr-04' | 'clr-02' | 'clr-08';  // 12 §12.17
 type Zoom = number;                               // clamped 80..200 (REQ-APP-010)
 

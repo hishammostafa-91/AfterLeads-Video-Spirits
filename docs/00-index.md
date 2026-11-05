@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Document set | AfterLeads-Video-Spirits implementation documentation |
-| Set version | 1.1.1 |
+| Set version | 1.1.2 |
 | Baseline date | 2026-11-01 |
 | Status | Approved baseline for implementation (v1.0 scope) |
 | Owner | AfterLeads (afterleadseg@gmail.com) |
@@ -218,6 +218,7 @@ Versions below were verified against the official registries on the baseline dat
 | UI | lucide-react | 1.x | Icons (ISC) |
 | UI | react-markdown | 10.x | In-app help viewer |
 | UI tests | Vitest / @testing-library/react / jsdom | 5.x / 16.x / 30.x | |
+| UI tests | @testing-library/dom | 10.x | Required peer of `@testing-library/react` 16 (added WP-04) |
 | UI tests | Playwright / @axe-core/playwright | 1.64.x / 4.x | UI harness, visual and accessibility tests |
 | E2E | WebdriverIO + tauri-driver | 10.x + latest | Windows end-to-end tests |
 | Lint | ESLint | **9.39.x** | 10.x is not supported by `eslint-plugin-jsx-a11y` |
