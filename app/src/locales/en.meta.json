@@ -1,4 +1,16 @@
 {
+  "components.button.ok": {
+    "description": "OK button label.",
+    "maxlength": 8
+  },
+  "components.button.edit": {
+    "description": "Edit button label (also used in icon tooltips).",
+    "maxlength": 12
+  },
+  "components.button.snap": {
+    "description": "Snapping toggle label.",
+    "maxlength": 16
+  },
   "harness.title": {
     "description": "Harness page title.",
     "maxlength": 40

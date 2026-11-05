@@ -56,7 +56,7 @@ export function collectIssues(
 /** Scan a source tree for message IDs used in code (`id="…"` / `id: "…"`). */
 export function collectUsedIds(srcRoot: string): Set<string> {
   const used = new Set<string>();
-  const pattern = /\bid\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
+  const pattern = /\b(?:id|labelMessageId)\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
       const full = join(dir, entry);

@@ -101,7 +101,7 @@ description: "Task list for WP-04 — Design system and UI foundation"
 
 ### Implementation for User Story 3 (each task: `<Name>.tsx` + `<Name>.module.css` + `<Name>.test.tsx` in `app/src/components/`, its story file in `app/src/harness/stories/`, and its keys added to all six catalogs + `en.meta.json`; behavior per contracts §3)
 
-- [ ] T017 [P] [US3] Buttons: `Button.tsx` (primary/secondary/ghost/danger; primary once per dialog; danger pairs with confirmation semantics), `IconButton.tsx` (icon + 500 ms tooltip carrying label+shortcut + accessible name — REQ-HLP-003), `ToggleButton.tsx`, `SegmentedControl.tsx` (RadioGroup-composed)
+- [X] T017 [P] [US3] Buttons: `Button.tsx` (primary/secondary/ghost/danger; primary once per dialog; danger pairs with confirmation semantics), `IconButton.tsx` (icon + 500 ms tooltip carrying label+shortcut + accessible name — REQ-HLP-003), `ToggleButton.tsx`, `SegmentedControl.tsx` (RadioGroup-composed)
 - [ ] T018 [P] [US3] Menu family in `Menu.tsx`: `Menu`/`Submenu`/`ContextMenu` on RAC MenuTrigger and `MenuBar` as a `role="menubar"` composition with the ARIA menubar keyboard pattern (RAC 1.22 ships no MenuBar — research D6); shortcuts right-aligned (left in RTL)
 - [ ] T019 [P] [US3] Overlays in `Dialog.tsx`/`Tooltip.tsx`/`Toast.tsx`: Dialog/AlertDialog (focus trap, initial focus on the safest control, Esc except unsaved-changes prompts, focus return), Popover, Tooltip (500 ms), Toast (region + polite announcement)
 - [ ] T020 [P] [US3] `Tabs.tsx` (panel-tab primitive; dockview integration stays WP-05)
@@ -111,8 +111,8 @@ description: "Task list for WP-04 — Design system and UI foundation"
 - [ ] T024 [P] [US3] `KeyframeToggle.tsx` + `KeyframeNavigator.tsx` (stopwatch state; ◀ ◆ ▶ enabled states)
 - [ ] T025 [P] [US3] `ColorPicker.tsx` (HSV square + hue slider + hex/RGB fields + recent colors; eyedropper is a later package's viewer integration) and `ColorWheel.tsx` (chroma puck + luma slider, Alt-drag fine control, double-click reset)
 - [ ] T026 [P] [US3] `CurveEditor.tsx` (SVG points: click-add, double-click/Delete remove, drag, channel tabs, reset) and `PointControl.tsx` (numeric x/y + handle slot)
-- [ ] T027 [P] [US3] `Fields.tsx`: SearchField, TextField, TextArea — `dir="auto"` for user content (§7.11)
-- [ ] T028 [P] [US3] `Selection.tsx`: Checkbox, Switch, RadioGroup, Select, ComboBox
+- [X] T027 [P] [US3] `Fields.tsx`: SearchField, TextField, TextArea — `dir="auto"` for user content (§7.11)
+- [X] T028 [P] [US3] `Selection.tsx`: Checkbox, Switch, RadioGroup, Select, ComboBox
 - [ ] T029 [P] [US3] `Collections.tsx`: Tree, GridList, Table, ListBox + the `useWindowing` hook (custom, no new dependency — research D10) virtualizing beyond 200 rows with a 200/201-row boundary test
 - [ ] T030 [P] [US3] `Feedback.tsx` (ProgressBar, Meter, Spinner — indeterminate only before the first progress value — Skeleton), `Badge.tsx` (text + icon state chips: Proxy, Offline, 10-bit, HDR, VFR; never color alone), and `EmptyState.tsx` (icon, one sentence, primary action, shortcut hint)
 

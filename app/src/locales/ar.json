@@ -1,4 +1,7 @@
 {
+  "components.button.ok": "موافق",
+  "components.button.edit": "تحرير",
+  "components.button.snap": "الالتقاط",
   "harness.title": "حاضنة نظام التصميم",
   "harness.subtitle": "المكونات والسمات واللغات",
   "harness.toolbar.theme": "السمة",

@@ -1,0 +1,82 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Button variants (07 §7.6; tokens only; logical properties only). */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--control-height);
+  padding-inline: var(--sp-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.button[disabled],
+.button[data-disabled] {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.primary {
+  background: var(--accent-solid);
+  color: #fff;
+}
+
+.primary:hover:not([disabled]) {
+  filter: brightness(1.1);
+}
+
+.secondary {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.secondary:hover:not([disabled]) {
+  background: var(--bg-hover);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.ghost:hover:not([disabled]) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.danger:hover:not([disabled]) {
+  filter: brightness(1.1);
+}
+
+.toggle[data-selected] {
+  background: var(--accent-subtle);
+  border-color: var(--accent-solid);
+  color: var(--accent-text);
+}
+
+/* Compact density (07 §7.4.6: 24px controls). */
+:root[data-density="compact"] .button {
+  min-block-size: var(--control-height-compact);
+}

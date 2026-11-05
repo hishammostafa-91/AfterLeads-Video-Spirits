@@ -1,4 +1,7 @@
 {
+  "components.button.ok": "OK",
+  "components.button.edit": "Bearbeiten",
+  "components.button.snap": "Einrasten",
   "harness.title": "Designsystem-Testumgebung",
   "harness.subtitle": "Komponenten, Designs und Sprachen",
   "harness.toolbar.theme": "Design",

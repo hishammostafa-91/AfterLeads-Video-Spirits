@@ -1,4 +1,7 @@
 {
+  "components.button.ok": "OK",
+  "components.button.edit": "Editar",
+  "components.button.snap": "Encaixe",
   "harness.title": "Bancada do sistema de design",
   "harness.subtitle": "Componentes, temas e idiomas",
   "harness.toolbar.theme": "Tema",

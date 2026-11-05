@@ -1,4 +1,7 @@
 {
+  "components.button.ok": "OK",
+  "components.button.edit": "Modifier",
+  "components.button.snap": "Magnétisme",
   "harness.title": "Banc du système de design",
   "harness.subtitle": "Composants, thèmes et langues",
   "harness.toolbar.theme": "Thème",

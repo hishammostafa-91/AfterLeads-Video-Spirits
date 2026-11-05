@@ -1,4 +1,7 @@
 {
+  "components.button.ok": "OK",
+  "components.button.edit": "Edit",
+  "components.button.snap": "Snapping",
   "harness.title": "Design system harness",
   "harness.subtitle": "Components, themes, and locales",
   "harness.toolbar.theme": "Theme",

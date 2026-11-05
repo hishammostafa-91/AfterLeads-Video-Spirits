@@ -1,0 +1,56 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Selection controls (07 §7.6; tokens only; logical properties only). */
+.checkbox,
+.switch,
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+
+.checkbox[data-selected] .indicator,
+.radio[data-selected] .indicator {
+  background: var(--accent-solid);
+}
+
+.checkbox:focus-visible,
+.switch:focus-visible,
+.radio:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.select,
+.combo-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.combo-box-row input {
+  min-block-size: var(--control-height);
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+}
+
+.combo-box-row input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
