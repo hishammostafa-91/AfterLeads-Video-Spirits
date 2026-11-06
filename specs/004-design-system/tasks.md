@@ -113,8 +113,8 @@ description: "Task list for WP-04 — Design system and UI foundation"
 - [X] T026 [P] [US3] `CurveEditor.tsx` (SVG points: click-add, double-click/Delete remove, drag, channel tabs, reset) and `PointControl.tsx` (numeric x/y + handle slot)
 - [X] T027 [P] [US3] `Fields.tsx`: SearchField, TextField, TextArea — `dir="auto"` for user content (§7.11)
 - [X] T028 [P] [US3] `Selection.tsx`: Checkbox, Switch, RadioGroup, Select, ComboBox
-- [ ] T029 [P] [US3] `Collections.tsx`: Tree, GridList, Table, ListBox + the `useWindowing` hook (custom, no new dependency — research D10) virtualizing beyond 200 rows with a 200/201-row boundary test
-- [ ] T030 [P] [US3] `Feedback.tsx` (ProgressBar, Meter, Spinner — indeterminate only before the first progress value — Skeleton), `Badge.tsx` (text + icon state chips: Proxy, Offline, 10-bit, HDR, VFR; never color alone), and `EmptyState.tsx` (icon, one sentence, primary action, shortcut hint)
+- [X] T029 [P] [US3] `Collections.tsx`: Tree, GridList, Table, ListBox + the `useWindowing` hook (custom, no new dependency — research D10) virtualizing beyond 200 rows with a 200/201-row boundary test
+- [X] T030 [P] [US3] `Feedback.tsx` (ProgressBar, Meter, Spinner — indeterminate only before the first progress value — Skeleton), `Badge.tsx` (text + icon state chips: Proxy, Offline, 10-bit, HDR, VFR; never color alone), and `EmptyState.tsx` (icon, one sentence, primary action, shortcut hint)
 
 **Checkpoint**: all seven stories independently functional — every 07 §7.6 component exists with stories in all nine states.
 

@@ -53,12 +53,13 @@ export function collectIssues(
   return issues;
 }
 
-/** Scan a source tree for message IDs used in code (`id="…"` /
- * `messageId: "…"` JSX props and object literals). */
+/** Scan a source tree for message IDs used in code (`id="…"` JSX
+ * props and any `*MessageId`/`messageId` literals in props or
+ * objects). */
 export function collectUsedIds(srcRoot: string): Set<string> {
   const used = new Set<string>();
   const pattern =
-    /\b(?:id|labelMessageId|messageId)\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
+    /\b(?:id|(?:[a-zA-Z]+)?[Mm]essageId)\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
       const full = join(dir, entry);

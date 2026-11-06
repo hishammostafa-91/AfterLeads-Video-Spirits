@@ -7,6 +7,26 @@
     "description": "Accessible name of the polite live region (07 s7.13 rule 3).",
     "maxlength": 20
   },
+  "components.badge.hdr": {
+    "description": "Badge: high dynamic range.",
+    "maxlength": 12
+  },
+  "components.badge.offline": {
+    "description": "Badge: media offline.",
+    "maxlength": 16
+  },
+  "components.badge.proxy": {
+    "description": "Badge: proxy media.",
+    "maxlength": 12
+  },
+  "components.badge.tenBit": {
+    "description": "Badge: 10-bit depth.",
+    "maxlength": 12
+  },
+  "components.badge.vfr": {
+    "description": "Badge: variable frame rate.",
+    "maxlength": 12
+  },
   "components.button.edit": {
     "description": "Edit button label (also used in icon tooltips).",
     "maxlength": 12
@@ -17,6 +37,42 @@
   },
   "components.button.snap": {
     "description": "Snapping toggle label.",
+    "maxlength": 16
+  },
+  "components.collections.binOne": {
+    "description": "Tree story bin name.",
+    "maxlength": 16
+  },
+  "components.collections.binTwo": {
+    "description": "Tree story bin name.",
+    "maxlength": 16
+  },
+  "components.collections.clipOne": {
+    "description": "Demo clip name in collections.",
+    "maxlength": 24
+  },
+  "components.collections.clipTwo": {
+    "description": "Demo clip name in collections.",
+    "maxlength": 24
+  },
+  "components.collections.duration": {
+    "description": "Table column header: clip duration.",
+    "maxlength": 16
+  },
+  "components.collections.name": {
+    "description": "Table column header: clip name.",
+    "maxlength": 16
+  },
+  "components.collections.table": {
+    "description": "Accessible name of the demo table.",
+    "maxlength": 16
+  },
+  "components.collections.trackAudio": {
+    "description": "Track listbox option.",
+    "maxlength": 16
+  },
+  "components.collections.trackVideo": {
+    "description": "Track listbox option.",
     "maxlength": 16
   },
   "components.color.blue": {
@@ -126,6 +182,30 @@
   "components.dialog.open": {
     "description": "Trigger that opens the demo dialog (harness).",
     "maxlength": 20
+  },
+  "components.empty.action": {
+    "description": "Empty-state primary action label.",
+    "maxlength": 24
+  },
+  "components.empty.message": {
+    "description": "Empty-state sentence.",
+    "maxlength": 64
+  },
+  "components.empty.shortcutPrefix": {
+    "description": "Prefix before the shortcut hint key.",
+    "maxlength": 16
+  },
+  "components.feedback.cache": {
+    "description": "Meter label for cache fill.",
+    "maxlength": 24
+  },
+  "components.feedback.render": {
+    "description": "Progress bar label for rendering work.",
+    "maxlength": 24
+  },
+  "components.feedback.spinner": {
+    "description": "Accessible name of the spinner.",
+    "maxlength": 24
   },
   "components.fields.nameLabel": {
     "description": "Text field label for a name.",

@@ -1,0 +1,25 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Badge (07 §7.6; tokens only; logical properties only). */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 9999px;
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+}
+
+.badge svg {
+  color: var(--accent-solid);
+}
+
+.text {
+  white-space: nowrap;
+}
