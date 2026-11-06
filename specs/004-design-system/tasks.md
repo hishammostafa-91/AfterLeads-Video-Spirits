@@ -109,8 +109,8 @@ description: "Task list for WP-04 — Design system and UI foundation"
 - [X] T022 [P] [US3] `Slider.tsx` with `AngleDial` (paired NumberField, double-click reset; dial per 07 §7.6)
 - [X] T023 [P] [US3] `TimecodeField.tsx` — segmented `HH:MM:SS:FF`, typed + `+`/`−` relative entry, always `dir="ltr"` (§7.11)
 - [X] T024 [P] [US3] `KeyframeToggle.tsx` + `KeyframeNavigator.tsx` (stopwatch state; ◀ ◆ ▶ enabled states)
-- [ ] T025 [P] [US3] `ColorPicker.tsx` (HSV square + hue slider + hex/RGB fields + recent colors; eyedropper is a later package's viewer integration) and `ColorWheel.tsx` (chroma puck + luma slider, Alt-drag fine control, double-click reset)
-- [ ] T026 [P] [US3] `CurveEditor.tsx` (SVG points: click-add, double-click/Delete remove, drag, channel tabs, reset) and `PointControl.tsx` (numeric x/y + handle slot)
+- [X] T025 [P] [US3] `ColorPicker.tsx` (HSV square + hue slider + hex/RGB fields + recent colors; eyedropper is a later package's viewer integration) and `ColorWheel.tsx` (chroma puck + luma slider, Alt-drag fine control, double-click reset)
+- [X] T026 [P] [US3] `CurveEditor.tsx` (SVG points: click-add, double-click/Delete remove, drag, channel tabs, reset) and `PointControl.tsx` (numeric x/y + handle slot)
 - [X] T027 [P] [US3] `Fields.tsx`: SearchField, TextField, TextArea — `dir="auto"` for user content (§7.11)
 - [X] T028 [P] [US3] `Selection.tsx`: Checkbox, Switch, RadioGroup, Select, ComboBox
 - [ ] T029 [P] [US3] `Collections.tsx`: Tree, GridList, Table, ListBox + the `useWindowing` hook (custom, no new dependency — research D10) virtualizing beyond 200 rows with a 200/201-row boundary test

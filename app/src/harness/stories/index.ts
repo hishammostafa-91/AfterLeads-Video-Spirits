@@ -7,6 +7,7 @@
  */
 import type { StoryFile } from "./types";
 import { buttonStories } from "./Button.stories";
+import { colorStories } from "./Color.stories";
 import { fieldsStories } from "./Fields.stories";
 import { menuStories } from "./Menu.stories";
 import { numericStories } from "./Numeric.stories";
@@ -22,4 +23,5 @@ export const storyFiles: StoryFile[] = [
   overlayStories,
   tabsStories,
   numericStories,
+  colorStories,
 ];

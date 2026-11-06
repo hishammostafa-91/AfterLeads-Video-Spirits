@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* PointControl (07 §7.6; tokens only; logical properties only). */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-2);
+}

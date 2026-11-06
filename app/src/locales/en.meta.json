@@ -19,6 +19,94 @@
     "description": "Snapping toggle label.",
     "maxlength": 16
   },
+  "components.color.blue": {
+    "description": "Single-letter label of the blue channel field (locale letter).",
+    "maxlength": 2
+  },
+  "components.color.green": {
+    "description": "Single-letter label of the green channel field (locale letter).",
+    "maxlength": 2
+  },
+  "components.color.hex": {
+    "description": "Label of the hex value field.",
+    "maxlength": 8
+  },
+  "components.color.hue": {
+    "description": "Accessible name of the hue slider.",
+    "maxlength": 12
+  },
+  "components.color.luma": {
+    "description": "Accessible name of the luma slider.",
+    "maxlength": 16
+  },
+  "components.color.recent": {
+    "description": "Accessible name of the recent-colors swatch row.",
+    "maxlength": 32
+  },
+  "components.color.red": {
+    "description": "Single-letter label of the red channel field.",
+    "maxlength": 2
+  },
+  "components.color.saturationBrightness": {
+    "description": "Accessible name of the HSV square.",
+    "maxlength": 32
+  },
+  "components.color.wheel": {
+    "description": "Accessible name of the chroma wheel.",
+    "maxlength": 24
+  },
+  "components.curve.channel.blue": {
+    "description": "Blue curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.green": {
+    "description": "Green curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.red": {
+    "description": "Red curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.y": {
+    "description": "Luma curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channels": {
+    "description": "Accessible name of the curve channel tab list.",
+    "maxlength": 32
+  },
+  "components.curve.editor": {
+    "description": "Accessible name of the curve editor SVG.",
+    "maxlength": 24
+  },
+  "components.curve.handle": {
+    "description": "Label of the point handle-mode select.",
+    "maxlength": 12
+  },
+  "components.curve.handleNone": {
+    "description": "Handle mode: no handles.",
+    "maxlength": 8
+  },
+  "components.curve.handleSmooth": {
+    "description": "Handle mode: smooth (mirrored) handles.",
+    "maxlength": 12
+  },
+  "components.curve.point": {
+    "description": "Accessible name of one curve point ({index} is 1-based).",
+    "maxlength": 32
+  },
+  "components.curve.reset": {
+    "description": "Reset-curve button label.",
+    "maxlength": 12
+  },
+  "components.curve.x": {
+    "description": "Label of the point X field.",
+    "maxlength": 2
+  },
+  "components.curve.y": {
+    "description": "Label of the point Y field.",
+    "maxlength": 2
+  },
   "components.dialog.cancel": {
     "description": "Cancel button label (dialogs, alert dialogs).",
     "maxlength": 12
