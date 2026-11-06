@@ -126,8 +126,8 @@ description: "Task list for WP-04 — Design system and UI foundation"
 
 **Independent Test**: `pnpm -C app test -- fonts` (integrity) + harness snapshots rendering Latin/Arabic/mono through the bundled faces.
 
-- [ ] T031 [P] [US4] Bundle `assets/fonts/` — Inter variable (FNT-01), Noto Sans Arabic variable (FNT-02), JetBrains Mono (FNT-03) as separate files from their official upstream repositories, each family's `OFL.txt` beside them, and `assets/fonts/fonts.json` recording `{id, family, file, sourceUrl, sha256, licenseFile}` per 12 §12.16; verify `NOTICES.md` rows match the bundle
-- [ ] T032 [US4] Create `app/src/design/fonts.css` (`@font-face` for the three families, `font-display: swap`, wired into `main.tsx` after tokens.css) and the integrity test `app/src/design/fonts.test.ts` re-hashing every file against `fonts.json` and asserting each license file exists (runs in `pnpm -C app test` — research D9/F10); snapshots now render with the real faces (`document.fonts.ready` awaited per D7)
+- [X] T031 [P] [US4] Bundle `assets/fonts/` — Inter variable (FNT-01), Noto Sans Arabic variable (FNT-02), JetBrains Mono (FNT-03) as separate files from their official upstream repositories, each family's `OFL.txt` beside them, and `assets/fonts/fonts.json` recording `{id, family, file, sourceUrl, sha256, licenseFile}` per 12 §12.16; verify `NOTICES.md` rows match the bundle
+- [X] T032 [US4] Create `app/src/design/fonts.css` (`@font-face` for the three families, `font-display: swap`, wired into `main.tsx` after tokens.css) and the integrity test `app/src/design/fonts.test.ts` re-hashing every file against `fonts.json` and asserting each license file exists (runs in `pnpm -C app test` — research D9/F10); snapshots now render with the real faces (`document.fonts.ready` awaited per D7)
 
 **Checkpoint**: US1–US4 independently functional.
 
