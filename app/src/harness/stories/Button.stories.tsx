@@ -3,10 +3,17 @@
 /**
  * Button family stories (07 §7.6; T017 backfill).
  */
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import type { JSX } from "react";
-import { Pencil } from "lucide-react";
-import { Button, IconButton, ToggleButton } from "../../components/Button";
+import { useState } from "react";
+import { Pencil } from "../../design/icons";
+import {
+  Button,
+  IconButton,
+  Segment,
+  SegmentedControl,
+  ToggleButton,
+} from "../../components/Button";
 import styles from "./stories.module.css";
 import type { StoryFile } from "./types";
 
@@ -55,6 +62,31 @@ function Disabled(): JSX.Element {
   );
 }
 
+/** SegmentedControl (07 §7.6): single-choice joined segments. */
+function Segmented(): JSX.Element {
+  const { formatMessage } = useIntl();
+  const [span, setSpan] = useState("day");
+  return (
+    <SegmentedControl
+      aria-label={formatMessage({ id: "components.segmented.duration" })}
+      value={span}
+      onChange={(value) => {
+        setSpan(value);
+      }}
+    >
+      <Segment value="day">
+        <FormattedMessage id="components.segmented.day" />
+      </Segment>
+      <Segment value="week">
+        <FormattedMessage id="components.segmented.week" />
+      </Segment>
+      <Segment value="month">
+        <FormattedMessage id="components.segmented.month" />
+      </Segment>
+    </SegmentedControl>
+  );
+}
+
 export const buttonStories: StoryFile = {
   id: "button",
   stories: [
@@ -62,5 +94,6 @@ export const buttonStories: StoryFile = {
     { id: "button.icon", render: () => <Icon /> },
     { id: "button.toggle", render: () => <Toggle /> },
     { id: "button.disabled", render: () => <Disabled /> },
+    { id: "button.segmented", render: () => <Segmented /> },
   ],
 };

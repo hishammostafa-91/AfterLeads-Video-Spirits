@@ -30,7 +30,7 @@ import {
   SwitchField,
   type SwitchFieldProps,
 } from "react-aria-components";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "../design/icons";
 import styles from "./Selection.module.css";
 
 function selectionClass(base: string, className: string | undefined): string {

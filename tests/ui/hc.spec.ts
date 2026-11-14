@@ -11,6 +11,7 @@
 import { expect, test, type CDPSession } from "@playwright/test";
 
 test("forced-colors story captures", async ({ page, browser }, testInfo) => {
+  test.setTimeout(120_000);
   test.skip(
     !browser.browserType().name().toLowerCase().includes("chromium"),
     "CDP forced-colors emulation is Chromium-only (research D7).",

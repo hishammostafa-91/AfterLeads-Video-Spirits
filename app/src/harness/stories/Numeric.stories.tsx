@@ -101,6 +101,46 @@ function Keyframes(): JSX.Element {
   );
 }
 
+/** FR-007 disabled + error states for the numeric family. */
+function NumericStates(): JSX.Element {
+  const { formatMessage } = useIntl();
+  const [value, setValue] = useState(100);
+  const [opacity, setOpacity] = useState(0.6);
+  return (
+    <div className={styles.column}>
+      <NumberField
+        label={formatMessage({ id: "components.number.scaleLabel" })}
+        value={value}
+        minValue={0}
+        maxValue={400}
+        step={1}
+        suffix="%"
+        isInvalid
+        onChange={setValue}
+      />
+      <NumberField
+        label={formatMessage({ id: "components.number.scaleLabel" })}
+        value={value}
+        minValue={0}
+        maxValue={400}
+        step={1}
+        suffix="%"
+        isDisabled
+        onChange={setValue}
+      />
+      <Slider
+        label={<FormattedMessage id="components.slider.opacityLabel" />}
+        minValue={0}
+        maxValue={1}
+        step={0.05}
+        value={opacity}
+        isDisabled
+        onChange={setOpacity}
+      />
+    </div>
+  );
+}
+
 export const numericStories: StoryFile = {
   id: "numeric",
   stories: [
@@ -109,5 +149,6 @@ export const numericStories: StoryFile = {
     { id: "slider.angle-dial", render: () => <Dial /> },
     { id: "timecode.field", render: () => <Timecode /> },
     { id: "keyframe.toggle-navigator", render: () => <Keyframes /> },
+    { id: "numeric.states", render: () => <NumericStates /> },
   ],
 };

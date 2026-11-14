@@ -80,6 +80,56 @@
   color: var(--accent-text);
 }
 
+/* SegmentedControl (07 §7.6): joined segments over radio semantics. */
+.segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.segment-field {
+  display: inline-flex;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--control-height-compact);
+  padding-inline: var(--sp-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.segment:hover:not([disabled]) {
+  background: var(--bg-hover);
+}
+
+.segment[data-selected] {
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.segment[data-disabled] {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.segment[data-focus-visible] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
 /* Compact density (07 §7.4.6: 24px controls). */
 :root[data-density="compact"] .button {
   min-block-size: var(--control-height-compact);

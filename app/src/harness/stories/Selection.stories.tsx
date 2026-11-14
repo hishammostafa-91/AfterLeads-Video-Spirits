@@ -80,11 +80,50 @@ function Picks(): JSX.Element {
   );
 }
 
+/** FR-007 disabled + error states for the selection family. */
+function SelectionStates(): JSX.Element {
+  const { formatMessage } = useIntl();
+  const [selected, setSelected] = useState<string | null>("first");
+  return (
+    <div className={styles.column}>
+      <Checkbox isDisabled>
+        <FormattedMessage id="components.selection.checkboxLabel" />
+      </Checkbox>
+      <Switch isDisabled defaultSelected>
+        <FormattedMessage id="components.selection.switchLabel" />
+      </Switch>
+      <RadioGroup
+        aria-label={formatMessage({ id: "components.selection.groupLabel" })}
+      >
+        <Radio value="fit" isDisabled>
+          <FormattedMessage id="components.selection.fitLabel" />
+        </Radio>
+      </RadioGroup>
+      <Select
+        label={formatMessage({ id: "components.selection.selectLabel" })}
+        isInvalid
+        value={selected}
+        onChange={(value) => {
+          setSelected(value === null ? null : String(value));
+        }}
+      >
+        <ListBoxItem id="first">
+          <FormattedMessage id="components.selection.optionFirst" />
+        </ListBoxItem>
+        <ListBoxItem id="second">
+          <FormattedMessage id="components.selection.optionSecond" />
+        </ListBoxItem>
+      </Select>
+    </div>
+  );
+}
+
 export const selectionStories: StoryFile = {
   id: "selection",
   stories: [
     { id: "selection.checkbox-switch", render: () => <Checks /> },
     { id: "selection.radio", render: () => <Radios /> },
     { id: "selection.select-combo", render: () => <Picks /> },
+    { id: "selection.states", render: () => <SelectionStates /> },
   ],
 };

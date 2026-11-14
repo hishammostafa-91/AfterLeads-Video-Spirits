@@ -217,8 +217,8 @@ Each story lands with its suites green and a commit (Conventional Commits + DCO)
 
 ## Phase 9: Convergence
 
-- [ ] T038 Implement `SegmentedControl` (RadioGroup-composed per T017) in `app/src/components/Button.tsx` (or `SegmentedControl.tsx`) with module.css, unit test, harness story, and its locale keys in all six catalogs + `en.meta.json` per FR-006/07 §7.6 row 1 (missing)
-- [ ] T039 Add `disabled` and `error` state stories to every component family currently lacking them (Fields, Selection, Menu, Overlays, Tabs, Numeric, Color, Collections, Feedback) so all nine FR-007 states are covered per data-model §5 (partial)
-- [ ] T040 Add a checkable menu item variant (role=menuitemcheckbox, D6-style composition — RAC 1.22.1 ships none) to `Menu.tsx` with story + test per 07 §7.6 Menu row "checkable items for toggles" (partial)
-- [ ] T041 Create `app/src/design/icons.ts` — the Lucide base-set loader + icon conventions per the plan's Project Structure touch-point (missing)
+- [X] T038 Implement `SegmentedControl` (RadioGroup-composed per T017) in `app/src/components/Button.tsx` (or `SegmentedControl.tsx`) with module.css, unit test, harness story, and its locale keys in all six catalogs + `en.meta.json` per FR-006/07 §7.6 row 1 (missing)
+- [X] T039 Add `disabled` and `error` state stories to every component family currently lacking them (Fields, Selection, Menu, Overlays, Tabs, Numeric, Color, Collections, Feedback) so all nine FR-007 states are covered per data-model §5 (partial)
+- [X] T040 Add a checkable menu item variant (role=menuitemcheckbox, D6-style composition — RAC 1.22.1 ships none) to `Menu.tsx` with story + test per 07 §7.6 Menu row "checkable items for toggles" (partial)
+- [X] T041 Create `app/src/design/icons.ts` — the Lucide base-set loader + icon conventions per the plan's Project Structure touch-point (missing)
 - [ ] T042 After `/wp-finish` pushes the branch, confirm the `ui` and `ui-harness` CI jobs are green and record the run links in `specs/004-design-system/evidence.md` per T035/G-08/G-09 (partial)

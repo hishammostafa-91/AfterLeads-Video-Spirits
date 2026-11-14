@@ -6,6 +6,7 @@
 import { useIntl } from "react-intl";
 import type { JSX } from "react";
 import { SearchField, TextArea, TextField } from "../../components/Fields";
+import styles from "./stories.module.css";
 import type { StoryFile } from "./types";
 
 function Text(): JSX.Element {
@@ -38,11 +39,41 @@ function Notes(): JSX.Element {
   );
 }
 
+/** FR-007 disabled + error states for the field family. */
+function FieldStates(): JSX.Element {
+  const { formatMessage } = useIntl();
+  return (
+    <div className={styles.column}>
+      <TextField
+        label={formatMessage({ id: "components.fields.nameLabel" })}
+        placeholder={formatMessage({ id: "components.fields.namePlaceholder" })}
+        isInvalid
+      />
+      <SearchField
+        label={formatMessage({ id: "components.fields.searchLabel" })}
+        placeholder={formatMessage({
+          id: "components.fields.searchPlaceholder",
+        })}
+        isDisabled
+      />
+      <TextArea
+        label={formatMessage({ id: "components.fields.notesLabel" })}
+        placeholder={formatMessage({
+          id: "components.fields.notesPlaceholder",
+        })}
+        isDisabled
+        isInvalid
+      />
+    </div>
+  );
+}
+
 export const fieldsStories: StoryFile = {
   id: "fields",
   stories: [
     { id: "fields.text", render: () => <Text /> },
     { id: "fields.search", render: () => <Search /> },
     { id: "fields.textarea", render: () => <Notes /> },
+    { id: "fields.states", render: () => <FieldStates /> },
   ],
 };

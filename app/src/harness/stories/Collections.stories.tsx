@@ -165,6 +165,35 @@ function Empty(): JSX.Element {
   );
 }
 
+/** FR-007 disabled state: items that cannot be selected. */
+function CollectionStates(): JSX.Element {
+  const { formatMessage } = useIntl();
+  return (
+    <div className={styles.column}>
+      <GridList
+        aria-label={formatMessage({ id: "components.collections.gridList" })}
+      >
+        <GridListItem>
+          <FormattedMessage id="components.collections.clipOne" />
+        </GridListItem>
+        <GridListItem isDisabled>
+          <FormattedMessage id="components.collections.clipTwo" />
+        </GridListItem>
+      </GridList>
+      <ListBox
+        aria-label={formatMessage({ id: "components.collections.listBox" })}
+      >
+        <ListBoxOption id="v1">
+          <FormattedMessage id="components.collections.trackVideo" />
+        </ListBoxOption>
+        <ListBoxOption id="a1" isDisabled>
+          <FormattedMessage id="components.collections.trackAudio" />
+        </ListBoxOption>
+      </ListBox>
+    </div>
+  );
+}
+
 export const collectionStories: StoryFile = {
   id: "collections",
   stories: [
@@ -173,6 +202,7 @@ export const collectionStories: StoryFile = {
     { id: "collections.table", render: () => <Tables /> },
     { id: "collections.listbox", render: () => <Lists /> },
     { id: "collections.windowed", render: () => <Windowed /> },
+    { id: "collections.states", render: () => <CollectionStates /> },
     { id: "feedback.progress", render: () => <Progress /> },
     { id: "badges.all", render: () => <Badges /> },
     { id: "empty.media", render: () => <Empty /> },

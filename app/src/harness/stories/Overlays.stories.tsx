@@ -111,6 +111,32 @@ function ToastDemo(): JSX.Element {
   );
 }
 
+/** FR-007 disabled + error states: a disabled overlay trigger beside
+ * the error-semantics AlertDialog trigger. */
+function OverlayStates(): JSX.Element {
+  return (
+    <div className={styles.row}>
+      <Button isDisabled>
+        <FormattedMessage id="components.dialog.open" />
+      </Button>
+      <DialogTrigger>
+        <Button variant="danger">
+          <FormattedMessage id="components.dialog.discard" />
+        </Button>
+        <ModalOverlay isDismissable={false}>
+          <AlertDialog
+            title={<FormattedMessage id="components.dialog.discardTitle" />}
+            cancelLabel={<FormattedMessage id="components.dialog.cancel" />}
+            actionLabel={<FormattedMessage id="components.dialog.discard" />}
+          >
+            <FormattedMessage id="components.dialog.discardBody" />
+          </AlertDialog>
+        </ModalOverlay>
+      </DialogTrigger>
+    </div>
+  );
+}
+
 export const overlayStories: StoryFile = {
   id: "overlays",
   stories: [
@@ -119,5 +145,6 @@ export const overlayStories: StoryFile = {
     { id: "overlays.popover", render: () => <PopoverDemo /> },
     { id: "overlays.tooltip", render: () => <TooltipDemo /> },
     { id: "overlays.toast", render: () => <ToastDemo /> },
+    { id: "overlays.states", render: () => <OverlayStates /> },
   ],
 };

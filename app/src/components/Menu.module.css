@@ -26,6 +26,15 @@
   cursor: pointer;
 }
 
+/* Checkable items (07 §7.6): the glyph slot keeps labels aligned
+   whether or not the item is checked. */
+.check-slot {
+  display: inline-flex;
+  align-items: center;
+  inline-size: 0.875rem;
+  color: var(--accent-text);
+}
+
 .item[data-focused] {
   background: var(--accent-subtle);
   color: var(--accent-text);

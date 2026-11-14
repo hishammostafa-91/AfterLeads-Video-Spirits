@@ -6,7 +6,7 @@
  * the accessible name switches between add/remove.
  */
 import type { JSX } from "react";
-import { Timer } from "lucide-react";
+import { Timer } from "../design/icons";
 import { useIntl } from "react-intl";
 import { Button } from "./Button";
 import styles from "./Keyframe.module.css";

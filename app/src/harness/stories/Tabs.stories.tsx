@@ -29,7 +29,29 @@ function TabsDemo(): JSX.Element {
   );
 }
 
+/** FR-007 disabled state: the middle tab is not selectable. */
+function TabsStates(): JSX.Element {
+  return (
+    <Tabs defaultSelectedKey="properties">
+      <TabList aria-label="Inspector">
+        <Tab id="properties">
+          <FormattedMessage id="components.tabs.properties" />
+        </Tab>
+        <Tab id="effects" isDisabled>
+          <FormattedMessage id="components.tabs.effects" />
+        </Tab>
+      </TabList>
+      <TabPanel id="properties">
+        <FormattedMessage id="components.tabs.properties" />
+      </TabPanel>
+    </Tabs>
+  );
+}
+
 export const tabsStories: StoryFile = {
   id: "tabs",
-  stories: [{ id: "tabs.inspector", render: () => <TabsDemo /> }],
+  stories: [
+    { id: "tabs.inspector", render: () => <TabsDemo /> },
+    { id: "tabs.states", render: () => <TabsStates /> },
+  ],
 };

@@ -6,7 +6,7 @@
  * its icon with its text (REQ-A11Y-003; 07 §7.6).
  */
 import type { JSX, ReactNode } from "react";
-import { Binary, CloudOff, MonitorPlay, Shuffle, Waves } from "lucide-react";
+import { Binary, CloudOff, MonitorPlay, Shuffle, Waves } from "../design/icons";
 import { FormattedMessage } from "react-intl";
 import styles from "./Badge.module.css";
 

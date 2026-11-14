@@ -19,7 +19,8 @@ const MODES = [
 ] as const;
 
 test("story matrix", async ({ page }, testInfo) => {
-  test.setTimeout(180_000);
+  // 44 cards × 3 modes per project; first-write runs are slower.
+  test.setTimeout(420_000);
   const { theme, locale } = testInfo.project.metadata as {
     theme: string;
     locale: string;

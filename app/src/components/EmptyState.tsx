@@ -5,7 +5,7 @@
  * shortcut hint.
  */
 import type { JSX, ReactNode } from "react";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen } from "../design/icons";
 import { FormattedMessage } from "react-intl";
 import { Button } from "./Button";
 import styles from "./EmptyState.module.css";

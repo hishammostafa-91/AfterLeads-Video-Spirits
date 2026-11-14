@@ -8,7 +8,7 @@
  * guarantee; the primitive is a list in a live region).
  */
 import type { JSX } from "react";
-import { Check, Info, TriangleAlert } from "lucide-react";
+import { Check, Info, TriangleAlert } from "../design/icons";
 import { useIntl } from "react-intl";
 import { create } from "zustand";
 import styles from "./Toast.module.css";

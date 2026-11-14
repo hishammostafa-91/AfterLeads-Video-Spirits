@@ -67,6 +67,8 @@ export interface TextAreaProps {
   value?: string;
   defaultValue?: string;
   isDisabled?: boolean;
+  /** Error state: marks the field invalid (07 §7.6 error stories). */
+  isInvalid?: boolean;
   isRequired?: boolean;
   name?: string;
 }
@@ -85,6 +87,8 @@ export function TextArea({
         placeholder={placeholder}
         dir="auto"
         disabled={props.isDisabled}
+        data-invalid={props.isInvalid ? "" : undefined}
+        aria-invalid={props.isInvalid || undefined}
         required={props.isRequired}
         name={props.name}
         defaultValue={props.defaultValue}

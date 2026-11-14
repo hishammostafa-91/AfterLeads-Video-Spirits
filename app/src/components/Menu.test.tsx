@@ -19,6 +19,7 @@ import {
   MenuBar,
   MenuBarItem,
   MenuItem,
+  MenuItemCheckbox,
   Submenu,
 } from "./Menu";
 import styles from "./Menu.module.css";
@@ -57,6 +58,37 @@ describe("Menu (07 s7.6)", () => {
     fireEvent.keyDown(screen.getAllByRole("menuitem")[0], { key: "Enter" });
     expect(onAction).toHaveBeenCalled();
     expect(onAction.mock.calls[0]?.[0]).toBe("undo");
+  });
+});
+
+describe("MenuItemCheckbox (07 s7.6 checkable items)", () => {
+  function renderCheckable(isChecked: boolean): void {
+    render(
+      <Wrapper>
+        <MenuTrigger defaultOpen>
+          <Button>
+            <FormattedMessage id="components.menu.edit" />
+          </Button>
+          <Menu>
+            <MenuItemCheckbox id="waveform" isChecked={isChecked}>
+              <FormattedMessage id="components.menu.waveform" />
+            </MenuItemCheckbox>
+          </Menu>
+        </MenuTrigger>
+      </Wrapper>,
+    );
+  }
+
+  it("exposes role=menuitemcheckbox with aria-checked reflecting state", () => {
+    renderCheckable(true);
+    const item = screen.getByRole("menuitemcheckbox");
+    expect(item.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("shows aria-checked=false when unchecked", () => {
+    renderCheckable(false);
+    const item = screen.getByRole("menuitemcheckbox");
+    expect(item.getAttribute("aria-checked")).toBe("false");
   });
 });
 

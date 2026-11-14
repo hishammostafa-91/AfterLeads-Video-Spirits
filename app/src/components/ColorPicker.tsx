@@ -32,6 +32,8 @@ export interface ColorPickerProps {
   onChange: (hex: string) => void;
   /** Recently used colors (hex), offered as swatches. */
   recent?: readonly string[];
+  /** Disables every control in the picker (07 §7.6). */
+  isDisabled?: boolean;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export function ColorPicker({
   value,
   onChange,
   recent = [],
+  isDisabled = false,
   className,
 }: ColorPickerProps): JSX.Element {
   const { formatMessage } = useIntl();
@@ -56,6 +59,7 @@ export function ColorPicker({
         yChannel="brightness"
         value={color}
         onChange={change}
+        isDisabled={isDisabled}
         aria-label={formatMessage({
           id: "components.color.saturationBrightness",
         })}
@@ -67,6 +71,7 @@ export function ColorPicker({
         channel="hue"
         value={color.toFormat("hsb")}
         onChange={change}
+        isDisabled={isDisabled}
         className={styles.hue}
       >
         {/* The Label child is RAC's naming path for a ColorSlider:

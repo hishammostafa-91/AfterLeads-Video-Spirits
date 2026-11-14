@@ -18,7 +18,7 @@ import {
   NumberField as RACNumberField,
   type NumberFieldProps as RACNumberFieldProps,
 } from "react-aria-components";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "../design/icons";
 import styles from "./NumberField.module.css";
 
 /** Scrub speed factor from the held modifiers (07 §7.6). */

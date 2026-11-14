@@ -49,11 +49,29 @@ function Curve(): JSX.Element {
   );
 }
 
+/** FR-007 disabled state for the color family. */
+function ColorStates(): JSX.Element {
+  const [hex, setHex] = useState("#ff8800");
+  const [wheelHex, setWheelHex] = useState("#3366cc");
+  return (
+    <div className={styles.row}>
+      <ColorPicker value={hex} onChange={setHex} isDisabled />
+      <ColorWheel
+        value={wheelHex}
+        defaultValue="#3366cc"
+        onChange={setWheelHex}
+        isDisabled
+      />
+    </div>
+  );
+}
+
 export const colorStories: StoryFile = {
   id: "color",
   stories: [
     { id: "color.picker", render: () => <Picker /> },
     { id: "color.wheel", render: () => <Wheel /> },
     { id: "curves.editor", render: () => <Curve /> },
+    { id: "color.states", render: () => <ColorStates /> },
   ],
 };

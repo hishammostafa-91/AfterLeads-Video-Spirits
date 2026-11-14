@@ -9,6 +9,7 @@
  * logical properties.
  */
 import type { JSX, ReactNode } from "react";
+import type React from "react";
 import { useRef, useState } from "react";
 import {
   Button as RACButton,
@@ -20,7 +21,7 @@ import {
   MenuTrigger,
   SubmenuTrigger,
 } from "react-aria-components";
-import { ChevronRight } from "lucide-react";
+import { Check, ChevronRight } from "../design/icons";
 import { useIntl } from "react-intl";
 import styles from "./Menu.module.css";
 
@@ -68,6 +69,51 @@ export function MenuItem({
           {shortcut}
         </kbd>
       )}
+    </RACMenuItem>
+  );
+}
+
+export interface MenuItemCheckboxProps extends Omit<
+  MenuItemProps,
+  "className" | "children"
+> {
+  /** The checked state (owned by the parent; toggled via onAction). */
+  isChecked: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+
+/**
+ * A checkable menu item (07 §7.6 Menu row: "checkable items for
+ * toggles"). RAC 1.22 ships no menuitemcheckbox, so the role and
+ * aria-checked ride the render element (D6-style composition, the
+ * MenuBar/Tree precedent); the check glyph mirrors to the inline
+ * start and is decorative — the state lives in aria-checked.
+ */
+export function MenuItemCheckbox({
+  isChecked,
+  className,
+  children,
+  ...props
+}: MenuItemCheckboxProps): JSX.Element {
+  return (
+    <RACMenuItem
+      {...props}
+      render={(renderProps) => (
+        <div
+          // RAC's render props allow function-valued style/className
+          // (render state); only the DOM-safe subset applies here.
+          {...(renderProps as React.ComponentProps<"div">)}
+          role="menuitemcheckbox"
+          aria-checked={isChecked}
+        />
+      )}
+      className={cx(styles.item, className)}
+    >
+      <span className={styles.checkSlot} aria-hidden="true">
+        {isChecked && <Check size={12} aria-hidden="true" />}
+      </span>
+      {children}
     </RACMenuItem>
   );
 }

@@ -33,6 +33,8 @@ export interface ColorWheelProps {
   onChange: (hex: string) => void;
   /** Double-click resets to this hex. */
   defaultValue: string;
+  /** Disables the wheel and its luma slider (07 §7.6). */
+  isDisabled?: boolean;
   className?: string;
 }
 
@@ -40,6 +42,7 @@ export function ColorWheel({
   value,
   onChange,
   defaultValue,
+  isDisabled = false,
   className,
 }: ColorWheelProps): JSX.Element {
   const { formatMessage } = useIntl();
@@ -99,6 +102,7 @@ export function ColorWheel({
         <RACColorWheel
           value={color}
           onChange={change}
+          isDisabled={isDisabled}
           outerRadius={40}
           innerRadius={28}
           aria-label={formatMessage({ id: "components.color.wheel" })}
@@ -111,6 +115,7 @@ export function ColorWheel({
         channel="lightness"
         value={color.toFormat("hsl")}
         onChange={change}
+        isDisabled={isDisabled}
         className={styles.luma}
       >
         {/* Label child = the thumb input's naming path (ColorPicker

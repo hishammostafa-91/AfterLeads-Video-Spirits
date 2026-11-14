@@ -33,7 +33,7 @@ import {
   TableBody as RACTableBody,
   TableHeader as RACTableHeader,
 } from "react-aria-components";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "../design/icons";
 import styles from "./Collections.module.css";
 
 function cx(...parts: Array<string | undefined>): string {

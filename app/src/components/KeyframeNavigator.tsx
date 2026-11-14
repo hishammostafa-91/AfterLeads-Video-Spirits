@@ -7,7 +7,7 @@
  * drops the button from the tab order).
  */
 import type { JSX } from "react";
-import { ChevronFirst, ChevronLast, Diamond } from "lucide-react";
+import { ChevronFirst, ChevronLast, Diamond } from "../design/icons";
 import { useIntl } from "react-intl";
 import { Button } from "./Button";
 import styles from "./Keyframe.module.css";

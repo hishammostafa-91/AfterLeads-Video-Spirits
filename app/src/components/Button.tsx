@@ -2,13 +2,19 @@
 // Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com>
 /**
  * Buttons (07 §7.6): Button (primary/secondary/ghost/danger),
- * ToggleButton, and IconButton (icon + tooltip with label+shortcut +
- * accessible name — REQ-HLP-003). Built on React Aria Components.
+ * ToggleButton, IconButton (icon + tooltip with label+shortcut +
+ * accessible name — REQ-HLP-003), and SegmentedControl
+ * (RadioGroup-composed single-choice segments, per contracts §3).
  */
 import type { JSX, ReactNode } from "react";
 import {
   Button as RACButton,
   type ButtonProps as RACButtonProps,
+  RadioButton,
+  type RadioFieldProps,
+  RadioField,
+  type RadioGroupProps as RACRadioGroupProps,
+  RadioGroup as RACRadioGroup,
   ToggleButton as RACToggleButton,
   type ToggleButtonProps as RACToggleButtonProps,
   Tooltip,
@@ -85,5 +91,56 @@ export function ToggleButton({
       {...props}
       className={classes("secondary", styles.toggle, className)}
     />
+  );
+}
+
+export interface SegmentedControlProps extends Omit<
+  RACRadioGroupProps,
+  "className" | "children"
+> {
+  className?: string;
+  /** `<Segment>` children (07 §7.6: RadioGroup-composed). */
+  children?: ReactNode;
+}
+
+/**
+ * A single-choice segmented control (07 §7.6) — a horizontal
+ * RadioGroup rendered as joined segments; arrow keys and typeahead
+ * come from the radio semantics.
+ */
+export function SegmentedControl({
+  className,
+  children,
+  ...props
+}: SegmentedControlProps): JSX.Element {
+  return (
+    <RACRadioGroup
+      {...props}
+      orientation="horizontal"
+      className={[styles.segmented, className].filter(Boolean).join(" ")}
+    >
+      {children}
+    </RACRadioGroup>
+  );
+}
+
+export interface SegmentProps extends Omit<RadioFieldProps, "className"> {
+  className?: string;
+  children?: ReactNode;
+}
+
+/** One segment of a SegmentedControl. */
+export function Segment({
+  className,
+  children,
+  ...props
+}: SegmentProps): JSX.Element {
+  return (
+    <RadioField
+      {...props}
+      className={[styles.segmentField, className].filter(Boolean).join(" ")}
+    >
+      <RadioButton className={styles.segment}>{children}</RadioButton>
+    </RadioField>
   );
 }

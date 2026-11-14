@@ -59,6 +59,14 @@
     "description": "Table column header: clip duration.",
     "maxlength": 16
   },
+  "components.collections.gridList": {
+    "description": "Accessible name of the media grid-list example.",
+    "maxlength": 14
+  },
+  "components.collections.listBox": {
+    "description": "Accessible name of the track list-box example.",
+    "maxlength": 13
+  },
   "components.collections.name": {
     "description": "Table column header: clip name.",
     "maxlength": 16
@@ -275,9 +283,17 @@
     "description": "Rename context-menu item.",
     "maxlength": 16
   },
+  "components.menu.safeAreas": {
+    "description": "Checkable menu item toggling the safe-area guides.",
+    "maxlength": 20
+  },
   "components.menu.undo": {
     "description": "Undo menu item.",
     "maxlength": 12
+  },
+  "components.menu.waveform": {
+    "description": "Checkable menu item toggling the audio waveform display.",
+    "maxlength": 22
   },
   "components.number.mixedLabel": {
     "description": "Number-field label shown in the mixed-state story.",
@@ -294,6 +310,22 @@
   "components.popover.filters": {
     "description": "Trigger that opens the filters popover (harness).",
     "maxlength": 16
+  },
+  "components.segmented.day": {
+    "description": "Day segment of the time-span control.",
+    "maxlength": 6
+  },
+  "components.segmented.duration": {
+    "description": "Label of the segmented control choosing a time span.",
+    "maxlength": 14
+  },
+  "components.segmented.month": {
+    "description": "Month segment of the time-span control.",
+    "maxlength": 7
+  },
+  "components.segmented.week": {
+    "description": "Week segment of the time-span control.",
+    "maxlength": 8
   },
   "components.selection.checkboxLabel": {
     "description": "Checkbox story label (snapping).",
