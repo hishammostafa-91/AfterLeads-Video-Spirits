@@ -28,15 +28,4 @@ const allStoryFiles: StoryFile[] = [
   collectionStories,
 ];
 
-// RAC 1.22's virtualized collections (Tree/GridList/Table) render
-// hidden content through a <template> that conflicts with React 19.3
-// under jsdom (createTextNode during commit) once other overlays have
-// mounted in the same document. Their jsdom component tests run in
-// isolated files (Collections.test.tsx); the full story matrix —
-// including these — runs in the real-browser Playwright harness
-// (research D7), so the vitest harness grid skips just this file.
-const JSDOM_UNSTABLE = new Set(["collections"]);
-
-export const storyFiles: StoryFile[] = import.meta.env.VITEST
-  ? allStoryFiles.filter((file) => !JSDOM_UNSTABLE.has(file.id))
-  : allStoryFiles;
+export const storyFiles: StoryFile[] = allStoryFiles;

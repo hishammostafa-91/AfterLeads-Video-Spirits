@@ -10,7 +10,7 @@
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Tab, TabList, Tabs } from "./Tabs";
+import { Tab, TabList, TabPanel, Tabs } from "./Tabs";
 import { Button } from "./Button";
 import styles from "./CurveEditor.module.css";
 
@@ -154,112 +154,122 @@ export function CurveEditor({
             </Tab>
           ))}
         </TabList>
-      </Tabs>
-      <svg
-        ref={svgRef}
-        viewBox={VIEW_BOX}
-        className={styles.curve}
-        role="application"
-        aria-label={formatMessage({ id: "components.curve.editor" })}
-        onPointerDown={(event) => {
-          // Click on empty space adds a point at the position.
-          if (event.target === svgRef.current) {
-            setChannelPoints(insertPoint(points, positionFromEvent(event)));
-          }
-        }}
-      >
-        <path
-          className={styles.path}
-          d={curvePath(points)}
-          fill="none"
-          stroke="var(--accent-solid)"
-          strokeWidth={2}
-        />
-        {points.map((p, index) => {
-          const { cx, cy } = toPixels(p);
-          return (
-            <circle
-              key={`${p.x.toFixed(3)}-${String(index)}`}
-              cx={cx}
-              cy={cy}
-              r={focused === index ? 6 : 5}
-              className={focused === index ? styles.pointFocused : styles.point}
-              tabIndex={0}
-              role="slider"
-              aria-label={formatMessage(
-                { id: "components.curve.point" },
-                { index: index + 1 },
-              )}
-              aria-valuenow={Math.round(p.y * 100)}
-              aria-valuetext={`${String(Math.round(p.x * 100))}% / ${String(
-                Math.round(p.y * 100),
-              )}%`}
-              onPointerDown={(event) => {
-                event.stopPropagation();
-                setFocused(index);
-                event.currentTarget.setPointerCapture(event.pointerId);
-              }}
-              onPointerMove={(event) => {
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                  const at = positionFromEvent(event);
-                  setChannelPoints(
-                    movePoint(points, index, {
-                      x: at.x - p.x,
-                      y: at.y - p.y,
-                    }),
-                  );
-                }
-              }}
-              onFocus={() => {
-                setFocused(index);
-              }}
-              onKeyDown={(event) => {
-                const jump = event.shiftKey ? STEP * 10 : STEP;
-                if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-                  event.preventDefault();
-                  setChannelPoints(
-                    movePoint(points, index, {
-                      x: event.key === "ArrowRight" ? jump : 0,
-                      y: event.key === "ArrowUp" ? jump : 0,
-                    }),
-                  );
-                } else if (
-                  event.key === "ArrowLeft" ||
-                  event.key === "ArrowDown"
-                ) {
-                  event.preventDefault();
-                  setChannelPoints(
-                    movePoint(points, index, {
-                      x: event.key === "ArrowLeft" ? -jump : 0,
-                      y: event.key === "ArrowDown" ? -jump : 0,
-                    }),
-                  );
-                } else if (
-                  event.key === "Delete" ||
-                  event.key === "Backspace"
-                ) {
-                  event.preventDefault();
-                  setChannelPoints(removePoint(points, index));
-                  setFocused(null);
-                }
-              }}
-              onDoubleClick={() => {
-                setChannelPoints(removePoint(points, index));
-                setFocused(null);
-              }}
+        {/* The graph is the selected channel's tab panel: the tab's
+            aria-controls must resolve (react-aria sets it only on the
+            selected tab; a Tabs without any TabPanel leaves it
+            dangling and axe flags aria-valid-attr-value). */}
+        <TabPanel id={channel} className={styles.panel}>
+          <svg
+            ref={svgRef}
+            viewBox={VIEW_BOX}
+            className={styles.curve}
+            role="application"
+            aria-label={formatMessage({ id: "components.curve.editor" })}
+            onPointerDown={(event) => {
+              // Click on empty space adds a point at the position.
+              if (event.target === svgRef.current) {
+                setChannelPoints(insertPoint(points, positionFromEvent(event)));
+              }
+            }}
+          >
+            <path
+              className={styles.path}
+              d={curvePath(points)}
+              fill="none"
+              stroke="var(--accent-solid)"
+              strokeWidth={2}
             />
-          );
-        })}
-      </svg>
-      <Button
-        variant="ghost"
-        onPress={() => {
-          setChannelPoints(DEFAULT_CURVE[channel]);
-          setFocused(null);
-        }}
-      >
-        <FormattedMessage id="components.curve.reset" />
-      </Button>
+            {points.map((p, index) => {
+              const { cx, cy } = toPixels(p);
+              return (
+                <circle
+                  key={`${p.x.toFixed(3)}-${String(index)}`}
+                  cx={cx}
+                  cy={cy}
+                  r={focused === index ? 6 : 5}
+                  className={
+                    focused === index ? styles.pointFocused : styles.point
+                  }
+                  tabIndex={0}
+                  role="slider"
+                  aria-label={formatMessage(
+                    { id: "components.curve.point" },
+                    { index: index + 1 },
+                  )}
+                  aria-valuenow={Math.round(p.y * 100)}
+                  aria-valuetext={`${String(Math.round(p.x * 100))}% / ${String(
+                    Math.round(p.y * 100),
+                  )}%`}
+                  onPointerDown={(event) => {
+                    event.stopPropagation();
+                    setFocused(index);
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={(event) => {
+                    if (
+                      event.currentTarget.hasPointerCapture(event.pointerId)
+                    ) {
+                      const at = positionFromEvent(event);
+                      setChannelPoints(
+                        movePoint(points, index, {
+                          x: at.x - p.x,
+                          y: at.y - p.y,
+                        }),
+                      );
+                    }
+                  }}
+                  onFocus={() => {
+                    setFocused(index);
+                  }}
+                  onKeyDown={(event) => {
+                    const jump = event.shiftKey ? STEP * 10 : STEP;
+                    if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+                      event.preventDefault();
+                      setChannelPoints(
+                        movePoint(points, index, {
+                          x: event.key === "ArrowRight" ? jump : 0,
+                          y: event.key === "ArrowUp" ? jump : 0,
+                        }),
+                      );
+                    } else if (
+                      event.key === "ArrowLeft" ||
+                      event.key === "ArrowDown"
+                    ) {
+                      event.preventDefault();
+                      setChannelPoints(
+                        movePoint(points, index, {
+                          x: event.key === "ArrowLeft" ? -jump : 0,
+                          y: event.key === "ArrowDown" ? -jump : 0,
+                        }),
+                      );
+                    } else if (
+                      event.key === "Delete" ||
+                      event.key === "Backspace"
+                    ) {
+                      event.preventDefault();
+                      setChannelPoints(removePoint(points, index));
+                      setFocused(null);
+                    }
+                  }}
+                  onDoubleClick={() => {
+                    setChannelPoints(removePoint(points, index));
+                    setFocused(null);
+                  }}
+                />
+              );
+            })}
+          </svg>
+          <Button
+            variant="ghost"
+            onPress={() => {
+              setChannelPoints(DEFAULT_CURVE[channel]);
+              setFocused(null);
+            }}
+          >
+            <FormattedMessage id="components.curve.reset" />
+          </Button>
+        </TabPanel>
+      </Tabs>
     </div>
   );
 }

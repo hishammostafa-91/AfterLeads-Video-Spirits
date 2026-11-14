@@ -52,6 +52,7 @@ export default tseslint.config(
       "**/*.mts",
       "src/design/tokens.test.ts",
       "src/design/fonts.test.ts",
+      "src/design/contrast.test.ts",
     ],
     extends: [tseslint.configs.disableTypeChecked],
   },

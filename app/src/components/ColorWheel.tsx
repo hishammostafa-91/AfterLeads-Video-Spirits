@@ -9,11 +9,12 @@
  */
 import type { JSX } from "react";
 import { useRef } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   ColorSlider as RACColorSlider,
   ColorThumb,
   ColorWheel as RACColorWheel,
+  Label as RACLabel,
   parseColor,
 } from "react-aria-components";
 import styles from "./ColorWheel.module.css";
@@ -110,9 +111,13 @@ export function ColorWheel({
         channel="lightness"
         value={color.toFormat("hsl")}
         onChange={change}
-        aria-label={formatMessage({ id: "components.color.luma" })}
         className={styles.luma}
       >
+        {/* Label child = the thumb input's naming path (ColorPicker
+            comment); RAC 1.22.1 leaves the input unnamed otherwise. */}
+        <RACLabel className={styles.lumaLabel}>
+          <FormattedMessage id="components.color.luma" />
+        </RACLabel>
         <ColorThumb className={styles.puck} />
       </RACColorSlider>
     </div>

@@ -17,7 +17,7 @@ function Variants(): JSX.Element {
         <FormattedMessage id="components.button.ok" />
       </Button>
       <Button variant="secondary">
-        <FormattedMessage id="components.button.cancel" />
+        <FormattedMessage id="components.dialog.cancel" />
       </Button>
       <Button variant="ghost">
         <FormattedMessage id="components.button.snap" />

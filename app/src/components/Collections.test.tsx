@@ -43,17 +43,56 @@ function Wrapper({ children }: { children: ReactNode }): JSX.Element {
 }
 
 describe("Collections (07 s7.6)", () => {
-  it("renders a tree (treegrid rows per the APG pattern)", () => {
+  it("renders a tree with treeitems and nested levels", () => {
     const { container } = render(
       <Wrapper>
         <Tree aria-label="Media">
-          <TreeItem textValue="Clip A">{"Clip A"}</TreeItem>
-          <TreeItem textValue="Clip B">{"Clip B"}</TreeItem>
+          <TreeItem textValue="bin">
+            {"Bin"}
+            <TreeItem textValue="clip">{"Clip"}</TreeItem>
+          </TreeItem>
         </Tree>
       </Wrapper>,
     );
-    expect(container.querySelector("[role='treegrid']")).not.toBeNull();
-    expect(container.querySelectorAll("[role='row']").length).toBe(2);
+    expect(container.querySelector("[role='tree']")).not.toBeNull();
+    const items = container.querySelectorAll("[role='treeitem']");
+    expect(items.length).toBe(2);
+    expect(items[0].getAttribute("aria-level")).toBe("1");
+    expect(items[0].getAttribute("aria-expanded")).toBe("false");
+    expect(items[1].getAttribute("aria-level")).toBe("2");
+  });
+
+  it("expands and collapses with the arrow keys (APG tree)", () => {
+    const { container } = render(
+      <Wrapper>
+        <Tree aria-label="Media">
+          <TreeItem textValue="bin">
+            {"Bin"}
+            <TreeItem textValue="clip">{"Clip"}</TreeItem>
+          </TreeItem>
+        </Tree>
+      </Wrapper>,
+    );
+    const tree = container.querySelector("[role='tree']");
+    if (!(tree instanceof HTMLElement)) {
+      throw new TypeError("expected the tree");
+    }
+    const parent = container.querySelectorAll("[role='treeitem']")[0];
+    if (!(parent instanceof HTMLElement)) {
+      throw new TypeError("expected the treeitem");
+    }
+    // Collapsed: the nested item's group is hidden.
+    const visible = (): number =>
+      Array.from(container.querySelectorAll("[role='treeitem']")).filter(
+        (el) => el.closest("[hidden]") === null,
+      ).length;
+    expect(visible()).toBe(1);
+    parent.focus();
+    fireEvent.keyDown(tree, { key: "ArrowRight" });
+    expect(parent.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelectorAll("[role='treeitem']").length).toBe(2);
+    fireEvent.keyDown(tree, { key: "ArrowLeft" });
+    expect(parent.getAttribute("aria-expanded")).toBe("false");
   });
 
   it("renders a grid list with rows", () => {

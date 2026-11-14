@@ -13,6 +13,12 @@
   background: var(--bg-raised);
 }
 
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
 .curve {
   inline-size: 10rem;
   block-size: 10rem;

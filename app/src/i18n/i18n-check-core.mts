@@ -50,6 +50,16 @@ export function collectIssues(
     issues.push(
       `unused catalog keys (no reference in app/src): ${unused.join(", ")}`,
     );
+  // Namespaced message IDs referenced in code must exist in the
+  // source catalog — story-grid ids (no namespace) are not message
+  // IDs and are ignored by the prefix filter.
+  const missingUsed = [...usedIds].filter(
+    (k) => /^(components|harness|a11y)\./.test(k) && !enKeys.has(k),
+  );
+  if (missingUsed.length > 0)
+    issues.push(
+      `catalog keys used in code but missing from en.json: ${missingUsed.join(", ")}`,
+    );
   return issues;
 }
 

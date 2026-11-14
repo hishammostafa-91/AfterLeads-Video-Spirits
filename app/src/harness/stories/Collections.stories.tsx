@@ -37,6 +37,9 @@ function Trees(): JSX.Element {
     <Tree aria-label="Media">
       <TreeItem textValue="binOne">
         <FormattedMessage id="components.collections.binOne" />
+        <TreeItem textValue="clipOne">
+          <FormattedMessage id="components.collections.clipOne" />
+        </TreeItem>
       </TreeItem>
       <TreeItem textValue="binTwo">
         <FormattedMessage id="components.collections.binTwo" />

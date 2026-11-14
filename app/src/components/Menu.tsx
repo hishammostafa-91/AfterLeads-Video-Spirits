@@ -130,11 +130,10 @@ export function ContextMenu({
     >
       {children}
       <MenuTrigger isOpen={open} onOpenChange={setOpen}>
-        <RACButton
+        <span
           className={styles.contextAnchor}
           style={{ insetInlineStart: point.x, top: point.y }}
-          aria-hidden
-          excludeFromTabOrder
+          aria-hidden="true"
         />
         <RACMenu className={styles.menu}>{items}</RACMenu>
       </MenuTrigger>
@@ -216,6 +215,9 @@ export function MenuBarItem({
     <MenuTrigger>
       <RACButton
         {...props}
+        render={(renderProps) => (
+          <button {...renderProps} type="button" role="menuitem" />
+        )}
         onKeyDown={menubarItemKeyDown}
         className={cx(styles.menuBarTrigger, className)}
       >

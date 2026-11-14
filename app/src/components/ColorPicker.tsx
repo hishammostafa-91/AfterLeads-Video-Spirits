@@ -9,7 +9,7 @@
  * viewer integration of a later package (spec fence).
  */
 import type { JSX } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   ColorArea as RACColorArea,
   ColorField as RACColorField,
@@ -19,6 +19,7 @@ import {
   ColorSwatchPickerItem,
   ColorThumb,
   Input as RACInput,
+  Label as RACLabel,
   parseColor,
 } from "react-aria-components";
 import type { Color } from "react-aria-components";
@@ -66,9 +67,15 @@ export function ColorPicker({
         channel="hue"
         value={color.toFormat("hsb")}
         onChange={change}
-        aria-label={formatMessage({ id: "components.color.hue" })}
         className={styles.hue}
       >
+        {/* The Label child is RAC's naming path for a ColorSlider:
+            its id becomes the thumb input's aria-labelledby. A plain
+            aria-label would stay on the group and leave the input
+            unnamed (RAC 1.22.1 / react-aria 3.53.1). */}
+        <RACLabel className={styles.sliderLabel}>
+          <FormattedMessage id="components.color.hue" />
+        </RACLabel>
         <ColorThumb className={styles.thumb} />
       </RACColorSlider>
       <div className={styles.fields}>
