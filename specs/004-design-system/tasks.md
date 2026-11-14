@@ -139,9 +139,9 @@ description: "Task list for WP-04 — Design system and UI foundation"
 
 **Independent Test**: `pnpm -C app harness` green; `pwsh -File tools/verify.ps1` all gates PASS (UI gates now executing).
 
-- [ ] T033 [US5] Create `tests/ui/snapshots.spec.ts` — every component × nine states × dark/light × en/ar via the four Playwright projects (URL-driven modes per D7), each capture preceded by `document.fonts.ready` and a repeat-run determinism assertion; and `tests/ui/hc.spec.ts` forcing `forced-colors: active` through a CDP session (`Emulation.setEmulatedMedia` — Playwright `colorScheme` does not cover it, research D7) for the High Contrast stories
-- [ ] T034 [US5] Create `tests/ui/a11y.spec.ts` as the `t_a11y_004` suite: per-story `@axe-core/playwright` scans (zero violations), focus-visible ring checks, reduced-motion zero-duration assertions, and badge/label text+icon (never-color-alone) checks; contrast ratios in dark/light asserted from the token values in a Vitest companion `app/src/design/contrast.test.ts` (4.5:1 text / 3:1 components — REQ-A11Y-003)
-- [ ] T035 [US5] Gate closure: `pwsh -File tools/verify.ps1` fully green with `ui-typecheck`, `ui-lint`, `ui-test`, `i18n` executing (no longer SKIPPED), the rust gates untouched and green, and the `ui`/`ui-harness` CI jobs green (T005 wiring verified end-to-end)
+- [X] T033 [US5] Create `tests/ui/snapshots.spec.ts` — every component × nine states × dark/light × en/ar via the four Playwright projects (URL-driven modes per D7), each capture preceded by `document.fonts.ready` and a repeat-run determinism assertion; and `tests/ui/hc.spec.ts` forcing `forced-colors: active` through a CDP session (`Emulation.setEmulatedMedia` — Playwright `colorScheme` does not cover it, research D7) for the High Contrast stories
+- [X] T034 [US5] Create `tests/ui/a11y.spec.ts` as the `t_a11y_004` suite: per-story `@axe-core/playwright` scans (zero violations), focus-visible ring checks, reduced-motion zero-duration assertions, and badge/label text+icon (never-color-alone) checks; contrast ratios in dark/light asserted from the token values in a Vitest companion `app/src/design/contrast.test.ts` (4.5:1 text / 3:1 components — REQ-A11Y-003)
+- [X] T035 [US5] Gate closure: `pwsh -File tools/verify.ps1` fully green with `ui-typecheck`, `ui-lint`, `ui-test`, `i18n` executing (no longer SKIPPED), the rust gates untouched and green, and the `ui`/`ui-harness` CI jobs green (T005 wiring verified end-to-end)
 
 **Checkpoint**: all five stories functional; the package's gates exist and pass.
 
@@ -149,8 +149,8 @@ description: "Task list for WP-04 — Design system and UI foundation"
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T036 [P] Final enforcement sweep: every new file carries the SPDX header; `pnpm -C app lint` fails a deliberately raw color / physical property / JSX literal / `any` (proving the rules bite — contracts G6); remove the deliberate probe afterwards
-- [ ] T037 Run the full `specs/004-design-system/quickstart.md` validation (all six acceptance rows + `tools/verify.ps1` + `python tools/git/check_commits.py origin/main..HEAD`) and record commands/results into `specs/004-design-system/evidence.md` (constitution III; G-09), including the snapshot-matrix counts and any environment notes
+- [X] T036 [P] Final enforcement sweep: every new file carries the SPDX header; `pnpm -C app lint` fails a deliberately raw color / physical property / JSX literal / `any` (proving the rules bite — contracts G6); remove the deliberate probe afterwards
+- [X] T037 Run the full `specs/004-design-system/quickstart.md` validation (all six acceptance rows + `tools/verify.ps1` + `python tools/git/check_commits.py origin/main..HEAD`) and record commands/results into `specs/004-design-system/evidence.md` (constitution III; G-09), including the snapshot-matrix counts and any environment notes
 
 ---
 
