@@ -3,11 +3,22 @@
   "plugins": ["stylelint-use-logical"],
   "rules": {
     "csstools/use-logical": true,
+    "color-no-hex": true,
+    "color-named": "never",
     "selector-pseudo-class-no-unknown": [
       true,
       {
         "ignorePseudoClasses": ["global", "local"]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/design/tokens.css"],
+      "rules": {
+        "color-no-hex": null,
+        "color-named": null
+      }
+    }
+  ]
 }

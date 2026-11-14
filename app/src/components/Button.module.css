@@ -34,7 +34,7 @@
 
 .primary {
   background: var(--accent-solid);
-  color: #fff;
+  color: var(--accent-foreground);
 }
 
 .primary:hover:not([disabled]) {
@@ -63,7 +63,11 @@
 
 .danger {
   background: var(--danger);
-  color: #fff;
+
+  /* --danger-foreground (CLR-01, amended): black on the canonical
+     danger red = 6.0:1 in both themes; white measured only 3.9:1
+     (REQ-A11Y-003). */
+  color: var(--danger-foreground);
 }
 
 .danger:hover:not([disabled]) {

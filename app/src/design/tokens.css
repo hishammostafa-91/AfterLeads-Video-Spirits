@@ -3,7 +3,8 @@
 
 /*
  * Design tokens (docs/07 §7.4, verbatim). Components reference tokens
- * only — never raw colors (FR-001; enforced by review, not by CSS).
+ * only — never raw colors (FR-001; enforced by stylelint: color-no-hex
+ * and color-named fail every sheet except this one and fonts.css).
  * Themes select values via [data-theme]; accents via [data-accent];
  * High Contrast maps to system colors under forced-colors AND for
  * manual selection via [data-theme="high-contrast"] (§7.4.3; owner
@@ -76,6 +77,19 @@
   --clr-blue: #3e63dd;
   --clr-purple: #8e4ec6;
   --clr-pink: #d6409f;
+
+  /* On-fill text (07 §7.4.1; 12 §12.17 as amended — owner rulings
+   * 2026-11-14: CLR-01, CLR-04, and CLR-08 take black text for
+   * ≥4.5:1 on normal-size labels; white measured 3.0–4.1:1 on
+   * those fills). The accent blocks below swap --accent-foreground
+   * with their fill. */
+  --accent-foreground: #fff;
+  --danger-foreground: #000;
+
+  /* Color thumb outline (07 §7.4.2 note): white ring + black halo
+   * stays legible over any picked color in every theme. */
+  --swatch-ring: #fff;
+  --swatch-halo: #000;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -206,6 +220,7 @@
   --accent-solid: #3e63dd;
   --accent-text: #8da4ef;
   --accent-subtle: #1e2a55;
+  --accent-foreground: #fff;
 }
 
 [data-theme="light"][data-accent="clr-06"] {
@@ -217,24 +232,28 @@
   --accent-solid: #8e4ec6;
   --accent-text: #c29feb;
   --accent-subtle: #2f1e45;
+  --accent-foreground: #fff;
 }
 
 [data-accent="clr-04"] {
   --accent-solid: #30a46c;
   --accent-text: #5bd39b;
   --accent-subtle: #16301f;
+  --accent-foreground: #000;
 }
 
 [data-accent="clr-02"] {
   --accent-solid: #f76b15;
   --accent-text: #ffa066;
   --accent-subtle: #3a2010;
+  --accent-foreground: #000;
 }
 
 [data-accent="clr-08"] {
   --accent-solid: #d6409f;
   --accent-text: #f08dc6;
   --accent-subtle: #3a1730;
+  --accent-foreground: #000;
 }
 
 /*

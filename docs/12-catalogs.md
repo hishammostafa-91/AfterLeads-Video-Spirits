@@ -615,14 +615,14 @@ Label and marker colors (same palette in all themes; text on them uses the contr
 
 | ID | Name | Hex | Text |
 |---|---|---|---|
-| CLR-01 | Red | `#E5484D` | white |
+| CLR-01 | Red | `#E5484D` | black |
 | CLR-02 | Orange | `#F76B15` | black |
 | CLR-03 | Yellow | `#FFC53D` | black |
-| CLR-04 | Green | `#30A46C` | white |
+| CLR-04 | Green | `#30A46C` | black |
 | CLR-05 | Cyan | `#05A2C2` | black |
 | CLR-06 | Blue | `#3E63DD` | white |
 | CLR-07 | Purple | `#8E4EC6` | white |
-| CLR-08 | Pink | `#D6409F` | white |
+| CLR-08 | Pink | `#D6409F` | black |
 
 Accent colors offered in Appearance settings: CLR-06 (default), CLR-07, CLR-04, CLR-02, CLR-08. Theme tokens derived from the accent are defined in 07 §7.4.
 

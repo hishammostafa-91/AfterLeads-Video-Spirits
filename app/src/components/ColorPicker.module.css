@@ -21,6 +21,14 @@
 
 .hue {
   inline-size: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.slider-label {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
 }
 
 .fields {
@@ -60,7 +68,7 @@
 .thumb {
   inline-size: 1rem;
   block-size: 1rem;
-  border: 2px solid white;
+  border: 2px solid var(--swatch-ring);
   border-radius: 50%;
-  box-shadow: 0 0 0 1px black;
+  box-shadow: 0 0 0 1px var(--swatch-halo);
 }
