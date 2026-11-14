@@ -46,6 +46,8 @@ export function harnessParams(): {
   theme: ThemeName;
   locale: LocaleTag | "en-XA" | "ar-XB";
   density: "comfortable" | "compact";
+  /** Render only the story with this id (?story=). */
+  story: string | null;
 } {
   const query = new URLSearchParams(window.location.search);
   const themeParam = query.get("theme");
@@ -62,7 +64,8 @@ export function harnessParams(): {
           ? localeParam
           : "en") as LocaleTag);
   const density = densityParam === "compact" ? "compact" : "comfortable";
-  return { theme, locale, density };
+  const story = query.get("story");
+  return { theme, locale, density, story };
 }
 
 /** Bind the theme persistence seam to the URL (research D12), once. */
@@ -263,14 +266,21 @@ export function HarnessApp(): JSX.Element {
             <FormattedMessage id="harness.stories.title" />
           </h2>
           <div className={styles.storyGrid}>
-            {storyFiles.flatMap((file) =>
-              file.stories.map((story) => (
-                <div key={story.id} className={styles.storyCard}>
+            {storyFiles
+              .flatMap((file) => file.stories)
+              .filter(
+                (story) => params.story === null || story.id === params.story,
+              )
+              .map((story) => (
+                <div
+                  key={story.id}
+                  className={styles.storyCard}
+                  data-story-id={story.id}
+                >
                   <span className={styles.storyLabel}>{story.id}</span>
                   {story.render()}
                 </div>
-              )),
-            )}
+              ))}
           </div>
         </section>
         <LiveRegions />
