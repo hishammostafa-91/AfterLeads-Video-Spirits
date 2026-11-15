@@ -7,6 +7,7 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 | Gate | Command | Result |
 |---|---|---|
 | All local gates | `pwsh -File tools/verify.ps1` | PASS — docs, commits, rust-format, rust-lint, dependency-policy, crate-rules, placeholders, rust-test, bindings-drift, ui-typecheck, ui-lint, ui-test, i18n ("All available gates passed") |
+| CI (T042) | PR #11 checks | PASS — all 9 green on `feat/004-design-system`: `ui` [job 132935456005](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456005), `ui-harness` [job 132935456199](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456199), plus build/rust-lint/rust-test/docs/commits/dco/e2e-smoke (run [43754482248](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248)) — the golden matrix is byte-reproducible in CI |
 | Documentation checks | `python tools/docs/check_docs.py` | PASS |
 | Commit checks | `python tools/git/check_commits.py origin/main..HEAD` | PASS (Conventional Commits + DCO on every commit) |
 | UI typecheck | `pnpm -C app typecheck` | PASS |
