@@ -30,7 +30,11 @@ import {
   SwitchField,
   type SwitchFieldProps,
 } from "react-aria-components";
-import { ChevronDown } from "../design/icons";
+import {
+  ChevronDown,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+} from "../design/icons";
 import styles from "./Selection.module.css";
 
 function selectionClass(base: string, className: string | undefined): string {
@@ -148,7 +152,11 @@ export function Select({
       {label && <RACLabel className={styles.label}>{label}</RACLabel>}
       <RACButton className={styles.trigger}>
         <SelectValue className={styles.triggerValue} />
-        <ChevronDown size={16} aria-hidden="true" />
+        <ChevronDown
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
       </RACButton>
       <RACPopover className={styles.popover}>
         <RACListBox className={styles.options}>{children}</RACListBox>
@@ -181,7 +189,11 @@ export function ComboBox({
       <div className={styles.comboBoxRow}>
         <RACInput className={styles.input} />
         <RACButton className={styles.comboBoxButton}>
-          <ChevronDown size={16} aria-hidden="true" />
+          <ChevronDown
+            size={ICON_SIZE_DENSE}
+            strokeWidth={ICON_STROKE_WIDTH}
+            aria-hidden="true"
+          />
         </RACButton>
       </div>
       <RACPopover className={styles.popover}>

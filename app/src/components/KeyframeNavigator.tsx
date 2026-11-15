@@ -7,7 +7,13 @@
  * drops the button from the tab order).
  */
 import type { JSX } from "react";
-import { ChevronFirst, ChevronLast, Diamond } from "../design/icons";
+import {
+  ChevronFirst,
+  ChevronLast,
+  Diamond,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+} from "../design/icons";
 import { useIntl } from "react-intl";
 import { Button } from "./Button";
 import styles from "./Keyframe.module.css";
@@ -48,7 +54,11 @@ export function KeyframeNavigator({
         className={styles.navButton}
         onPress={onPrevious}
       >
-        <ChevronFirst size={16} aria-hidden="true" />
+        <ChevronFirst
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
       </Button>
       <Button
         variant="ghost"
@@ -73,7 +83,11 @@ export function KeyframeNavigator({
         className={styles.navButton}
         onPress={onNext}
       >
-        <ChevronLast size={16} aria-hidden="true" />
+        <ChevronLast
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
       </Button>
     </div>
   );

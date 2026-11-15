@@ -55,21 +55,32 @@ export interface IconButtonProps extends Omit<RACButtonProps, "className"> {
   shortcut?: string;
   className?: string;
 }
-
 export function IconButton({
   icon,
   labelMessageId,
   shortcut,
+  className,
   ...props
 }: IconButtonProps): JSX.Element {
   const { formatMessage } = useIntl();
   const label = formatMessage({ id: labelMessageId });
   return (
     <TooltipTrigger delay={500}>
-      <RACButton {...props} aria-label={label}>
+      <RACButton
+        {...props}
+        aria-label={label}
+        className={classes("ghost", styles.iconButton, className)}
+      >
         {icon}
       </RACButton>
-      <Tooltip>{shortcut ? `${label} (${shortcut})` : label}</Tooltip>
+      <Tooltip>
+        {shortcut
+          ? formatMessage(
+              { id: "components.iconButton.tooltip" },
+              { label, shortcut },
+            )
+          : label}
+      </Tooltip>
     </TooltipTrigger>
   );
 }

@@ -24,6 +24,15 @@
   block-size: 8rem;
 }
 
+/* Focus rings (US3/AC1): the wheel holds focus for its hidden
+   inputs; the luma slider's input delegates to its puck. */
+.wheel:focus-visible,
+.wheel:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
 .luma {
   inline-size: 8rem;
   display: flex;
@@ -43,4 +52,9 @@
   border-radius: 50%;
   background: transparent;
   box-shadow: 0 0 0 1px var(--swatch-halo);
+}
+
+.luma:has(input:focus-visible) .puck {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }

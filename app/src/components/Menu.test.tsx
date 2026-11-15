@@ -90,6 +90,29 @@ describe("MenuItemCheckbox (07 s7.6 checkable items)", () => {
     const item = screen.getByRole("menuitemcheckbox");
     expect(item.getAttribute("aria-checked")).toBe("false");
   });
+
+  it("fires onAction on Enter (keyboard activation through the render-prop role)", () => {
+    const onAction = vi.fn();
+    render(
+      <Wrapper>
+        <MenuTrigger defaultOpen>
+          <Button>
+            <FormattedMessage id="components.menu.edit" />
+          </Button>
+          <Menu onAction={onAction}>
+            <MenuItemCheckbox id="waveform" isChecked>
+              <FormattedMessage id="components.menu.waveform" />
+            </MenuItemCheckbox>
+          </Menu>
+        </MenuTrigger>
+      </Wrapper>,
+    );
+    fireEvent.keyDown(screen.getByRole("menuitemcheckbox"), {
+      key: "Enter",
+    });
+    expect(onAction).toHaveBeenCalled();
+    expect(onAction.mock.calls[0]?.[0]).toBe("waveform");
+  });
 });
 
 describe("MenuBar (APG menubar pattern)", () => {
@@ -157,6 +180,34 @@ describe("ContextMenu", () => {
     const target = container.querySelector(".context-target") as HTMLElement;
     expect(target).not.toBeNull();
     fireEvent.contextMenu(target);
+    expect(screen.getByRole("menu")).toBeTruthy();
+  });
+
+  it("opens with the keyboard via the kebab trigger (FR-012)", () => {
+    const { container } = render(
+      <Wrapper>
+        <ContextMenu
+          items={
+            <MenuItem id="rename">
+              <FormattedMessage id="components.menu.rename" />
+            </MenuItem>
+          }
+        >
+          <div className="context-target">
+            <FormattedMessage id="components.menu.contextArea" />
+          </div>
+        </ContextMenu>
+      </Wrapper>,
+    );
+    const target = container.querySelector(".context-target");
+    if (!(target instanceof HTMLElement)) {
+      throw new TypeError("expected the context target");
+    }
+    const kebab = screen.getByRole("button", {
+      name: "Open menu",
+    });
+    expect(target.parentElement?.contains(kebab)).toBe(true);
+    fireEvent.click(kebab);
     expect(screen.getByRole("menu")).toBeTruthy();
   });
 });

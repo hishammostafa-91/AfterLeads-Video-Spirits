@@ -34,6 +34,12 @@ function accentBlock(accent: string): string {
   return SHEET.slice(start, end);
 }
 
+function lightAccentBlock(accent: string): string {
+  const start = SHEET.indexOf(`[data-theme="light"][data-accent="${accent}"]`);
+  const end = SHEET.indexOf("}", start);
+  return SHEET.slice(start, end);
+}
+
 function rootBlock(): string {
   const start = SHEET.indexOf(":root");
   const end = SHEET.indexOf("}", start);
@@ -108,6 +114,30 @@ const TEXT_PAIRS: ReadonlyArray<{
     bg: "bg-panel",
     min: 4.5,
   },
+  {
+    label: "text-tertiary on bg-app",
+    fg: "text-tertiary",
+    bg: "bg-app",
+    min: 4.5,
+  },
+  {
+    label: "danger-text on bg-panel",
+    fg: "danger-text",
+    bg: "bg-panel",
+    min: 4.5,
+  },
+  {
+    label: "warning-text on bg-panel",
+    fg: "warning-text",
+    bg: "bg-panel",
+    min: 4.5,
+  },
+  {
+    label: "success-text on bg-panel",
+    fg: "success-text",
+    bg: "bg-panel",
+    min: 4.5,
+  },
   // Component/large-text threshold (3:1): the accent edge. The
   // canonical border-strong values (07 §7.4) are decorative
   // boundaries — component identification rides on the focus ring
@@ -157,6 +187,46 @@ describe("token contrast ratios (REQ-A11Y-003)", () => {
       expect(value, `${accent} = ${value.toFixed(2)}`).toBeGreaterThanOrEqual(
         4.5,
       );
+    });
+  }
+
+  // Links/selected text (07 §7.4.1 --accent-text) must read on every
+  // theme surface and on the subtle selection background, for the
+  // default accent AND every alternative in both themes (H5: the
+  // light theme overrides text+subtle per accent).
+  for (const theme of ["dark", "light"]) {
+    const surface = themeBlock(theme);
+    for (const accent of ["clr-06", "clr-07", "clr-04", "clr-02", "clr-08"]) {
+      it(`${theme}/${accent}: accent-text reads on surfaces and subtle`, () => {
+        const accentScope =
+          theme === "light" ? lightAccentBlock(accent) : accentBlock(accent);
+        const accentText = token(accentScope, "accent-text");
+        const accentSubtle = token(accentScope, "accent-subtle");
+        const onApp = ratio(accentText, token(surface, "bg-app"));
+        expect(onApp, `on bg-app = ${onApp.toFixed(2)}`).toBeGreaterThanOrEqual(
+          4.5,
+        );
+        const onPanel = ratio(accentText, token(surface, "bg-panel"));
+        expect(
+          onPanel,
+          `on bg-panel = ${onPanel.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(4.5);
+        const onSubtle = ratio(accentText, accentSubtle);
+        expect(
+          onSubtle,
+          `on accent-subtle = ${onSubtle.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      });
+    }
+  }
+
+  // Focus indicators are UI components: ≥ 3:1 against the app
+  // background in both themes (FR-013).
+  for (const theme of ["dark", "light"]) {
+    it(`${theme}: focus-ring ≥ 3:1 on bg-app`, () => {
+      const block = themeBlock(theme);
+      const value = ratio(token(block, "focus-ring"), token(block, "bg-app"));
+      expect(value, `${theme} = ${value.toFixed(2)}`).toBeGreaterThanOrEqual(3);
     });
   }
 });

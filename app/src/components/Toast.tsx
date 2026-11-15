@@ -8,7 +8,13 @@
  * guarantee; the primitive is a list in a live region).
  */
 import type { JSX } from "react";
-import { Check, Info, TriangleAlert } from "../design/icons";
+import {
+  Check,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+  Info,
+  TriangleAlert,
+} from "../design/icons";
 import { useIntl } from "react-intl";
 import { create } from "zustand";
 import styles from "./Toast.module.css";
@@ -67,12 +73,30 @@ export function showToast(options: ShowToastOptions): void {
 
 function ToastIcon({ variant }: { variant: ToastVariant }): JSX.Element {
   if (variant === "success") {
-    return <Check size={16} aria-hidden="true" />;
+    return (
+      <Check
+        size={ICON_SIZE_DENSE}
+        strokeWidth={ICON_STROKE_WIDTH}
+        aria-hidden="true"
+      />
+    );
   }
   if (variant === "error") {
-    return <TriangleAlert size={16} aria-hidden="true" />;
+    return (
+      <TriangleAlert
+        size={ICON_SIZE_DENSE}
+        strokeWidth={ICON_STROKE_WIDTH}
+        aria-hidden="true"
+      />
+    );
   }
-  return <Info size={16} aria-hidden="true" />;
+  return (
+    <Info
+      size={ICON_SIZE_DENSE}
+      strokeWidth={ICON_STROKE_WIDTH}
+      aria-hidden="true"
+    />
+  );
 }
 
 /**

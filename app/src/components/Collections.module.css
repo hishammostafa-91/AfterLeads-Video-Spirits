@@ -51,9 +51,21 @@
   cursor: pointer;
 }
 
-.item:focus-visible {
+.item:focus-visible,
+.item[data-focus-visible] {
   outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
+}
+
+/* RAC collection rows/options (GridList/Table/ListBox) receive
+   data-focus-visible on the row; ring them (US3/AC1). Tables focus
+   the row and mark data-focused — cover both hooks. */
+.grid-list [data-focus-visible],
+.options [data-focus-visible],
+.table [data-focus-visible],
+.table:has(:focus-visible) tr[data-focused] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
 }
 
 .item[data-focused],
@@ -61,6 +73,13 @@
   background: var(--accent-subtle);
   color: var(--accent-text);
   outline: none;
+}
+
+/* Focus ring wins over the hover rule above (equal specificity,
+   later wins) — data-focus-visible marks the keyboard focus. */
+.item[data-focus-visible] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
 }
 
 .item-label {

@@ -5,6 +5,11 @@
     "csstools/use-logical": true,
     "color-no-hex": true,
     "color-named": "never",
+    "declaration-property-value-disallowed-list": {
+      "/^color|^background|^border|^box-shadow|^outline|^fill|^stroke|^caret/": [
+        "/\\b(rgb|rgba|hsl|hsla|oklch|oklab|lab|lch|color)\\(/i"
+      ]
+    },
     "selector-pseudo-class-no-unknown": [
       true,
       {
@@ -17,7 +22,8 @@
       "files": ["src/design/tokens.css"],
       "rules": {
         "color-no-hex": null,
-        "color-named": null
+        "color-named": null,
+        "declaration-property-value-disallowed-list": null
       }
     }
   ]

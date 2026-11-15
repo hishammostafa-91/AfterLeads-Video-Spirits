@@ -5,7 +5,7 @@
  */
 import { FormattedMessage, useIntl } from "react-intl";
 import type { JSX } from "react";
-import { Film } from "lucide-react";
+import { Film, ICON_SIZE_TOOLBAR, ICON_STROKE_WIDTH } from "../../design/icons";
 import {
   GridList,
   GridListItem,
@@ -156,7 +156,13 @@ function Empty(): JSX.Element {
   const { formatMessage } = useIntl();
   return (
     <EmptyState
-      icon={<Film size={24} aria-hidden="true" />}
+      icon={
+        <Film
+          size={ICON_SIZE_TOOLBAR}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
+      }
       message={formatMessage({ id: "components.empty.message" })}
       actionMessageId="components.empty.action"
       onAction={() => {}}

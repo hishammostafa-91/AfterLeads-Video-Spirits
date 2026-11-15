@@ -21,7 +21,13 @@ import {
   MenuTrigger,
   SubmenuTrigger,
 } from "react-aria-components";
-import { Check, ChevronRight } from "../design/icons";
+import {
+  Check,
+  ChevronRight,
+  EllipsisVertical,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+} from "../design/icons";
 import { useIntl } from "react-intl";
 import styles from "./Menu.module.css";
 
@@ -111,7 +117,13 @@ export function MenuItemCheckbox({
       className={cx(styles.item, className)}
     >
       <span className={styles.checkSlot} aria-hidden="true">
-        {isChecked && <Check size={12} aria-hidden="true" />}
+        {isChecked && (
+          <Check
+            size={ICON_SIZE_DENSE}
+            strokeWidth={ICON_STROKE_WIDTH}
+            aria-hidden="true"
+          />
+        )}
       </span>
       {children}
     </RACMenuItem>
@@ -133,7 +145,8 @@ export function Submenu({ label, children }: SubmenuProps): JSX.Element {
         <ChevronRight
           className={styles.submenuArrow}
           aria-hidden="true"
-          size={12}
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
         />
       </RACMenuItem>
       <RACMenu className={styles.menu}>{children}</RACMenu>
@@ -150,8 +163,10 @@ export interface ContextMenuProps {
 
 /**
  * A context menu: right-click (contextmenu event) opens the menu at
- * the pointer position; Esc or a click outside closes it (RAC
- * MenuTrigger with a controlled zero-size anchor at the pointer).
+ * the pointer position; a kebab trigger inside the area gives
+ * keyboard users the same menu (FR-012 — every action reachable);
+ * Esc or a click outside closes it (RAC MenuTrigger with a
+ * controlled zero-size anchor at the target point).
  */
 export function ContextMenu({
   children,
@@ -160,6 +175,8 @@ export function ContextMenu({
   const [open, setOpen] = useState(false);
   const [point, setPoint] = useState({ x: 0, y: 0 });
   const areaRef = useRef<HTMLDivElement>(null);
+  const { formatMessage } = useIntl();
+
   return (
     <div
       ref={areaRef}
@@ -183,6 +200,26 @@ export function ContextMenu({
         />
         <RACMenu className={styles.menu}>{items}</RACMenu>
       </MenuTrigger>
+      <button
+        type="button"
+        className={styles.contextKebab}
+        aria-label={formatMessage({ id: "components.menu.open" })}
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          const area = areaRef.current?.getBoundingClientRect();
+          setPoint({
+            x: rect.left - (area?.left ?? 0) + rect.width / 2,
+            y: rect.top - (area?.top ?? 0) + rect.height / 2,
+          });
+          setOpen(true);
+        }}
+      >
+        <EllipsisVertical
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
+      </button>
     </div>
   );
 }

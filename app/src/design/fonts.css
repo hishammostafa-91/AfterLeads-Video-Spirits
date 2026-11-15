@@ -4,15 +4,17 @@
 /* The bundled faces (FNT-01..03, docs/12 §12.16; manifest:
    assets/fonts/fonts.json). Family names match the 07 §7.4.5 stacks
    in tokens.css. font-display: swap keeps text visible while the
-   local faces load. */
+   local faces load. The `tech(variations)` function notation is the
+   CSS Fonts 4 form (Chromium ≥ 106 / WebView2); the legacy
+   *-variations keywords were removed from the spec. */
 
 @font-face {
   font-family: "Inter Variable";
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url("../../../assets/fonts/InterVariable.woff2")
-    format("woff2-variations");
+  src: url("../../../assets/fonts/InterVariable.woff2") format("woff2")
+    tech(variations);
 }
 
 @font-face {
@@ -21,7 +23,7 @@
   font-weight: 100 900;
   font-display: swap;
   src: url("../../../assets/fonts/NotoSansArabic-Variable.ttf")
-    format("truetype-variations");
+    format("truetype") tech(variations);
 }
 
 @font-face {
@@ -30,5 +32,5 @@
   font-weight: 100 800;
   font-display: swap;
   src: url("../../../assets/fonts/JetBrainsMono-Variable.ttf")
-    format("truetype-variations");
+    format("truetype") tech(variations);
 }

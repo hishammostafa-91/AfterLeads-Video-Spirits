@@ -101,21 +101,35 @@ describe("ToggleButton (07 s7.6)", () => {
 });
 
 describe("Fields (07 s7.6; dir=auto per s7.11)", () => {
-  it("TextField renders with dir=auto input", () => {
-    const { container } = render(
-      <TextField label="Name" placeholder="Type…" />,
+  it("TextField associates its label and exposes disabled/invalid state", () => {
+    render(<TextField label="Name" placeholder="Type…" isDisabled isInvalid />);
+    const input = screen.getByLabelText("Name");
+    expect(input.tagName).toBe("INPUT");
+    expect(input.getAttribute("dir")).toBe("auto");
+    expect((input as HTMLInputElement).disabled).toBe(true);
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+  });
+
+  it("SearchField associates its label", () => {
+    render(<SearchField label="Search" placeholder="Search…" />);
+    const input = screen.getByLabelText("Search");
+    expect(input.tagName).toBe("INPUT");
+    expect(input.getAttribute("dir")).toBe("auto");
+  });
+
+  it("TextArea associates its label and honors a controlled value", () => {
+    render(<TextArea label="Notes" placeholder="…" value="a note" />);
+    const area = screen.getByLabelText("Notes");
+    expect(area.tagName).toBe("TEXTAREA");
+    expect(area.getAttribute("dir")).toBe("auto");
+    expect((area as HTMLTextAreaElement).value).toBe("a note");
+  });
+
+  it("TextArea marks the invalid state", () => {
+    render(<TextArea label="Notes" placeholder="…" isInvalid />);
+    expect(screen.getByLabelText("Notes").getAttribute("aria-invalid")).toBe(
+      "true",
     );
-    expect(container.querySelector("input[dir='auto']")).not.toBeNull();
-  });
-
-  it("SearchField renders with dir=auto input", () => {
-    const { container } = render(<SearchField label="Search" />);
-    expect(container.querySelector("input[dir='auto']")).not.toBeNull();
-  });
-
-  it("TextArea renders with dir=auto textarea", () => {
-    const { container } = render(<TextArea label="Notes" placeholder="…" />);
-    expect(container.querySelector("textarea[dir='auto']")).not.toBeNull();
   });
 });
 

@@ -6,7 +6,7 @@
 import { FormattedMessage, useIntl } from "react-intl";
 import type { JSX } from "react";
 import { useState } from "react";
-import { Pencil } from "../../design/icons";
+import { ICON_SIZE_DENSE, ICON_STROKE_WIDTH, Pencil } from "../../design/icons";
 import {
   Button,
   IconButton,
@@ -39,7 +39,13 @@ function Variants(): JSX.Element {
 function Icon(): JSX.Element {
   return (
     <IconButton
-      icon={<Pencil size={16} />}
+      icon={
+        <Pencil
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
+          aria-hidden="true"
+        />
+      }
       labelMessageId="components.button.edit"
       shortcut="F2"
     />

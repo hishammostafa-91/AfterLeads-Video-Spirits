@@ -80,6 +80,12 @@
   color: var(--accent-text);
 }
 
+/* Icon-only buttons (07 §7.5): square target, no text padding. */
+.icon-button {
+  padding-inline: calc((var(--target-min) - 1px) / 2);
+  padding-block: calc((var(--target-min) - 1px) / 2);
+}
+
 /* SegmentedControl (07 §7.6): joined segments over radio semantics. */
 .segmented {
   display: inline-flex;
@@ -93,6 +99,16 @@
 
 .segment-field {
   display: inline-flex;
+  position: relative;
+}
+
+/* The native radio holds focus and state; hide it from view (the
+   segment label is the visual) but keep it focusable. */
+.segment-field input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
 }
 
 .segment {
@@ -125,7 +141,8 @@
   cursor: default;
 }
 
-.segment[data-focus-visible] {
+.segment[data-focus-visible],
+.segment-field:has(input:focus-visible) .segment {
   outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }

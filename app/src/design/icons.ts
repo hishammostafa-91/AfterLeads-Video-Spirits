@@ -30,6 +30,8 @@ export {
   ChevronRight,
   CloudOff,
   Diamond,
+  EllipsisVertical,
+  Film,
   Info,
   Minus,
   MonitorPlay,

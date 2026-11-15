@@ -6,7 +6,7 @@
  * the accessible name switches between add/remove.
  */
 import type { JSX } from "react";
-import { Timer } from "../design/icons";
+import { ICON_SIZE_DENSE, ICON_STROKE_WIDTH, Timer } from "../design/icons";
 import { useIntl } from "react-intl";
 import { Button } from "./Button";
 import styles from "./Keyframe.module.css";
@@ -38,7 +38,11 @@ export function KeyframeToggle({
         onToggle(!isKeyframed);
       }}
     >
-      <Timer size={16} aria-hidden="true" />
+      <Timer
+        size={ICON_SIZE_DENSE}
+        strokeWidth={ICON_STROKE_WIDTH}
+        aria-hidden="true"
+      />
     </Button>
   );
 }

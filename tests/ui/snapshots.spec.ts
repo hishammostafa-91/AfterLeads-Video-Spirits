@@ -15,7 +15,7 @@ import { expect, test } from "@playwright/test";
 const MODES = [
   { id: "default", url: "" },
   { id: "compact", url: "&density=compact" },
-  { id: "hc", url: "&theme=high-contrast" },
+  { id: "hc", url: null as string | null },
 ] as const;
 
 test("story matrix", async ({ page }, testInfo) => {
@@ -26,9 +26,11 @@ test("story matrix", async ({ page }, testInfo) => {
     locale: string;
   };
   for (const mode of MODES) {
-    await page.goto(
-      `/?theme=${theme}&locale=${locale}${mode.url === "" ? "" : mode.url}`,
-    );
+    // H3: the HC mode must REPLACE the project theme, not append a
+    // second ?theme= (URLSearchParams keeps the first value).
+    const themeParam = mode.id === "hc" ? "high-contrast" : theme;
+    const url = `/?theme=${themeParam}&locale=${locale}${mode.id === "compact" ? "&density=compact" : ""}`;
+    await page.goto(url);
     await page.evaluate(() => document.fonts.ready);
     const cards = page.locator("[data-story-id]");
     const count = await cards.count();
@@ -36,10 +38,15 @@ test("story matrix", async ({ page }, testInfo) => {
 
     // Repeat-run determinism: the first card captures identically
     // twice under the fixed viewport + reduced motion (research D7).
+    // The comparison goes through Playwright's screenshot matcher
+    // (per-pixel threshold): content-sized elements land on
+    // fractional device pixels whose antialiasing jitters ±1 between
+    // rasterizations — byte equality would false-fail on that noise.
     const first = cards.first();
-    const shot1 = await first.screenshot();
-    const shot2 = await first.screenshot();
-    expect(shot1.equals(shot2)).toBe(true);
+    const shot1 = await first.screenshot({ animations: "disabled" });
+    await expect(first).toHaveScreenshot(shot1, {
+      animations: "disabled",
+    });
 
     for (let i = 0; i < count; i += 1) {
       const card = cards.nth(i);
@@ -81,15 +88,21 @@ test("interaction states", async ({ page }, testInfo) => {
     await expect(card).toBeVisible();
     // Visible-only: RAC renders visually hidden native inputs inside
     // Checkbox/Switch/Radio — hover/press never become actionable on
-    // them, and the ring lives on the visible control.
+    // them, and the ring lives on the visible control. The selector
+    // includes the collection roles (tree items, table rows, list
+    // options) so those cards get interaction states too.
     const primary = card
-      .locator("button, input, textarea, [role='slider'], [role='tab'], a")
+      .locator(
+        "button, input, textarea, [role='slider'], [role='tab'], a, " +
+          "[role='treeitem'], [role='row'], [role='option']",
+      )
       .filter({ visible: true })
       .first();
 
-    // Static stories (menu.context's right-click area, progress,
-    // badges, empty states) have no primary control — the page-mode
-    // matrix covers them; there is no interaction state to capture.
+    // Cards whose only content has no control matching the selector
+    // (menu.context's right-click area, progress, badges, empty
+    // states) have no interaction state to capture — the page-mode
+    // matrix covers them.
     if ((await primary.count()) === 0) continue;
 
     // Hover. force: RAC Checkbox/Switch/Radio overlay the native

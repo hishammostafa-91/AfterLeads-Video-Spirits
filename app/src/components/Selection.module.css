@@ -84,11 +84,14 @@
   background: var(--accent-solid);
 }
 
-.checkbox-button:focus-visible,
-.switch-button:focus-visible,
-.radio-button:focus-visible {
+/* Focus rings (US3/AC1): the native inputs hold focus (RAC hides
+   them from the pointer), so the ring rides the custom indicators
+   via :has(input:focus-visible). */
+.checkbox-button:has(input:focus-visible) .check-indicator,
+.switch-button:has(input:focus-visible) .switch-track,
+.radio-button:has(input:focus-visible) .radio-indicator {
   outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline-offset: 1px;
   border-radius: var(--radius-sm);
 }
 

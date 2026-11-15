@@ -96,6 +96,34 @@
   position: relative;
 }
 
+/* Kebab trigger (FR-012 keyboard path): sits at the area's inline
+   end; opening from it anchors the menu at the button. */
+.context-kebab {
+  position: absolute;
+  inset-block-start: var(--sp-1);
+  inset-inline-end: var(--sp-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--target-min);
+  min-inline-size: var(--target-min);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.context-kebab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.context-kebab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
 /* Zero-size anchor positioned at the pointer; the menu opens from it. */
 .context-anchor {
   position: absolute;

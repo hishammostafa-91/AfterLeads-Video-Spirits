@@ -18,7 +18,12 @@ import {
   NumberField as RACNumberField,
   type NumberFieldProps as RACNumberFieldProps,
 } from "react-aria-components";
-import { Minus, Plus } from "../design/icons";
+import {
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+  Minus,
+  Plus,
+} from "../design/icons";
 import styles from "./NumberField.module.css";
 
 /** Scrub speed factor from the held modifiers (07 §7.6). */
@@ -210,7 +215,11 @@ export function NumberField({
       )}
       <RACGroup className={styles.group} aria-label={label} onWheel={onWheel}>
         <RACButton slot="decrement" className={styles.stepper}>
-          <Minus size={12} aria-hidden="true" />
+          <Minus
+            size={ICON_SIZE_DENSE}
+            strokeWidth={ICON_STROKE_WIDTH}
+            aria-hidden="true"
+          />
         </RACButton>
         <RACInput
           ref={inputRef}
@@ -225,7 +234,11 @@ export function NumberField({
           </span>
         )}
         <RACButton slot="increment" className={styles.stepper}>
-          <Plus size={12} aria-hidden="true" />
+          <Plus
+            size={ICON_SIZE_DENSE}
+            strokeWidth={ICON_STROKE_WIDTH}
+            aria-hidden="true"
+          />
         </RACButton>
       </RACGroup>
     </RACNumberField>

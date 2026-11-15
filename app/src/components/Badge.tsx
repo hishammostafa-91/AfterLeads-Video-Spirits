@@ -6,7 +6,15 @@
  * its icon with its text (REQ-A11Y-003; 07 §7.6).
  */
 import type { JSX, ReactNode } from "react";
-import { Binary, CloudOff, MonitorPlay, Shuffle, Waves } from "../design/icons";
+import {
+  Binary,
+  CloudOff,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+  MonitorPlay,
+  Shuffle,
+  Waves,
+} from "../design/icons";
 import { FormattedMessage } from "react-intl";
 import styles from "./Badge.module.css";
 
@@ -18,23 +26,41 @@ const BADGE_DEFS: Record<
 > = {
   proxy: {
     messageId: "components.badge.proxy",
-    icon: (size) => <Shuffle size={size} aria-hidden="true" />,
+    icon: (size) => (
+      <Shuffle size={size} strokeWidth={ICON_STROKE_WIDTH} aria-hidden="true" />
+    ),
   },
   offline: {
     messageId: "components.badge.offline",
-    icon: (size) => <CloudOff size={size} aria-hidden="true" />,
+    icon: (size) => (
+      <CloudOff
+        size={size}
+        strokeWidth={ICON_STROKE_WIDTH}
+        aria-hidden="true"
+      />
+    ),
   },
   tenBit: {
     messageId: "components.badge.tenBit",
-    icon: (size) => <Binary size={size} aria-hidden="true" />,
+    icon: (size) => (
+      <Binary size={size} strokeWidth={ICON_STROKE_WIDTH} aria-hidden="true" />
+    ),
   },
   hdr: {
     messageId: "components.badge.hdr",
-    icon: (size) => <MonitorPlay size={size} aria-hidden="true" />,
+    icon: (size) => (
+      <MonitorPlay
+        size={size}
+        strokeWidth={ICON_STROKE_WIDTH}
+        aria-hidden="true"
+      />
+    ),
   },
   vfr: {
     messageId: "components.badge.vfr",
-    icon: (size) => <Waves size={size} aria-hidden="true" />,
+    icon: (size) => (
+      <Waves size={size} strokeWidth={ICON_STROKE_WIDTH} aria-hidden="true" />
+    ),
   },
 };
 
@@ -49,7 +75,7 @@ export function Badge({ kind, className }: BadgeProps): JSX.Element {
   const { messageId, icon } = BADGE_DEFS[kind];
   return (
     <span className={classes} data-kind={kind}>
-      {icon(12)}
+      {icon(ICON_SIZE_DENSE)}
       <span className={styles.text}>
         <FormattedMessage id={messageId} />
       </span>

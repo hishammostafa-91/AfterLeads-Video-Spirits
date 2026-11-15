@@ -68,7 +68,8 @@
   --z-drag-ghost: 600;
 
   /* Label and marker palette (12 §12.17 CLR-01..08) — same in all
-   * themes; text on them uses the contrasting color listed there. */
+   * themes; text on them uses the contrasting color listed there
+   * (as amended 2026-11-14: CLR-01/04/08 take black). */
   --clr-red: #e5484d;
   --clr-orange: #f76b15;
   --clr-yellow: #ffc53d;
@@ -77,6 +78,14 @@
   --clr-blue: #3e63dd;
   --clr-purple: #8e4ec6;
   --clr-pink: #d6409f;
+  --clr-red-foreground: #000;
+  --clr-orange-foreground: #000;
+  --clr-yellow-foreground: #000;
+  --clr-green-foreground: #000;
+  --clr-cyan-foreground: #000;
+  --clr-blue-foreground: #fff;
+  --clr-purple-foreground: #fff;
+  --clr-pink-foreground: #000;
 
   /* On-fill text (07 §7.4.1; 12 §12.17 as amended — owner rulings
    * 2026-11-14: CLR-01, CLR-04, and CLR-08 take black text for
@@ -235,11 +244,21 @@
   --accent-foreground: #fff;
 }
 
+[data-theme="light"][data-accent="clr-07"] {
+  --accent-text: #6a3a9a;
+  --accent-subtle: #f0e6fa;
+}
+
 [data-accent="clr-04"] {
   --accent-solid: #30a46c;
   --accent-text: #5bd39b;
   --accent-subtle: #16301f;
   --accent-foreground: #000;
+}
+
+[data-theme="light"][data-accent="clr-04"] {
+  --accent-text: #1e5a3a;
+  --accent-subtle: #d9f2e4;
 }
 
 [data-accent="clr-02"] {
@@ -249,11 +268,21 @@
   --accent-foreground: #000;
 }
 
+[data-theme="light"][data-accent="clr-02"] {
+  --accent-text: #9a3d00;
+  --accent-subtle: #fde8d9;
+}
+
 [data-accent="clr-08"] {
   --accent-solid: #d6409f;
   --accent-text: #f08dc6;
   --accent-subtle: #3a1730;
   --accent-foreground: #000;
+}
+
+[data-theme="light"][data-accent="clr-08"] {
+  --accent-text: #b02878;
+  --accent-subtle: #fadcec;
 }
 
 /*
@@ -280,7 +309,18 @@
     --accent-solid: Highlight;
     --accent-text: Highlight;
     --accent-subtle: Highlight;
+    --accent-foreground: HighlightText;
     --focus-ring: Highlight;
+    --danger: CanvasText;
+    --danger-text: CanvasText;
+    --danger-foreground: Canvas;
+    --warning: CanvasText;
+    --warning-text: CanvasText;
+    --success: CanvasText;
+    --success-text: CanvasText;
+    --info: CanvasText;
+    --swatch-ring: CanvasText;
+    --swatch-halo: Canvas;
     --shadow-popover: none;
     --shadow-dialog: none;
 
@@ -304,7 +344,18 @@
   --accent-solid: Highlight;
   --accent-text: Highlight;
   --accent-subtle: Highlight;
+  --accent-foreground: HighlightText;
   --focus-ring: Highlight;
+  --danger: CanvasText;
+  --danger-text: CanvasText;
+  --danger-foreground: Canvas;
+  --warning: CanvasText;
+  --warning-text: CanvasText;
+  --success: CanvasText;
+  --success-text: CanvasText;
+  --info: CanvasText;
+  --swatch-ring: CanvasText;
+  --swatch-halo: Canvas;
   --shadow-popover: none;
   --shadow-dialog: none;
 

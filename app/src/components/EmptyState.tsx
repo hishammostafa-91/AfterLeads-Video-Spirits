@@ -5,7 +5,11 @@
  * shortcut hint.
  */
 import type { JSX, ReactNode } from "react";
-import { PackageOpen } from "../design/icons";
+import {
+  ICON_SIZE_TOOLBAR,
+  ICON_STROKE_WIDTH,
+  PackageOpen,
+} from "../design/icons";
 import { FormattedMessage } from "react-intl";
 import { Button } from "./Button";
 import styles from "./EmptyState.module.css";
@@ -35,7 +39,13 @@ export function EmptyState({
   return (
     <div className={classes}>
       <span className={styles.icon}>
-        {icon ?? <PackageOpen size={24} aria-hidden="true" />}
+        {icon ?? (
+          <PackageOpen
+            size={ICON_SIZE_TOOLBAR}
+            strokeWidth={ICON_STROKE_WIDTH}
+            aria-hidden="true"
+          />
+        )}
       </span>
       <p className={styles.sentence}>{message}</p>
       <Button variant="primary" onPress={onAction}>

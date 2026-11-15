@@ -19,6 +19,14 @@
   border-radius: var(--radius-sm);
 }
 
+/* Focus rings (US3/AC1): the area holds focus for its hidden x/y
+   inputs; the hue slider's input delegates to its thumb. */
+.area:focus-visible,
+.area:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .hue {
   inline-size: 12rem;
   display: flex;
@@ -71,4 +79,9 @@
   border: 2px solid var(--swatch-ring);
   border-radius: 50%;
   box-shadow: 0 0 0 1px var(--swatch-halo);
+}
+
+.hue:has(input:focus-visible) .thumb {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }

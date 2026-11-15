@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0-or-later",
+  "//": "@playwright/test is declared at the root for tests/ui config resolution (Playwright resolves the launcher from the config's nearest package) and in app/package.json for the pnpm -C app harness script — both pin the same ~1.64.x baseline row; this is not a duplicate dependency in the published sense (the app is private too).",
   "devDependencies": {
     "@playwright/test": "~1.64.1"
   },

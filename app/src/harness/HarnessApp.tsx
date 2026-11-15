@@ -10,8 +10,8 @@
  * locale half next. Landmarks per 07 §7.13 rule 2; live regions per
  * rule 3.
  */
-import { FormattedMessage } from "react-intl";
-import type { JSX } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 import { LiveRegions } from "../components/a11y";
 import {
@@ -228,6 +228,23 @@ function accentLabel(accent: Accent): JSX.Element {
   }
 }
 
+/**
+ * The stories landmark (07 §7.13 rule 2). A child of <I18n> so the
+ * accessible name localizes (G-13) — the provider wraps this inside
+ * HarnessApp's return, so useIntl must live here, not in HarnessApp.
+ */
+function StoriesSection(props: { children: ReactNode }): JSX.Element {
+  const { formatMessage } = useIntl();
+  return (
+    <section
+      className={styles.stories}
+      aria-label={formatMessage({ id: "harness.stories.title" })}
+    >
+      {props.children}
+    </section>
+  );
+}
+
 export function HarnessApp(): JSX.Element {
   const params = harnessParams();
   ensureUrlPersistence({ theme: params.theme });
@@ -261,7 +278,7 @@ export function HarnessApp(): JSX.Element {
         <div className={styles.toolbar} role="toolbar">
           <ToolbarControls />
         </div>
-        <section className={styles.stories} aria-label="Stories">
+        <StoriesSection>
           <h2 className={styles.storiesTitle}>
             <FormattedMessage id="harness.stories.title" />
           </h2>
@@ -282,7 +299,7 @@ export function HarnessApp(): JSX.Element {
                 </div>
               ))}
           </div>
-        </section>
+        </StoriesSection>
         <LiveRegions />
       </main>
     </I18n>

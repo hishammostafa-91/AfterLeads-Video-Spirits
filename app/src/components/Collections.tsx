@@ -33,7 +33,11 @@ import {
   TableBody as RACTableBody,
   TableHeader as RACTableHeader,
 } from "react-aria-components";
-import { ChevronRight } from "../design/icons";
+import {
+  ChevronRight,
+  ICON_SIZE_DENSE,
+  ICON_STROKE_WIDTH,
+} from "../design/icons";
 import styles from "./Collections.module.css";
 
 function cx(...parts: Array<string | undefined>): string {
@@ -382,7 +386,8 @@ function TreeItemBase({
           <ChevronRight
             className={styles.treeChevron}
             aria-hidden="true"
-            size={12}
+            size={ICON_SIZE_DENSE}
+            strokeWidth={ICON_STROKE_WIDTH}
           />
         )}
         <span className={styles.itemLabel}>{labelNodes}</span>

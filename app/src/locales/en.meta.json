@@ -239,6 +239,10 @@
     "description": "Search field placeholder.",
     "maxlength": 16
   },
+  "components.iconButton.tooltip": {
+    "description": "Icon-only button tooltip: the action label with its keyboard shortcut.",
+    "maxlength": 40
+  },
   "components.keyframe.add": {
     "description": "Accessible name for adding a keyframe.",
     "maxlength": 24
@@ -274,6 +278,10 @@
   "components.menu.newProject": {
     "description": "New-project menu item.",
     "maxlength": 20
+  },
+  "components.menu.open": {
+    "description": "Accessible name of the context-area kebab trigger.",
+    "maxlength": 12
   },
   "components.menu.redo": {
     "description": "Redo menu item.",

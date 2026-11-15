@@ -62,7 +62,12 @@
 
 .story-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+
+  /* Fixed rem tracks keep every card boundary at an integer device
+     pixel — 1fr tracks land on fractional offsets whose subpixel
+     antialiasing jitters between captures (D7 determinism). */
+  grid-template-columns: repeat(auto-fill, minmax(0, 18rem));
+  justify-content: start;
   gap: var(--sp-3);
 }
 
