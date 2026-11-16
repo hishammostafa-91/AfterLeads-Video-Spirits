@@ -73,6 +73,10 @@ test("themes flip resolved token values (SC-001)", async ({ page }) => {
   await page.goto("/?theme=high-contrast&locale=en");
   const hcBg = await read("--bg-app");
   expect(hcBg.trim().toLowerCase()).toBe("canvas");
+  // H-01 (round 2): the HC selection pairing resolves at runtime —
+  // Highlight fills carry HighlightText labels.
+  const hcOnSubtle = await read("--accent-subtle-foreground");
+  expect(hcOnSubtle.trim().toLowerCase()).toBe("highlighttext");
 });
 
 // SC-001: accents flip the resolved accent tokens.

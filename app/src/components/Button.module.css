@@ -77,7 +77,7 @@
 .toggle[data-selected] {
   background: var(--accent-subtle);
   border-color: var(--accent-solid);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
 }
 
 /* Icon-only buttons (07 §7.5): square target, no text padding. */
@@ -133,7 +133,7 @@
 
 .segment[data-selected] {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
 }
 
 .segment[data-disabled] {

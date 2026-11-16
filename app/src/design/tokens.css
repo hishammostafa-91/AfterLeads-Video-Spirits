@@ -95,6 +95,12 @@
   --accent-foreground: #fff;
   --danger-foreground: #000;
 
+  /* Text on --accent-subtle selection fills (round-2 H-01): follows
+   * --accent-text per theme and accent; the High Contrast blocks
+   * override it to HighlightText so the Highlight fill keeps its
+   * label visible (07 §7.4.3 pairs Highlight with HighlightText). */
+  --accent-subtle-foreground: var(--accent-text);
+
   /* Color thumb outline (07 §7.4.2 note): white ring + black halo
    * stays legible over any picked color in every theme. */
   --swatch-ring: #fff;
@@ -309,6 +315,7 @@
     --accent-solid: Highlight;
     --accent-text: Highlight;
     --accent-subtle: Highlight;
+    --accent-subtle-foreground: HighlightText;
     --accent-foreground: HighlightText;
     --focus-ring: Highlight;
     --danger: CanvasText;
@@ -344,6 +351,7 @@
   --accent-solid: Highlight;
   --accent-text: Highlight;
   --accent-subtle: Highlight;
+  --accent-subtle-foreground: HighlightText;
   --accent-foreground: HighlightText;
   --focus-ring: Highlight;
   --danger: CanvasText;

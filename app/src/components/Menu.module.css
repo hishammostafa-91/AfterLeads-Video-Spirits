@@ -37,7 +37,7 @@
 
 .item[data-focused] {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
   outline: none;
 }
 
@@ -84,7 +84,7 @@
 .menu-bar-trigger:hover,
 .menu-bar-trigger[data-focused] {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
 }
 
 .menu-bar-trigger:focus-visible {

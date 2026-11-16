@@ -88,6 +88,7 @@ Tokens are CSS custom properties in `app/src/design/tokens.css`; components refe
 | `--accent-foreground` | `#FFFFFF` (black for the green/orange/pink accents, CLR-04/CLR-02/CLR-08) | Text/icons on `--accent-solid` (≥ 4.5:1 per accent) |
 | `--accent-text` | `#8DA4EF` | Links, selected text (≈ 7.4:1) |
 | `--accent-subtle` | `#1E2A55` | Selection backgrounds |
+| `--accent-subtle-foreground` | equals `--accent-text` (`HighlightText` in High Contrast) | Text on `--accent-subtle` selection fills |
 | `--focus-ring` | `#8DA4EF` | 2 px outline + 1 px offset (≥ 3:1) |
 | `--danger` / `--danger-text` | `#E5484D` / `#FF9592` | Errors, record |
 | `--danger-foreground` | `#000000` | Text on `--danger` (6.0:1; CLR-01) |
@@ -114,7 +115,7 @@ Status colors are the same hues with darker text variants: danger text `#C62A2F`
 
 ### 7.4.3 High Contrast
 
-When `forced-colors: active` (Windows contrast themes) or the user selects High Contrast, tokens map to system colors: backgrounds `Canvas`, text `CanvasText`, accents and selection `Highlight`/`HighlightText`, controls `ButtonFace`/`ButtonText`, disabled `GrayText`, links `LinkText`. Clip colors become outlined shapes with text labels; meters use `CanvasText` fills with patterns for clip and peak states.
+When `forced-colors: active` (Windows contrast themes) or the user selects High Contrast, tokens map to system colors: backgrounds `Canvas`, text `CanvasText`, accents and selection `Highlight`/`HighlightText`, controls `ButtonFace`/`ButtonText`, disabled `GrayText`, links `LinkText`. Selection fills (`--accent-subtle` → `Highlight`) pair with `--accent-subtle-foreground` → `HighlightText` (in dark/light it equals `--accent-text`), so selected and focused labels stay visible. Clip colors become outlined shapes with text labels; meters use `CanvasText` fills with patterns for clip and peak states.
 
 ### 7.4.4 Timeline and media colors
 

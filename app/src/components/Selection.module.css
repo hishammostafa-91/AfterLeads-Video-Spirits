@@ -201,5 +201,5 @@
 
 .options [role="option"][data-focused] {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
 }

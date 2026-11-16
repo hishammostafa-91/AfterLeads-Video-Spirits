@@ -72,5 +72,5 @@
 
 .stepper:hover {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
 }

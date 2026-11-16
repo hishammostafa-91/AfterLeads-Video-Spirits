@@ -229,4 +229,34 @@ describe("token contrast ratios (REQ-A11Y-003)", () => {
       expect(value, `${theme} = ${value.toFixed(2)}`).toBeGreaterThanOrEqual(3);
     });
   }
+
+  // Round-2 H-01: the on-subtle token must pair the Highlight
+  // selection fill with HighlightText labels in High Contrast — for
+  // both triggers (manual theme and forced-colors) — and follow
+  // --accent-text in the regular themes.
+  it("root: accent-subtle-foreground follows accent-text", () => {
+    expect(token(rootBlock(), "accent-subtle-foreground")).toBe(
+      "var(--accent-text)",
+    );
+  });
+
+  for (const label of ["manual high-contrast theme", "forced-colors block"]) {
+    it(`${label}: Highlight fill pairs with HighlightText`, () => {
+      // Anchor on the selector with its brace — the header comment
+      // also mentions [data-theme="high-contrast"] verbatim.
+      const block =
+        label === "manual high-contrast theme"
+          ? SHEET.slice(
+              SHEET.indexOf('[data-theme="high-contrast"] {'),
+              SHEET.indexOf("}", SHEET.indexOf('[data-theme="high-contrast"] {')),
+            )
+          : SHEET.slice(
+              SHEET.indexOf("@media (forced-colors: active)"),
+              SHEET.indexOf("}", SHEET.indexOf("@media (forced-colors: active)")),
+            );
+      expect(token(block, "accent-subtle")).toBe("Highlight");
+      expect(token(block, "accent-subtle-foreground")).toBe("HighlightText");
+      expect(token(block, "accent-foreground")).toBe("HighlightText");
+    });
+  }
 });
