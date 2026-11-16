@@ -6,6 +6,7 @@
  * every message's ICU syntax is valid (react-intl parses each catalog
  * entry with placeholder values — REQ-I18N-004; docs/08 §8.4).
  */
+// @vitest-environment node
 import { createIntl } from "react-intl";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
