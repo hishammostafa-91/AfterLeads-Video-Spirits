@@ -13,22 +13,21 @@ import { join } from "node:path";
 import { createRequire } from "node:module";
 import { collectIssues, collectUsedIds, LOCALES } from "./i18n-check-core.mts";
 
-// ICU syntax validation (docs/08 s8.4; T014) uses the same parser
-// react-intl/eslint-plugin-formatjs run (the formatjs toolchain is a
-// declared dependency; the parser itself is only installed as its
-// transitive, so it resolves through the plugin's scope - pnpm's
-// layout keeps it there, not in app/node_modules).
-const nodeRequire = createRequire(import.meta.url) as unknown as {
-  resolve: (id: string) => string;
-};
-// Resolve the plugin's main entry (its package.json subpath is not
-// exported); createRequire from inside the package then reaches its
-// transitive parser in pnpm's store scope.
-const pluginEntry = nodeRequire.resolve("eslint-plugin-formatjs");
-const pluginRequire = createRequire(pluginEntry) as unknown as (id: string) => {
+// ICU syntax validation (docs/08 s8.4; T014) parses with the exact
+// parser version the react-intl runtime formats messages with:
+// react-intl is a declared dependency and depends on
+// @formatjs/icu-messageformat-parser, so resolving through its scope
+// pins the checker to the production parser without adding an
+// undeclared transitive to the baseline (G-11; round-2 L-04 — this
+// previously rode eslint-plugin-formatjs's private dependency).
+const requireFromReactIntl = createRequire(
+  createRequire(import.meta.url).resolve("react-intl"),
+);
+const { parse } = requireFromReactIntl(
+  "@formatjs/icu-messageformat-parser",
+) as {
   parse: (message: string) => unknown;
 };
-const { parse } = pluginRequire("@formatjs/icu-messageformat-parser");
 
 const localesDir = fileURLToPath(new URL("../locales/", import.meta.url));
 const srcRoot = fileURLToPath(new URL("../", import.meta.url));

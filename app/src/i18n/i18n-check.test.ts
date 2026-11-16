@@ -7,9 +7,14 @@
  * entry with placeholder values — REQ-I18N-004; docs/08 §8.4).
  */
 import { createIntl } from "react-intl";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   collectIssues,
+  collectUsedIds,
   LOCALES,
   type LocaleCatalogs,
 } from "./i18n-check-core.mts";
@@ -31,9 +36,35 @@ function placeholders(message: string): Set<string> {
 }
 
 describe("t_i18n_004 key-set discipline (REQ-I18N-004)", () => {
-  it("passes on the real catalogs", () => {
-    const used = new Set(Object.keys(catalogs.en));
+  it("passes on the real catalogs against the real used-id scan", () => {
+    // Round-2 L-05: feed the actual source scan, not the key list —
+    // the unused-key rule was vacuous when every key "used" itself.
+    const srcRoot = fileURLToPath(new URL("../", import.meta.url));
+    const used = collectUsedIds(srcRoot);
+    expect(used.size).toBeGreaterThan(0);
     expect(collectIssues(catalogs, realMeta, used)).toEqual([]);
+  });
+
+  it("collectUsedIds finds literal ids and ignores dynamic ones", () => {
+    const dir = mkdtempSync(join(tmpdir(), "alvs-i18n-scan-"));
+    try {
+      // Non-namespaced fixture ids: the checker's missing-used rule
+      // only considers the components/harness/a11y namespaces, so
+      // these literals are inert when this very file is scanned.
+      writeFileSync(
+        join(dir, "Fixture.tsx"),
+        '<Button id="fixture.a" labelMessageId="fixture.b" />\n',
+      );
+      writeFileSync(
+        join(dir, "logic.ts"),
+        'intl.formatMessage({ id: "fixture.c" });\n' +
+          "const dynamic = widget.id = makeId();\n",
+      );
+      const used = collectUsedIds(dir);
+      expect([...used].sort()).toEqual(["fixture.a", "fixture.b", "fixture.c"]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("fails on a locale missing a key", () => {
