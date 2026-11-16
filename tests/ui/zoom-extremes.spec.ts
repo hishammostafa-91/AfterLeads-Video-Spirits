@@ -27,18 +27,24 @@ for (const zoom of [80, 200] as const) {
 }
 
 // REQ-APP-010 / SC-002: the root zoom applies at every documented
-// monitor-DPI step and the layout never overflows.
+// monitor-DPI step and the layout never overflows. The applied zoom
+// is asserted through the computed style on #root (round-2 M-06: the
+// inline --app-zoom custom property is an implementation detail — a
+// broken `zoom` declaration would leave it passing).
 for (const zoom of [100, 125, 150, 175, 200] as const) {
   test(`zoom ${zoom} applies without overflow`, async ({ page }) => {
     await page.goto(`/?locale=en&zoom=${zoom}`);
     await page.evaluate(() => document.fonts.ready);
     const applied = await page.evaluate(
-      (z) =>
-        document.documentElement.style.getPropertyValue("--app-zoom") ===
-        String(z),
+      (z) => {
+        const root = document.getElementById("root");
+        if (!root) return Number.NaN;
+        const computed = window.getComputedStyle(root).zoom;
+        return parseFloat(computed);
+      },
       zoom,
     );
-    expect(applied).toBe(true);
+    expect(applied, `computed zoom on #root`).toBeCloseTo(zoom / 100, 2);
     const overflow = await page.evaluate(
       () =>
         Math.max(
@@ -79,7 +85,15 @@ test("themes flip resolved token values (SC-001)", async ({ page }) => {
   expect(hcOnSubtle.trim().toLowerCase()).toBe("highlighttext");
 });
 
-// SC-001: accents flip the resolved accent tokens.
+// SC-001: accents flip the resolved accent tokens to the exact
+// canonical fills (07 §7.4.1 / 12 §12.17 — round-2 M-06: `!== default`
+// let any wrong value pass).
+const ACCENT_FILLS: Readonly<Record<string, string>> = {
+  "clr-07": "#8e4ec6",
+  "clr-04": "#30a46c",
+  "clr-02": "#f76b15",
+  "clr-08": "#d6409f",
+};
 for (const accent of ["clr-07", "clr-04", "clr-02", "clr-08"] as const) {
   test(`accent ${accent} flips the resolved accent tokens (SC-001)`, async ({
     page,
@@ -91,7 +105,6 @@ for (const accent of ["clr-07", "clr-04", "clr-02", "clr-08"] as const) {
         .getPropertyValue("--accent-solid")
         .trim(),
     );
-    expect(solid).toBeTruthy();
-    expect(solid).not.toBe("#3e63dd");
+    expect(solid.toLowerCase()).toBe(ACCENT_FILLS[accent]);
   });
 }

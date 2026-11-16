@@ -86,7 +86,16 @@ test("t_a11y_004 — stories are axe-clean, focus-visible rings show, motion is 
     // Per-story axe scan: zero violations (SC-006).
     const results = await new AxeBuilder({ page })
       .include(`[data-story-id='${storyId}']`)
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .withTags([
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa",
+        // WCAG 2.2 is the requirement (FR-013); 2.2 rules include the
+        // 24x24 target size documented in 07 §7.4.6 (round-2 M-07).
+        "wcag22a",
+        "wcag22aa",
+      ])
       .analyze();
     const violations = results.violations.map(
       (v) => `${v.id}: ${v.nodes.length}`,
@@ -121,17 +130,61 @@ test("t_a11y_004 — stories are axe-clean, focus-visible rings show, motion is 
       }
     }
     if (primary !== null) {
+      // Prime the keyboard interaction modality: the rings are
+      // :focus-visible-gated (correct — rings belong to keyboard
+      // focus), and Chromium only applies :focus-visible to script
+      // focus when the last interaction was keyboard.
+      await page.keyboard.press("Tab");
       await primary.focus();
-      // Focus check (US3/AC1): assert a visible 2 px outline in the
-      // --focus-ring token color somewhere in the card — RAC often
-      // draws the ring on the label visual instead of the (possibly
-      // visually hidden) input that holds focus.
+      // Focus check (US3/AC1): the ring must belong to the focused
+      // control — its own outline, or the label visual associated
+      // with it (RAC draws the ring on the label while the input
+      // stays visually hidden). Scanning the whole card would pass on
+      // any persistently outlined element (round-2 M-05).
       const ring = await primary.evaluate((el) => {
-        const scope = el.closest("[data-story-id]") ?? el;
-        const target = getComputedStyle(document.documentElement)
+        const ringToken = getComputedStyle(document.documentElement)
           .getPropertyValue("--focus-ring")
           .trim();
-        for (const node of Array.from(scope.querySelectorAll("*"))) {
+        // Ownership: the focused control's own outline; its label
+        // visuals (RAC composes inputs inside their label —
+        // RadioButton renders <label class=segment><input/></label>,
+        // the checkbox ring sits on an indicator span inside the
+        // label); and immediate wrappers, which components ring via
+        // :has(input:focus-visible). Wrappers are checked by own
+        // outline only so the scan can never widen to the card
+        // (round-2 M-05).
+        const ownOnly: Element[] = [el];
+        let wrapper = el.parentElement;
+        for (let depth = 0; wrapper && depth < 3; depth += 1) {
+          ownOnly.push(wrapper);
+          wrapper = wrapper.parentElement;
+        }
+        const labelScopes: Element[] = [];
+        const wrappingLabel = el.closest("label");
+        if (wrappingLabel) labelScopes.push(wrappingLabel);
+        if (el.id) {
+          labelScopes.push(
+            ...Array.from(
+              document.querySelectorAll(`label[for="${el.id}"]`),
+            ),
+          );
+        }
+        const labelledBy = el.getAttribute("aria-labelledby");
+        if (labelledBy) {
+          for (const id of labelledBy.split(/\s+/)) {
+            labelScopes.push(
+              ...Array.from(document.querySelectorAll(`#${CSS.escape(id)}`)),
+            );
+          }
+        }
+        const nodes = [
+          ...ownOnly,
+          ...labelScopes,
+          ...labelScopes.flatMap((scope) =>
+            Array.from(scope.querySelectorAll("*")),
+          ),
+        ];
+        for (const node of nodes) {
           const style = window.getComputedStyle(node);
           if (
             style.outlineStyle !== "none" &&
@@ -140,7 +193,7 @@ test("t_a11y_004 — stories are axe-clean, focus-visible rings show, motion is 
             return {
               width: style.outlineWidth,
               color: style.outlineColor,
-              ring: target,
+              ring: ringToken,
             };
           }
         }
