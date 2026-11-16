@@ -28,7 +28,7 @@
   inline-size: 1rem;
   block-size: 1rem;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-xs, 0.25rem);
+  border-radius: var(--radius-sm);
   background: var(--bg-raised);
 }
 
@@ -180,8 +180,8 @@
   padding: var(--sp-1);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background: var(--bg-overlay);
-  box-shadow: var(--shadow-overlay);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
 }
 
 .options {

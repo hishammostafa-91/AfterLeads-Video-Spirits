@@ -7,8 +7,8 @@
   padding-block: var(--sp-1);
   padding-inline: var(--sp-2);
   border-radius: var(--radius-sm);
-  background: var(--bg-overlay);
-  box-shadow: var(--shadow-overlay);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
   color: var(--text-primary);
   font-size: var(--fs-sm);
 }

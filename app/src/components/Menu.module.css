@@ -4,14 +4,14 @@
 /* Menu family (07 §7.6; tokens only; logical properties only). */
 
 .menu {
-  min-inline-size: var(--menu-min-width, 12.5rem);
+  min-inline-size: 12.5rem;
   max-inline-size: 20rem;
   padding-block: var(--sp-1);
   padding-inline: var(--sp-1);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background: var(--bg-overlay);
-  box-shadow: var(--shadow-overlay);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
   color: var(--text-primary);
   font-size: var(--fs-md);
 }

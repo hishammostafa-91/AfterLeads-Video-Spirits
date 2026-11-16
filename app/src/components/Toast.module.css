@@ -22,8 +22,8 @@
   padding-inline: var(--sp-3);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  background: var(--bg-overlay);
-  box-shadow: var(--shadow-overlay);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
   color: var(--text-primary);
   font-size: var(--fs-md);
 }
