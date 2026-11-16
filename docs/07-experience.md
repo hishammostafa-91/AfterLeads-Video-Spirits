@@ -96,7 +96,7 @@ Tokens are CSS custom properties in `app/src/design/tokens.css`; components refe
 | `--success` / `--success-text` | `#30A46C` / `#3DD68C` | Success |
 | `--info` | `#05A2C2` | Info |
 
-Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accent-subtle` (and `--accent-foreground`: black for green `#30A46C`, orange `#F76B15`, and pink `#D6409F`, white otherwise) with: purple `#8E4EC6`/`#C29FEB`/`#2F1E45`, green `#30A46C`/`#5BD39B`/`#16301F`, orange `#F76B15`/`#FFA066`/`#3A2010`, pink `#D6409F`/`#F08DC6`/`#3A1730`. Dark-theme `--accent-text` values are §7.4.1's; the Light theme overrides `--accent-text` and `--accent-subtle` per accent in §7.4.2 (purple `#6A3A9A`/`#F0E6FA`, green `#1E5A3A`/`#D9F2E4`, orange `#9A3D00`/`#FDE8D9`, pink `#B02878`/`#FADCEC`) so every accent keeps ≥ 4.5:1 text on light surfaces and on its subtle selection background; the default accent (CLR-06) keeps `#3451C4`/`#E6ECFD`. Dark-theme `--accent-text` values are §7.4.1's; the Light theme overrides `--accent-text` per accent in §7.4.2 (purple `#6A3A9A`, green `#1E5A3A`, orange `#9A3D00`, pink `#C03088`) so every accent keeps ≥ 4.5:1 on light surfaces; the default accent (CLR-06) keeps `#3451C4`.
+Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accent-subtle` (and `--accent-foreground`: black for green `#30A46C`, orange `#F76B15`, and pink `#D6409F`, white otherwise) with: purple `#8E4EC6`/`#C29FEB`/`#2F1E45`, green `#30A46C`/`#5BD39B`/`#16301F`, orange `#F76B15`/`#FFA066`/`#3A2010`, pink `#D6409F`/`#F08DC6`/`#3A1730`. Dark-theme `--accent-text` values are §7.4.1's; the Light theme overrides `--accent-text` and `--accent-subtle` per accent in §7.4.2 (purple `#6A3A9A`/`#F0E6FA`, green `#1E5A3A`/`#D9F2E4`, orange `#9A3D00`/`#FDE8D9`, pink `#B02878`/`#FADCEC`) so every accent keeps ≥ 4.5:1 text on light surfaces and on its subtle selection background; the default accent (CLR-06) keeps `#3451C4`/`#E6ECFD`.
 
 ### 7.4.2 Color — Light theme
 
@@ -104,7 +104,7 @@ Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accen
 |---|---|---|---|
 | `--bg-app` | `#F3F4F6` | `--text-primary` | `#1A1B1E` |
 | `--bg-panel` | `#FFFFFF` | `--text-secondary` | `#4B4E57` |
-| `--bg-panel-header` | `#F7F8FA` | `--text-tertiary` | `#6A6D76` (≈ 5.3:1) |
+| `--bg-panel-header` | `#F7F8FA` | `--text-tertiary` | `#6A6D76` (≈ 5.1:1) |
 | `--bg-raised` | `#FFFFFF` | `--text-disabled` | `#A3A6AE` |
 | `--bg-hover` | `#EEF0F3` | `--accent-solid` | `#3E63DD` |
 | `--bg-active` | `#E3E6EB` | `--accent-text` | `#3451C4` (≈ 6.5:1) |

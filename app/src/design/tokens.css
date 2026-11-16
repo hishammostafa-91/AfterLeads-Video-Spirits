@@ -225,11 +225,9 @@
 
 /*
  * Accent alternatives (§7.4.1; 12 §12.17: CLR-06 default + CLR-07,
- * CLR-04, CLR-02, CLR-08) swap the three accent tokens. §7.4.1 is the
- * canonical source for the alternative triples; the default accent's
- * Light variants are §7.4.2's (light-specific values for the
- * alternatives are a canonical gap — flagged for the owner in the
- * evidence notes; the documented triples apply as written).
+ * CLR-04, CLR-02, CLR-08) swap the three accent tokens. The Light
+ * theme overrides --accent-text/--accent-subtle per accent with the
+ * measured values §7.4.1 documents (owner ruling A, round-1 H5).
  */
 [data-accent="clr-06"] {
   --accent-solid: #3e63dd;
