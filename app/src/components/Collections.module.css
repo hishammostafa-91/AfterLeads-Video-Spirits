@@ -26,7 +26,7 @@
 
 .tree-chevron {
   color: var(--text-secondary);
-  transition: rotate var(--motion-fast, 120ms) ease;
+  transition: rotate var(--dur-fast) var(--ease-standard);
 }
 
 :global([dir="rtl"]) .tree-chevron {

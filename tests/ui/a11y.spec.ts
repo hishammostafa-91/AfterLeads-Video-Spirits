@@ -49,6 +49,32 @@ test("t_a11y_004 — stories are axe-clean, focus-visible rings show, motion is 
     expect(duration).not.toBe("none");
   }
 
+  // H-02 (round 2): the transitioned non-progress controls must
+  // compute a 0s duration under the suite's reduced-motion emulation
+  // — the switch thumb and the tree chevron animate through
+  // --dur-fast, which the reduced-motion media query zeroes.
+  const zeroedCards = ["selection.checkbox-switch", "collections.tree"];
+  for (const storyId of zeroedCards) {
+    const card = page.locator(`[data-story-id='${storyId}']`);
+    if ((await card.count()) === 0) continue;
+    const animated = await card.first().evaluate((el) =>
+      [el, ...Array.from(el.querySelectorAll("*"))]
+        .filter(
+          (node) => getComputedStyle(node).transitionDuration !== "0s",
+        )
+        .map(
+          (node) =>
+            `${(node as Element).tagName}.${String(
+              (node as Element).className,
+            )}: ${getComputedStyle(node).transitionDuration}`,
+        ),
+    );
+    expect(
+      animated,
+      `${storyId} must have no non-zero transition durations under reduce`,
+    ).toEqual([]);
+  }
+
   const cards = page.locator("[data-story-id]");
   const count = await cards.count();
   expect(count).toBeGreaterThan(0);

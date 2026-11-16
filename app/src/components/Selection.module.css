@@ -71,7 +71,7 @@
   translate: 0 -50%;
   border-radius: 50%;
   background: var(--text-secondary);
-  transition: inset-inline-start var(--motion-fast, 120ms) ease;
+  transition: inset-inline-start var(--dur-fast) var(--ease-standard);
 }
 
 .switch-button[data-selected] .switch-thumb {
