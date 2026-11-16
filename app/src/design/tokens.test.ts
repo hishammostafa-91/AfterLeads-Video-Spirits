@@ -6,8 +6,6 @@
 // be missing from the other. Pure file parsing, no DOM — the node
 // environment gives import.meta.url a real file: URL (vitest's CSS
 // handling returns empty strings for ?raw imports).
-// @ts-expect-error no @types/node in the baseline (vite.config.ts
-// precedent).
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 

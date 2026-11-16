@@ -11,12 +11,8 @@
  * tokens shipped with no elevation and transparent overlay surfaces
  * (round-2 findings).
  */
-// @ts-expect-error no @types/node in the baseline (tokens.test.ts
-// precedent).
 import { readdirSync, readFileSync, statSync } from "node:fs";
-// @ts-expect-error no @types/node in the baseline.
 import { join } from "node:path";
-// @ts-expect-error no @types/node in the baseline.
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -36,14 +32,14 @@ const walk = (dir: string): void => {
       walk(full);
     } else if (/\.(css|tsx?|mts)$/.test(entry)) {
       const rel = full.slice(SRC.length);
-      const lines = String(readFileSync(full, "utf8")).split("\n");
+      const lines = readFileSync(full, "utf8").split("\n");
       lines.forEach((line: string, idx: number) => {
         for (const match of line.matchAll(DEFINING)) {
           defined.add(match[1]);
         }
         for (const match of line.matchAll(REFERENCING)) {
           const sites = referenced.get(match[1]) ?? [];
-          sites.push(`${rel}:${idx + 1}`);
+          sites.push(`${rel}:${String(idx + 1)}`);
           referenced.set(match[1], sites);
         }
       });

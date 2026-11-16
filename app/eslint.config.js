@@ -101,19 +101,4 @@ export default tseslint.config(
       "i18next/no-literal-string": "off",
     },
   },
-  {
-    // Node-run files (no @types/node in the baseline): keep the
-    // syntax-level rules, drop the type-aware ones whose node globals
-    // they cannot resolve (vite.config.ts precedent). tokens.test.ts
-    // and fonts.test.ts run in the node environment and read files
-    // via fs/crypto.
-    files: [
-      "**/*.mts",
-      "src/design/tokens.test.ts",
-      "src/design/fonts.test.ts",
-      "src/design/contrast.test.ts",
-      "src/design/token-hygiene.test.ts",
-    ],
-    extends: [tseslint.configs.disableTypeChecked],
-  },
 );

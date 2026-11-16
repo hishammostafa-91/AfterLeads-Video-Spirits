@@ -7,14 +7,9 @@
  * suite additionally exercises the checker's failure modes and the
  * pseudo-locales; both gates run locally and in CI.
  */
-// @ts-expect-error no @types/node in the baseline (vite.config.ts
-// precedent); this script runs under node directly.
 import { readFileSync } from "node:fs";
-// @ts-expect-error no @types/node in the baseline.
 import { fileURLToPath } from "node:url";
-// @ts-expect-error no @types/node in the baseline.
 import { join } from "node:path";
-// @ts-expect-error no @types/node in the baseline.
 import { createRequire } from "node:module";
 import { collectIssues, collectUsedIds, LOCALES } from "./i18n-check-core.mts";
 
@@ -46,13 +41,12 @@ const read = (name: string): Record<string, unknown> =>
 const catalogs = Object.fromEntries(
   LOCALES.map((locale) => [locale, read(`${locale}.json`)]),
 ) as Record<string, Record<string, string>>;
-const meta = read("en.meta.json") as Record<string, unknown>;
+const meta = read("en.meta.json");
 
 // ICU syntax validation (docs/08 s8.4; T014): every message must parse.
 const icuIssues: string[] = [];
 for (const locale of LOCALES) {
   const catalog = catalogs[locale];
-  if (!catalog) continue;
   for (const [key, value] of Object.entries(catalog)) {
     if (typeof value !== "string") continue;
     try {
@@ -70,10 +64,9 @@ const issues = [
 
 if (issues.length > 0) {
   for (const issue of issues) console.error(`i18n:check: ${issue}`);
-  // @ts-expect-error no @types/node in the baseline.
   process.exitCode = 1;
 } else {
   console.log(
-    `i18n:check: ${Object.keys(catalogs.en ?? {}).length} keys identical across ${LOCALES.length} locales; meta complete; no unused keys.`,
+    `i18n:check: ${String(Object.keys(catalogs.en).length)} keys identical across ${String(LOCALES.length)} locales; meta complete; no unused keys.`,
   );
 }

@@ -210,6 +210,7 @@ Versions below were verified against the official registries on the baseline dat
 | Dev tools | cargo-nextest / cargo-deny / cargo-llvm-cov / cargo-about / cargo-cyclonedx / git-cliff / tauri-driver | 0.9.150 / 0.20.2 / 0.9.1 / 0.9.3 / 0.5.9 / 2.14.2 / 2.1.0 | Installed by `tools/setup/Install-DevTools.ps1` |
 | Dev tools | @cyclonedx/cyclonedx-npm | 6.x | npm SBOM (08 §8.3.3) |
 | UI | TypeScript | **6.0.x** | 7.x is not supported by `typescript-eslint` (peer `<6.1.0`) |
+| UI | @types/node | 26.x | Node API types for the node-run i18n gate and design tests (added WP-04 round 2; matches the Node 26 runtime) |
 | UI | React / Vite / @vitejs/plugin-react | 19.3.x / 8.3.x / 6.x | |
 | UI | react-aria-components | 1.22.x | Accessible, RTL-aware primitives |
 | UI | dockview | 8.8.x | Docking layout |

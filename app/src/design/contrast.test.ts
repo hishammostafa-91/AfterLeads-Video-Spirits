@@ -8,19 +8,15 @@
  * text — in both the dark and light themes.
  */
 // @vitest-environment node
-// @ts-expect-error no @types/node in the baseline (tokens.test.ts
-// precedent).
 import { readFileSync } from "node:fs";
-// @ts-expect-error no @types/node in the baseline.
 import { dirname, join } from "node:path";
-// @ts-expect-error no @types/node in the baseline.
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const SHEET = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), "tokens.css"),
   "utf8",
-) as string;
+);
 
 function themeBlock(theme: string): string {
   const start = SHEET.indexOf(`[data-theme="${theme}"]`);
@@ -141,7 +137,12 @@ const TEXT_PAIRS: ReadonlyArray<{
   // Input boundaries are UI components (round-2 H-03, owner ruling
   // A): --border-strong must hold ≥3:1 against both surfaces it
   // outlines, in both themes.
-  { label: "border-strong on bg-panel", fg: "border-strong", bg: "bg-panel", min: 3 },
+  {
+    label: "border-strong on bg-panel",
+    fg: "border-strong",
+    bg: "bg-panel",
+    min: 3,
+  },
   {
     label: "border-strong on bg-raised",
     fg: "border-strong",
@@ -165,7 +166,7 @@ describe("token contrast ratios (REQ-A11Y-003)", () => {
         const value = ratio(token(block, pair.fg), token(block, pair.bg));
         expect(
           value,
-          `${theme}: ${pair.label} = ${value.toFixed(2)} (min ${pair.min})`,
+          `${theme}: ${pair.label} = ${value.toFixed(2)} (min ${String(pair.min)})`,
         ).toBeGreaterThanOrEqual(pair.min);
       }
       // On-danger text (CLR-01 amended, owner ruling 2026-11-14):
@@ -254,11 +255,17 @@ describe("token contrast ratios (REQ-A11Y-003)", () => {
         label === "manual high-contrast theme"
           ? SHEET.slice(
               SHEET.indexOf('[data-theme="high-contrast"] {'),
-              SHEET.indexOf("}", SHEET.indexOf('[data-theme="high-contrast"] {')),
+              SHEET.indexOf(
+                "}",
+                SHEET.indexOf('[data-theme="high-contrast"] {'),
+              ),
             )
           : SHEET.slice(
               SHEET.indexOf("@media (forced-colors: active)"),
-              SHEET.indexOf("}", SHEET.indexOf("@media (forced-colors: active)")),
+              SHEET.indexOf(
+                "}",
+                SHEET.indexOf("@media (forced-colors: active)"),
+              ),
             );
       expect(token(block, "accent-subtle")).toBe("Highlight");
       expect(token(block, "accent-subtle-foreground")).toBe("HighlightText");

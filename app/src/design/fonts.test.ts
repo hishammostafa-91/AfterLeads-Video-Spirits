@@ -7,14 +7,9 @@
  * `pnpm -C app test` gate.
  */
 // @vitest-environment node
-// @ts-expect-error no @types/node in the baseline (vite.config.ts
-// precedent); the integrity check runs under node directly.
 import { createHash } from "node:crypto";
-// @ts-expect-error no @types/node in the baseline.
 import { existsSync, readFileSync } from "node:fs";
-// @ts-expect-error no @types/node in the baseline.
 import { dirname, join, resolve } from "node:path";
-// @ts-expect-error no @types/node in the baseline.
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
