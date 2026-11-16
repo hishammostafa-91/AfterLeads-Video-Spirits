@@ -43,18 +43,62 @@ export default tseslint.config(
     },
   },
   {
-    // Attribute-literal coverage (reviewer M8): kept at the
-    // text-children default here because jsx-only mode also flags
-    // test fixtures' component props (no per-file rule override
-    // applies cleanly); product attribute strings are enforced by the
-    // i18n checker's used-but-missing scan and were verified clean.
-    files: [
-      "src/components/**/*.tsx",
-      "src/harness/**/*.tsx",
-      "src/i18n/**/*.tsx",
-    ],
+    // Attribute-literal coverage (round-2 M-04): jsx-only mode also
+    // validates JSX attributes in the product components. The plugin
+    // (6.1.5) has no file-ignore option (checked its schema and
+    // settings handling), so the test fixtures opt out through the
+    // later config block — flat-config layering, not a rule option.
+    // The jsx-attributes exclude list is the plugin's own defaults
+    // plus component-API props whose values are enum identifiers
+    // (variant names, roles, dir), not user-facing copy.
+    files: ["src/components/**/*.tsx", "src/i18n/**/*.tsx"],
     rules: {
-      "i18next/no-literal-string": "error",
+      "i18next/no-literal-string": [
+        "error",
+        {
+          mode: "jsx-only",
+          "jsx-attributes": {
+            include: [],
+            exclude: [
+              "className",
+              "styleName",
+              "style",
+              "type",
+              "key",
+              "id",
+              "width",
+              "height",
+              "variant",
+              "kind",
+              "size",
+              "density",
+              "dir",
+              "role",
+              "fill",
+              "strokeWidth",
+              "as",
+              "name",
+              "lang",
+              "translate",
+              "aria-hidden",
+              "slot",
+              "locale",
+              "defaultLocale",
+              "selectedKey",
+              "defaultSelectedKey",
+            ],
+          },
+        },
+      ],
+    },
+  },
+  {
+    // Test fixtures render copy from the catalogs like the app, but
+    // they also assert literal marker strings — out of scope for
+    // G-13 (never shipped to users).
+    files: ["src/**/*.test.tsx", "src/**/*.test.ts"],
+    rules: {
+      "i18next/no-literal-string": "off",
     },
   },
   {
@@ -68,6 +112,7 @@ export default tseslint.config(
       "src/design/tokens.test.ts",
       "src/design/fonts.test.ts",
       "src/design/contrast.test.ts",
+      "src/design/token-hygiene.test.ts",
     ],
     extends: [tseslint.configs.disableTypeChecked],
   },
