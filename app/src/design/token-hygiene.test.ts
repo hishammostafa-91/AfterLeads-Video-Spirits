@@ -36,8 +36,8 @@ const walk = (dir: string): void => {
       walk(full);
     } else if (/\.(css|tsx?|mts)$/.test(entry)) {
       const rel = full.slice(SRC.length);
-      const lines = readFileSync(full, "utf8").split("\n");
-      lines.forEach((line, idx) => {
+      const lines = String(readFileSync(full, "utf8")).split("\n") as string[];
+      lines.forEach((line: string, idx: number) => {
         for (const match of line.matchAll(DEFINING)) {
           defined.add(match[1]);
         }
