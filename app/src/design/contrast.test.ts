@@ -138,10 +138,16 @@ const TEXT_PAIRS: ReadonlyArray<{
     bg: "bg-panel",
     min: 4.5,
   },
-  // Component/large-text threshold (3:1): the accent edge. The
-  // canonical border-strong values (07 §7.4) are decorative
-  // boundaries — component identification rides on the focus ring
-  // and accent, so no 3:1 border assertion is imposed on them.
+  // Input boundaries are UI components (round-2 H-03, owner ruling
+  // A): --border-strong must hold ≥3:1 against both surfaces it
+  // outlines, in both themes.
+  { label: "border-strong on bg-panel", fg: "border-strong", bg: "bg-panel", min: 3 },
+  {
+    label: "border-strong on bg-raised",
+    fg: "border-strong",
+    bg: "bg-raised",
+    min: 3,
+  },
   { label: "accent-solid on bg-app", fg: "accent-solid", bg: "bg-app", min: 3 },
   {
     label: "accent-solid on bg-raised",

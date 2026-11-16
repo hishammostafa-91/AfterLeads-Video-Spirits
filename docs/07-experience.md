@@ -79,7 +79,7 @@ Tokens are CSS custom properties in `app/src/design/tokens.css`; components refe
 | `--bg-hover` | `#2A2B31` | Hover |
 | `--bg-active` | `#33343B` | Pressed / selected row |
 | `--border-subtle` | `#2A2B30` | Separators |
-| `--border-strong` | `#3A3B42` | Input borders (3.3:1 vs panel) |
+| `--border-strong` | `#6C6D72` | Input borders (≥3:1 vs panel and raised: 3.44:1 / 3.04:1; owner ruling round-2 H-03) |
 | `--text-primary` | `#ECEDEE` | Body text (≈ 15:1) |
 | `--text-secondary` | `#A9ABB3` | Labels (≈ 7.6:1) |
 | `--text-tertiary` | `#83858E` | Hints (≈ 4.7:1) |
@@ -109,7 +109,7 @@ Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accen
 | `--bg-hover` | `#EEF0F3` | `--accent-solid` | `#3E63DD` |
 | `--bg-active` | `#E3E6EB` | `--accent-text` | `#3451C4` (≈ 6.5:1) |
 | `--border-subtle` | `#E4E6EA` | `--accent-subtle` | `#E6ECFD` |
-| `--border-strong` | `#B9BCC4` | `--focus-ring` | `#3E63DD` |
+| `--border-strong` | `#8D9098` | `--focus-ring` | `#3E63DD` |
 
 Status colors are the same hues with darker text variants: danger text `#C62A2F`, warning text `#8A5A00`, success text `#18794E`. The on-fill tokens (`--accent-foreground`, `--danger-foreground`) and the color-picker thumb outline (`--swatch-ring` `#FFFFFF` border with `--swatch-halo` `#000000` shadow, legible over any picked color) are theme-independent.
 
