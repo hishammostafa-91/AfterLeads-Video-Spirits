@@ -9,7 +9,7 @@ Dependencies: docs/10-execution.md §10.8. Baseline: documentation set 1.0.1 (ba
 | WP-01 | CI and quality gates | done | `ci/001-ci-quality-gates` | #3 | 2026-11-02 | — |
 | WP-02 | Core types and project model | done | `feat/002-core-model` | #5 | 2026-11-03 | — |
 | WP-03 | Storage and application services | done | `feat/003-storage-services` | #6 | 2026-11-04 | - |
-| WP-04 | Design system and UI foundation | in-review | `feat/004-design-system` | - | 2026-11-15 | owner review |
+| WP-04 | Design system and UI foundation | in-review | `feat/004-design-system` | #11 | 2026-11-15 | owner review |
 | WP-05 | Application shell | todo | `feat/005-app-shell` | — | — | — |
 | WP-06 | FFmpeg build and media I/O | todo | `feat/006-media-io` | — | — | — |
 | WP-07 | Jobs and workers | todo | `feat/007-jobs-workers` | — | — | — |

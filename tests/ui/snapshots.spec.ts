@@ -13,9 +13,9 @@
 import { expect, test } from "@playwright/test";
 
 const MODES = [
-  { id: "default", url: "" },
-  { id: "compact", url: "&density=compact" },
-  { id: "hc", url: null as string | null },
+  { id: "default", density: false },
+  { id: "compact", density: true },
+  { id: "hc", density: false },
 ] as const;
 
 test("story matrix", async ({ page }, testInfo) => {
@@ -29,7 +29,7 @@ test("story matrix", async ({ page }, testInfo) => {
     // H3: the HC mode must REPLACE the project theme, not append a
     // second ?theme= (URLSearchParams keeps the first value).
     const themeParam = mode.id === "hc" ? "high-contrast" : theme;
-    const url = `/?theme=${themeParam}&locale=${locale}${mode.id === "compact" ? "&density=compact" : ""}`;
+    const url = `/?theme=${themeParam}&locale=${locale}${mode.density ? "&density=compact" : ""}`;
     await page.goto(url);
     await page.evaluate(() => document.fonts.ready);
     const cards = page.locator("[data-story-id]");
@@ -58,7 +58,8 @@ test("story matrix", async ({ page }, testInfo) => {
 });
 
 test("interaction states", async ({ page }, testInfo) => {
-  // 35 stories × (hover/focus/pressed) captures per project.
+  // 42 cards with a primary control × (hover/focus/pressed) captures
+  // per project (static stories are skipped by the selector guard).
   test.setTimeout(180_000);
   const { theme, locale } = testInfo.project.metadata as {
     theme: string;

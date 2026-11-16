@@ -14,7 +14,7 @@
       "family": "Noto Sans Arabic",
       "file": "NotoSansArabic-Variable.ttf",
       "format": "truetype-variations",
-      "sourceUrl": "https://github.com/google/fonts/tree/main/ofl/notosansarabic (NotoSansArabic[wdth,wght].ttf; the repository publishes the variable face as TTF only)",
+      "sourceUrl": "https://github.com/google/fonts/raw/main/ofl/notosansarabic/NotoSansArabic%5Bwdth,wght%5D.ttf (the repository publishes the variable face as TTF only)",
       "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
       "licenseFile": "NotoSansArabic-OFL.txt"
     },
