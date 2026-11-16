@@ -70,7 +70,8 @@ export function KeyframeNavigator({
         }}
       >
         <Diamond
-          size={12}
+          size={ICON_SIZE_DENSE}
+          strokeWidth={ICON_STROKE_WIDTH}
           aria-hidden="true"
           className={isOnKeyframe ? styles.diamondOn : undefined}
           fill={isOnKeyframe ? "currentColor" : "none"}
