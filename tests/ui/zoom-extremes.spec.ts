@@ -138,7 +138,8 @@ test("High Contrast hovered/focused collection rows pair Highlight with Highligh
   // rules above.
 });
 
-// SC-001: accents flip the resolved accent tokens to the exact// canonical fills (07 §7.4.1 / 12 §12.17 — round-2 M-06: `!== default`
+// SC-001: accents flip the resolved accent tokens to the exact
+// canonical fills (07 §7.4.1 / 12 §12.17 - round-2 M-06: `!== default`
 // let any wrong value pass).
 const ACCENT_FILLS: Readonly<Record<string, string>> = {
   "clr-07": "#8e4ec6",

@@ -7,13 +7,13 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 | Gate | Command | Result |
 |---|---|---|
 | All local gates | `pwsh -File tools/verify.ps1` | PASS — docs, commits, rust-format, rust-lint, dependency-policy, crate-rules, placeholders, rust-test, bindings-drift, ui-typecheck, ui-lint, ui-test, i18n ("All available gates passed") |
-| CI (T042) | PR #11 checks | PASS — all 9 green on `feat/004-design-system`: `ui` [job 132935456005](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456005), `ui-harness` [job 132935456199](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456199), plus build/rust-lint/rust-test/docs/commits/dco/e2e-smoke (run [43754482248](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248)) — the golden matrix is byte-reproducible in CI |
+| CI (T042) | PR #11 checks | PASS — all 9 green on `feat/004-design-system`: `ui` [job 132935456005](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456005), `ui-harness` [job 132935456199](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248/job/132935456199), plus build/rust-lint/rust-test/docs/commits/dco/e2e-smoke (run [43754482248](https://github.com/hishammostafa-91/AfterLeads-Video-Spirits/actions/runs/43754482248)) - the golden matrix is threshold-stable in CI (Playwright's per-pixel comparator) |
 | Documentation checks | `python tools/docs/check_docs.py` | PASS |
 | Commit checks | `python tools/git/check_commits.py origin/main..HEAD` | PASS (Conventional Commits + DCO on every commit) |
 | UI typecheck | `pnpm -C app typecheck` | PASS |
 | UI lint | `pnpm -C app lint` (eslint + stylelint + prettier) | PASS |
 | UI unit tests | `pnpm -C app test` | PASS (158 tests over 19 files; includes the round-2 token-hygiene scanner and the real used-id i18n scan) |
-| i18n | `pnpm -C app i18n:check` | PASS (125 keys identical across 6 locales; meta complete; no unused keys; no namespaced key used in code but missing from en.json) |
+| i18n | `pnpm -C app i18n:check` | PASS (130 keys identical across 6 locales; meta complete; no unused keys; no namespaced key used in code but missing from en.json) |
 | Production build | `pnpm -C app exec vite build` | PASS (bundles InterVariable.woff2 352 KB, NotoSansArabic-Variable.ttf 845 KB, JetBrainsMono-Variable.ttf 303 KB) |
 
 ## Acceptance suites (quickstart rows)
@@ -23,9 +23,9 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 | 1 | T-UI-001 | `pnpm -C app test -- -t t_ui_001` | PASS — 7 tests: themes/accent/forced-colors flip live without reload |
 | 2 | T-UI-002 | `pnpm -C app test -- -t t_ui_002` | PASS — 2 unit tests (clamp + `--app-zoom`); the harness `zoom-extremes.spec.ts` covers zoom 80/200 (LOC-90 clipping) and every monitor-DPI step 100/125/150/175/200 with no document overflow |
 | 3 | T-I18N-003 | `pnpm -C app test -- -t t_i18n_003` | PASS — 5 tests: Arabic plurals, `latn` numbers/dates, LTR-isolated timecode |
-| 4 | T-I18N-004 | `pnpm -C app i18n:check` then `pnpm -C app test -- -t t_i18n_004` | PASS — key sets equal (115 keys × 6 locales); 15 tests: LOC-90/LOC-91 pseudo-locales render unclipped |
+| 4 | T-I18N-004 | `pnpm -C app i18n:check` then `pnpm -C app test -- -t t_i18n_004` | PASS — key sets equal (130 keys × 6 locales); 16 tests: LOC-90/LOC-91 pseudo-locales render unclipped |
 | 5 | T-A11Y-004 | `pnpm -C app harness -- --grep a11y` | PASS — 4 passed (one per project): per-story axe zero violations, visible 2 px `--focus-ring` focus rings (asserted by width + token color), reduced-motion zeroes transitions while progress indicators keep animating, badge text+icon |
-| 6 | Snapshots | `pnpm -C app harness` | PASS - 68 tests, 1,224 goldens threshold-stable; repeat-run determinism asserted in-test through Playwright's per-pixel threshold comparator (content-sized text boundaries jitter ±1 between rasterizations - byte equality would false-fail on that noise); axe clean per story |
+| 6 | Snapshots | `pnpm -C app harness` | PASS - 72 tests, 1,224 goldens threshold-stable; repeat-run determinism asserted in-test through Playwright's per-pixel threshold comparator (content-sized text boundaries jitter ±1 between rasterizations - byte equality would false-fail on that noise); axe clean per story |
 
 ## Snapshot matrix counts (T033 + convergence)
 
@@ -35,7 +35,7 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 - `snapshots.spec.ts` "interaction states": 42 cards with a primary control × hover/focus/pressed × 4 projects = **504 goldens** (the M10 selector widening added the Tree/GridList/Table/ListBox rows/options; cards whose only content matches nothing — `menu.context`'s area, progress, badges, empty states — have no interaction state to capture; the page-mode matrix covers them).
 - `hc.spec.ts`: 44 cards × 4 projects under CDP `forced-colors: active` = **176 goldens** (`Emulation.setEmulatedMedia`; `matchMedia("(forced-colors: active)")` asserted true before capture; the skip guard is lowercase-`chromium` — Playwright reports `"chromium"`).
 - `harness.spec.ts`: 4 shell goldens (one per project).
-- Total committed goldens: **1,224 PNG** across 68 tests (the suite grew with the reviewer fixes: zoom 80/200 + the five DPI steps, the theme/accent computed-value tests); first runs write, verification runs pass. Adding cards reflows the CSS grid, so golden updates go through one `--update-snapshots` pass followed by a full verification run.
+- Total committed goldens: **1,224 PNG** across 72 tests (the suite grew with the reviewer fixes: zoom 80/200 + the five DPI steps, the theme/accent computed-value tests, the HC component-pairing test); first runs write, verification runs pass. Adding cards reflows the CSS grid, so golden updates go through one `--update-snapshots` pass followed by a full verification run.
 - Harness API for focused work: `?story=<id>` renders a single card; each card carries `data-story-id`; interaction captures hover with `force` (RAC overlays the native checkbox/switch/radio inputs with their `<label>`, which is the real press target).
 
 ## Contrast rulings implemented (owner, 2026-11-14)

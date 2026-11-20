@@ -227,11 +227,11 @@ Each story lands with its suites green and a commit (Conventional Commits + DCO)
 
 ## Phase 10: Convergence (reviewer round 1 deferrals)
 
-- [ ] T043 Virtualize Tree/GridList/Table beyond 200 rows like `WindowedListBox` (shared `useWindowing`) and make the windowed ListBox operable (focusable options, arrow-key selection, aria-selected reflecting state) per 07 §7.6 "Virtualized beyond 200 rows" (partial)
+- [ ] T043 Virtualize Tree/GridList/Table beyond 200 rows like `WindowedListBox` (shared `useWindowing`) and make the windowed ListBox operable (focusable options, arrow-key selection, aria-selected reflecting state) per 07 §7.6 "Virtualized beyond 200 rows" (partial); when selection styling lands, `[data-selected]` rows take `--accent-subtle` + `--accent-subtle-foreground` (round-4 L-02)
 - [ ] T044 Apply compact density (`[data-density="compact"]` 24 px controls per 07 §7.4.6) to every control family — Selection, NumberField, TimecodeField, Tabs, Menu items, Slider — with one compact-height assertion per family (partial)
 - [ ] T045 NumberField mixed state: keep `onChange` live so the first edit commits out of "—" and drives the placeholder declaratively per 07 §7.6 "mixed state '—'" (partial)
 - [ ] T046 TimecodeField: take integer flicks (02 ADR-008) instead of raw frames and expose per-segment spinbutton semantics (role/aria-valuenow) per FR-012/07 §7.6 (partial)
 - [ ] T047 Harness render purity: move `ensureUrlPersistence`/`ensureLocaleFromUrl`/density side-effects into effects and expose a locale reset helper for tests (partial)
 - [ ] T048 Toast: dismiss button + hover/focus pause (WCAG 2.2.1) and route error toasts through the assertive region per 07 §7.13 (partial)
-- [ ] T049 Tree semantics: selection state (aria-selected reflecting selection, Space activating leaves), clamped (non-wrapping) arrows, and a required accessible label per APG tree/owner ruling A (partial)
+- [ ] T049 Tree semantics: selection state (aria-selected reflecting selection, Space activating leaves), clamped (non-wrapping) arrows, and a required accessible label per APG tree/owner ruling A (partial); selected rows style with `--accent-subtle` + `--accent-subtle-foreground` (round-4 L-02)
 - [ ] T050 Replace the inline `jsx-a11y/no-autofocus` disable in `Dialog.tsx` with RAC-managed initial focus (or an owner-acknowledged scoped override) per G-08 (partial)
