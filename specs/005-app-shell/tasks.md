@@ -21,9 +21,9 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 0 — Command catalog foundation (plan Phase 0)
 
-- [ ] T001 Create `app/src/commands/catalog.ts`: the 168-entry typed table from 12 §12.10 (commandId, labelKey, menu path, default shortcut as physical `KeyboardEvent.code` sequence, context, checkable, implementedIn WP) and `app/src/commands/catalog.fixture.ts` with the raw KB table; both files' headers cite 12 §12.10
-- [ ] T002 Unit tests `app/src/commands/catalog.test.ts`: registry ≡ fixture (168/168 exact fields), zero conflicts in the default map within any context, menu paths cover exactly the 12 §12.11 groups, KB-168 is palette-only (US2)
-- [ ] T003 Shortcut display helper `app/src/commands/keyLabel.ts` (US label fallback, `navigator.keyboard.getLayoutMap()` when available) with unit tests
+- [X] T001 Create `app/src/commands/catalog.ts`: the 168-entry typed table from 12 §12.10 (commandId, labelKey, menu path, default shortcut as physical `KeyboardEvent.code` sequence, context, checkable, implementedIn WP) and `app/src/commands/catalog.fixture.ts` with the raw KB table; both files' headers cite 12 §12.10
+- [X] T002 Unit tests `app/src/commands/catalog.test.ts`: registry ≡ fixture (168/168 exact fields), zero conflicts in the default map within any context, menu paths cover exactly the 12 §12.11 groups, KB-168 is palette-only (US2)
+- [X] T003 Shortcut display helper `app/src/commands/keyLabel.ts` (US label fallback, `navigator.keyboard.getLayoutMap()` when available) with unit tests
 
 ## Phase 1 — Command runtime (plan Phase 1)
 
