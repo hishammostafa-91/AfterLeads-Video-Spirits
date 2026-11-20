@@ -1,6 +1,6 @@
 # WP-04 Evidence — commands, results, and test IDs (G-09)
 
-Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-14/15. Branch `feat/004-design-system`.
+Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-14..16. Branch `feat/004-design-system`.
 
 ## Gates
 
@@ -12,8 +12,8 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 | Commit checks | `python tools/git/check_commits.py origin/main..HEAD` | PASS (Conventional Commits + DCO on every commit) |
 | UI typecheck | `pnpm -C app typecheck` | PASS |
 | UI lint | `pnpm -C app lint` (eslint + stylelint + prettier) | PASS |
-| UI unit tests | `pnpm -C app test` | PASS (137 tests; includes `tokens.test.ts`, `contrast.test.ts` (7), `fonts.test.ts` (4), SegmentedControl (2), MenuItemCheckbox (2)) |
-| i18n | `pnpm -C app i18n:check` | PASS (115 keys identical across 6 locales; meta complete; no unused keys; no namespaced key used in code but missing from en.json) |
+| UI unit tests | `pnpm -C app test` | PASS (158 tests over 19 files; includes the round-2 token-hygiene scanner and the real used-id i18n scan) |
+| i18n | `pnpm -C app i18n:check` | PASS (125 keys identical across 6 locales; meta complete; no unused keys; no namespaced key used in code but missing from en.json) |
 | Production build | `pnpm -C app exec vite build` | PASS (bundles InterVariable.woff2 352 KB, NotoSansArabic-Variable.ttf 845 KB, JetBrainsMono-Variable.ttf 303 KB) |
 
 ## Acceptance suites (quickstart rows)
@@ -54,9 +54,9 @@ Owner agreed to fix the CRITICAL/HIGH set; the standing "all findings including 
 - **H5 (ruling A)** Light-theme `--accent-text`+`--accent-subtle` overrides for CLR-07/04/02/08 (purple `#6A3A9A`/`#F0E6FA`, green `#1E5A3A`/`#D9F2E4`, orange `#9A3D00`/`#FDE8D9`, pink `#B02878`/`#FADCEC`), documented in 07 §7.4.1's alternatives paragraph; `contrast.test.ts` now asserts accent-text on bg-app/bg-panel/accent-subtle for both themes × all five accents (19 tests total, incl. focus-ring ≥3:1 and the `*-text` status pairs).
 - **M5** ContextMenu opens via the ContextMenu key / Shift+F10 (focusable `role="button" aria-haspopup="menu"` target; keyboard test).
 - **M6** the IconButton tooltip is the ICU message `components.iconButton.tooltip` (`{label} ({shortcut})`) — no concatenation.
-- **M7** `i18n:check` validates ICU syntax itself, resolving the formatjs parser through `eslint-plugin-formatjs`'s pnpm scope (no new dependency).
-- **M8** stylelint bans color functional notation (`rgb()/hsl()/oklch()/…`) on color-bearing properties outside tokens.css (probed failing on `rgb(255 0 0)`); the eslint attribute-literal half stays at text-only mode (jsx-only also flags test fixtures and no per-file override applies) — product attribute strings verified clean and covered by the i18n used-but-missing scan.
-- **M9** every icon usage takes `ICON_SIZE_DENSE`/`ICON_SIZE_TOOLBAR` + `ICON_STROKE_WIDTH` (16/20/1.75 per 07 §7.5; no 12/24 leftovers).
+- **M7** `i18n:check` validates ICU syntax itself, resolving the formatjs parser through `eslint-plugin-formatjs`'s pnpm scope (no new dependency). *(Superseded in round 2, L-04: the parser now resolves through `react-intl`'s scope — the exact version the runtime uses.)*
+- **M8** stylelint bans color functional notation (`rgb()/hsl()/oklch()/…`) on color-bearing properties outside tokens.css (probed failing on `rgb(255 0 0)`); the eslint attribute-literal half stays at text-only mode (jsx-only also flags test fixtures and no per-file override applies) — product attribute strings verified clean and covered by the i18n used-but-missing scan. *(Superseded in round 2, M-04: jsx-only attribute mode landed via flat-config layering - a later config block turns the rule off for test fixtures; the plugin itself has no file-ignore option in 6.1.5.)*
+- **M9** every icon usage takes `ICON_SIZE_DENSE`/`ICON_SIZE_TOOLBAR` + `ICON_STROKE_WIDTH` (16/20/1.75 per 07 §7.5; no 12/24 leftovers). *(The round-2 review found the claim premature — `KeyframeNavigator` still had `size={12}`; fixed as L-02 and now true.)*
 - **M10** focus checks assert `outline-width: 2px` and the `--focus-ring` token color; the interaction selector covers `[role=treeitem|row|option]` so Tree/GridList/Table/ListBox get interaction goldens.
 - **M11** zoom-extremes covers all five DPI steps (100/125/150/175/200) plus 80/200 extremes, and asserts computed token flips per theme/accent (SC-001/SC-002); High Contrast asserts `--bg-app: Canvas`.
 - **M12** see H5 — full pair matrix in contrast.test.ts.
@@ -73,3 +73,30 @@ Deferred with owner-visible tracking (appended as Phase 10 tasks): M1 (windowing
 - Light-theme values for the non-default accent triples remain the documented dark triples (canonical gap flagged in `tokens.css`; §7.4.1 note added for `--accent-foreground`).
 - RAC 1.22.1 gaps worked around in-component: ColorSlider/ColorWheel thumb inputs are named via a RAC `<Label>` child (`aria-label` stays on the group and leaves the input unnamed); CurveEditor renders its graph inside a real `TabPanel` so the selected tab's `aria-controls` resolves; the ContextMenu anchor is a zero-size `<span aria-hidden="true">` (an anchor `<button>` without a name fails `button-name`); WindowedListBox's scroll container is the focusable `role="listbox"` (WCAG 2.1.1 scroll access).
 - Convergence additions (Phase 9): `SegmentedControl` composes RAC `RadioField`/`RadioButton` (the bare `Radio` primitive is deprecated in 1.22); checkable menu items are `MenuItemCheckbox` (role=menuitemcheckbox via the render prop, D6-style — RAC ships none); `app/src/design/icons.ts` is the Lucide base-set barrel + the §7.5 conventions (16 px dense / 20 px toolbar / stroke 1.75) and every component imports through it; the nine `*.states` cards cover the FR-007 disabled/error states for the interactive families (Fields, Selection, Menu, Overlays, Tabs, Numeric, Color, Collections) — Feedback/Badge/EmptyState are display components without disabled/error states in their §7.6 contracts, covered by the page-mode matrix instead.
+
+
+## Reviewer round 2 (2026-11-16) - verdict FAIL, all findings fixed same day
+
+Report: `plan/tracking/reviews/WP-04-r2.md` (round 1 was delivered in-session before the file convention existed). Round-1 fix set verified present and correct by the reviewer. New findings: 3 HIGH, 7 MEDIUM (+2 already tracked as T046/T048), 7 LOW (+2 tracked). Owner rulings before fixing (2026-11-16):
+
+- **H-03 ruling A**: `--border-strong` darkened to `#6C6D72` (3.44:1 panel / 3.04:1 raised) and light `#8D9098` (3.19:1) - previously 1.59:1/1.90:1 while 07 s7.4.1 annotated 3.3:1 and `contrast.test.ts` exempted borders as decorative. Both doc tables amended; the exemption comment replaced by explicit border-on-panel/raised assertions.
+- **H-01 ruling A**: new `--accent-subtle-foreground` (equals `--accent-text` via lazy indirection; `HighlightText` in both HC triggers) - previously both HC tokens mapped to `Highlight`, so selected/hovered surfaces painted Highlight-on-High (1:1, invisible labels in the user-selectable HC theme). Six subtle-fill rules swapped; s7.4.1 gains the token row, s7.4.3 states the pairing; `contrast.test.ts` asserts both HC mappings and the runtime `HighlightText` resolve.
+
+Fixes (atomic commits, verified individually):
+
+- **H-02** `7c1d288` - `--motion-fast` never existed (120ms literal fallback survived reduced motion on the tree chevron + switch thumb); now `--dur-fast`+`--ease-standard`, and the a11y suite asserts zero non-zero transition durations under the suite's reduce emulation on both cards.
+- **H-01** `6bdcecd`, **H-03** `766bbd3` - as ruled above.
+- **M-01 + L-01 (+2 found in class)** `0c42d9f` - `--shadow-overlay` and `--bg-overlay` were never defined: every menu/dialog/toast/tooltip/popover shipped transparent with no elevation (a var() to an undefined custom property invalidates the declaration at computed-value time); `--menu-min-width` rode a literal fallback. Overlays now use `--bg-raised` (s7.4.1: menus are raised surfaces) + `--shadow-popover`/`--shadow-dialog` (s7.4.6); `--radius-xs` fallbacks collapse to `--radius-sm`. New `token-hygiene.test.ts` fails on any var() reference to an undefined custom property (0 undefined over 100 defined, with an anti-vacuity sanity assertion).
+- **L-02** `7381ba2` - keyframe diamond 12px/default-stroke -> `ICON_SIZE_DENSE`/`ICON_STROKE_WIDTH`.
+- **M-02** `d5ea2f9` - 07 s7.4.1: the duplicated light-override sentence (pink `#C03088` at 4.11:1, contradicting the kept `#B02878`/`#FADCEC`) removed; stale light tertiary annotation 5.3:1 -> measured 5.1:1 (the round-2 reviewer's 4.70:1 was itself wrong - the project formula measures 5.17:1); tokens.css stale canonical-gap comment updated.
+- **M-04** `a16c337` - jsx-only attribute-literal mode landed: product components (src/components, src/i18n) run `i18next/no-literal-string` in jsx-only with plugin-default + enum-valued API-prop attribute excludes (probe-driven); test fixtures opt out via a later flat-config block. The round-1 "no clean override" claim was wrong - the plugin (6.1.5, schema verified) has no file-ignore option, but flat-config layering provides it.
+- **L-06** `7619f7f` (owner approved) - `@types/node` 26.6.6 (published 2026-10-28, matches the Node 26 runtime) added to the docs/00 s0.8 baseline; TypeScript 6 no longer auto-includes node_modules/@types so both tsconfigs set `types:["node"]`; all 16 `@ts-expect-error` suppressions removed and the eslint `disableTypeChecked` exemption block deleted - type-aware linting then surfaced and fixed 12 real issues it had masked.
+- **L-04 + L-05** `e1ddb9a` + `fcccf37` - the ICU parser resolves through `react-intl`'s scope (declared dependency; exactly the runtime's `@formatjs/icu-messageformat-parser 3.5.22`); the vitest suite feeds the REAL source scan into `collectIssues` (the unused-key case was vacuous) and `collectUsedIds` gets a fixture test (literal ids found, dynamic ignored; non-namespaced fixture ids stay inert under the checker's prefix filter).
+- **M-05/M-06/M-07** `eaecb7c` - the focus-ring check proves ownership (the focused control's own outline, its label visuals - RAC composes inputs inside their label - or immediate wrappers ringed via `:has(input:focus-visible)`, wrappers own-outline only so the scan cannot widen to the card; keyboard modality primed with Tab because rings are :focus-visible-gated). Zoom asserted through the computed `zoom` on #root; accents assert the exact s12.17 fills. axe gains `wcag22a`/`wcag22aa` - zero violations across 44 stories x 4 projects.
+- **L-07/L-08/L-09** `29ae9ab` - dead `MODES[].url` dropped; FNT-02 `sourceUrl` points at the exact raw file (percent-encoded brackets); STATUS.md records PR #11; stale "35 stories" comment corrected.
+- **Goldens** `0096475` - 76 of 1,224 regenerated (shape unchanged: 528 matrix + 504 interactions + 176 forced-colors) after one `--update-snapshots` pass; the clean run passes over the new set.
+
+Round-2 verification: `pnpm -C app test` 158/158; `pnpm -C app harness` 68 passed over 1,224 goldens (regen then clean run); `pnpm -C app i18n:check` 125 keys; `pwsh -File tools/verify.ps1` all 13 gates PASS; `python tools/docs/check_docs.py` PASS.
+
+Still deferred (owner-tracked Phase 10, unchanged): T043-T050. The reviewer's M-09 warning stands: T046 (TimecodeField flicks API) should land before WP-05 binds the frames-based signature.
+
