@@ -1,0 +1,3081 @@
+[
+  {
+    "kb": "KB-001",
+    "id": "file.newProject",
+    "label": "New Project…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+N",
+    "shortcuts": [
+      {
+        "key": "KeyN",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-002",
+    "id": "file.openProject",
+    "label": "Open Project…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+O",
+    "shortcuts": [
+      {
+        "key": "KeyO",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-003",
+    "id": "file.save",
+    "label": "Save",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+S",
+    "shortcuts": [
+      {
+        "key": "KeyS",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-004",
+    "id": "file.saveAs",
+    "label": "Save As…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+S",
+    "shortcuts": [
+      {
+        "key": "KeyS",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-005",
+    "id": "file.closeProject",
+    "label": "Close Project",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+W",
+    "shortcuts": [
+      {
+        "key": "KeyW",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-006",
+    "id": "file.importMedia",
+    "label": "Import Media…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+I",
+    "shortcuts": [
+      {
+        "key": "KeyI",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-007",
+    "id": "file.importCaptions",
+    "label": "Import Captions…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-008",
+    "id": "file.export",
+    "label": "Export…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+E",
+    "shortcuts": [
+      {
+        "key": "KeyE",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-009",
+    "id": "file.exportFrame",
+    "label": "Export Frame…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+E",
+    "shortcuts": [
+      {
+        "key": "KeyE",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-010",
+    "id": "file.exportMarkers",
+    "label": "Export Markers › Chapter List / CSV…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-011",
+    "id": "file.exportEdl",
+    "label": "Export EDL…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-012",
+    "id": "file.collectFiles",
+    "label": "Collect Files…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-013",
+    "id": "file.restoreBackup",
+    "label": "Restore from Backup…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-014",
+    "id": "file.projectSettings",
+    "label": "Project Settings…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-015",
+    "id": "file.settings",
+    "label": "Settings…",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+,",
+    "shortcuts": [
+      {
+        "key": "Comma",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-016",
+    "id": "file.exit",
+    "label": "Exit",
+    "menu": "File",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+F4",
+    "shortcuts": [
+      {
+        "key": "F4",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-017",
+    "id": "edit.undo",
+    "label": "Undo",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Z",
+    "shortcuts": [
+      {
+        "key": "KeyZ",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-018",
+    "id": "edit.redo",
+    "label": "Redo",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Y (also Ctrl+Shift+Z)",
+    "shortcuts": [
+      {
+        "key": "KeyY",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-019",
+    "id": "edit.cut",
+    "label": "Cut",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+X",
+    "shortcuts": [
+      {
+        "key": "KeyX",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-020",
+    "id": "edit.copy",
+    "label": "Copy",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+C",
+    "shortcuts": [
+      {
+        "key": "KeyC",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-021",
+    "id": "edit.paste",
+    "label": "Paste",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+V",
+    "shortcuts": [
+      {
+        "key": "KeyV",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-022",
+    "id": "edit.pasteInsert",
+    "label": "Paste Insert",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+V",
+    "shortcuts": [
+      {
+        "key": "KeyV",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-023",
+    "id": "edit.pasteAttributes",
+    "label": "Paste Attributes…",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+V",
+    "shortcuts": [
+      {
+        "key": "KeyV",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-024",
+    "id": "edit.duplicate",
+    "label": "Duplicate",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+D",
+    "shortcuts": [
+      {
+        "key": "KeyD",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-025",
+    "id": "edit.delete",
+    "label": "Delete",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Delete",
+    "shortcuts": [
+      {
+        "key": "Delete",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-026",
+    "id": "edit.rippleDelete",
+    "label": "Ripple Delete",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+Delete",
+    "shortcuts": [
+      {
+        "key": "Delete",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-027",
+    "id": "edit.selectAll",
+    "label": "Select All",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+A",
+    "shortcuts": [
+      {
+        "key": "KeyA",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-028",
+    "id": "edit.deselectAll",
+    "label": "Deselect All",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+A",
+    "shortcuts": [
+      {
+        "key": "KeyA",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-029",
+    "id": "edit.rename",
+    "label": "Rename",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "F2",
+    "shortcuts": [
+      {
+        "key": "F2",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-030",
+    "id": "edit.find",
+    "label": "Find",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+F",
+    "shortcuts": [
+      {
+        "key": "KeyF",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-031",
+    "id": "edit.keyboardShortcuts",
+    "label": "Keyboard Shortcuts…",
+    "menu": "Edit",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+K",
+    "shortcuts": [
+      {
+        "key": "KeyK",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-032",
+    "id": "clip.split",
+    "label": "Split at Playhead",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+K",
+    "shortcuts": [
+      {
+        "key": "KeyK",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-033",
+    "id": "clip.splitAll",
+    "label": "Split All Tracks at Playhead",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+K",
+    "shortcuts": [
+      {
+        "key": "KeyK",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-034",
+    "id": "clip.toggleEnabled",
+    "label": "Enable/Disable Clip",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+E",
+    "shortcuts": [
+      {
+        "key": "KeyE",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-035",
+    "id": "clip.toggleLink",
+    "label": "Link/Unlink",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+L",
+    "shortcuts": [
+      {
+        "key": "KeyL",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-036",
+    "id": "clip.group",
+    "label": "Group",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+G",
+    "shortcuts": [
+      {
+        "key": "KeyG",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-037",
+    "id": "clip.ungroup",
+    "label": "Ungroup",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+G",
+    "shortcuts": [
+      {
+        "key": "KeyG",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-038",
+    "id": "clip.speedDuration",
+    "label": "Speed/Duration…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+R",
+    "shortcuts": [
+      {
+        "key": "KeyR",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-039",
+    "id": "clip.reverse",
+    "label": "Reverse",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-040",
+    "id": "clip.freezeFrame",
+    "label": "Freeze Frame…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-041",
+    "id": "clip.nest",
+    "label": "Nest Selection",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-042",
+    "id": "clip.matchFrame",
+    "label": "Match Frame (show in Source)",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "F",
+    "shortcuts": [
+      {
+        "key": "KeyF",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-043",
+    "id": "clip.addMaskRect",
+    "label": "Add Rectangle Mask",
+    "menu": "Clip",
+    "submenu": "Mask",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-044",
+    "id": "clip.addMaskEllipse",
+    "label": "Add Ellipse Mask",
+    "menu": "Clip",
+    "submenu": "Mask",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-045",
+    "id": "clip.addMaskPath",
+    "label": "Draw Path Mask",
+    "menu": "Clip",
+    "submenu": "Mask",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-046",
+    "id": "clip.labelColor",
+    "label": "Label Color › CLR-01..08",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-047",
+    "id": "clip.normalizeLoudness",
+    "label": "Normalize Loudness…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-048",
+    "id": "clip.stabilize",
+    "label": "Basic Stabilize…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-049",
+    "id": "clip.transcribe",
+    "label": "Transcribe to Captions…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-050",
+    "id": "clip.copyGrade",
+    "label": "Copy Grade",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+C",
+    "shortcuts": [
+      {
+        "key": "KeyC",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-051",
+    "id": "clip.pasteGrade",
+    "label": "Paste Grade",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+Shift+V",
+    "shortcuts": [
+      {
+        "key": "KeyV",
+        "ctrl": true,
+        "shift": true,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-052",
+    "id": "media.createProxy",
+    "label": "Create Proxies",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "media",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-053",
+    "id": "media.optimize",
+    "label": "Optimize Media…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "media",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-054",
+    "id": "media.relink",
+    "label": "Relink Media…",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "media",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-055",
+    "id": "media.revealInExplorer",
+    "label": "Show in Explorer",
+    "menu": "Clip",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+R",
+    "shortcuts": [
+      {
+        "key": "KeyR",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "media",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-056",
+    "id": "timeline.newSequence",
+    "label": "New Sequence…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+N",
+    "shortcuts": [
+      {
+        "key": "KeyN",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-057",
+    "id": "timeline.sequenceSettings",
+    "label": "Sequence Settings…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-058",
+    "id": "timeline.addVideoTrack",
+    "label": "Add Video Track",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-059",
+    "id": "timeline.addAudioTrack",
+    "label": "Add Audio Track",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-060",
+    "id": "timeline.addCaptionTrack",
+    "label": "Add Caption Track",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-061",
+    "id": "timeline.insert",
+    "label": "Insert from Source",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": ", (Comma)",
+    "shortcuts": [
+      {
+        "key": "Comma",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-062",
+    "id": "timeline.overwrite",
+    "label": "Overwrite from Source",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": ". (Period)",
+    "shortcuts": [
+      {
+        "key": "Period",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-063",
+    "id": "timeline.lift",
+    "label": "Lift In–Out",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "; (Semicolon)",
+    "shortcuts": [
+      {
+        "key": "Semicolon",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-064",
+    "id": "timeline.extract",
+    "label": "Extract In–Out",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "' (Quote)",
+    "shortcuts": [
+      {
+        "key": "Quote",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-065",
+    "id": "timeline.trimPrevToPlayhead",
+    "label": "Ripple Trim Previous Edit to Playhead",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Q",
+    "shortcuts": [
+      {
+        "key": "KeyQ",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-066",
+    "id": "timeline.trimNextToPlayhead",
+    "label": "Ripple Trim Next Edit to Playhead",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "W",
+    "shortcuts": [
+      {
+        "key": "KeyW",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-067",
+    "id": "timeline.extendEdit",
+    "label": "Extend Edit to Playhead",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "E",
+    "shortcuts": [
+      {
+        "key": "KeyE",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-068",
+    "id": "timeline.addVideoTransition",
+    "label": "Add Default Video Transition",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+T",
+    "shortcuts": [
+      {
+        "key": "KeyT",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-069",
+    "id": "timeline.addAudioTransition",
+    "label": "Add Default Audio Crossfade",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+T",
+    "shortcuts": [
+      {
+        "key": "KeyT",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-070",
+    "id": "timeline.toggleSnapping",
+    "label": "Snapping",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "S",
+    "shortcuts": [
+      {
+        "key": "KeyS",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": true,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-071",
+    "id": "timeline.toggleLinkedSelection",
+    "label": "Linked Selection",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+L",
+    "shortcuts": [
+      {
+        "key": "KeyL",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": true,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-072",
+    "id": "timeline.closeGap",
+    "label": "Close Gap",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-073",
+    "id": "timeline.deleteAllGaps",
+    "label": "Delete All Gaps on Track",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-074",
+    "id": "timeline.nudgeLeft",
+    "label": "Nudge Left 1 Frame",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-075",
+    "id": "timeline.nudgeRight",
+    "label": "Nudge Right 1 Frame",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-076",
+    "id": "timeline.nudgeLeft10",
+    "label": "Nudge Left 10 Frames",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+Shift+Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": false,
+        "shift": true,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-077",
+    "id": "timeline.nudgeRight10",
+    "label": "Nudge Right 10 Frames",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+Shift+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": false,
+        "shift": true,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-078",
+    "id": "timeline.audioSubframeNudge",
+    "label": "Nudge Audio by 1/4 Frame (Left/Right)",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+Left / Ctrl+Alt+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      },
+      {
+        "key": "ArrowRight",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-079",
+    "id": "timeline.zoomIn",
+    "label": "Zoom In",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+=",
+    "shortcuts": [
+      {
+        "key": "Equal",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-080",
+    "id": "timeline.zoomOut",
+    "label": "Zoom Out",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+-",
+    "shortcuts": [
+      {
+        "key": "Minus",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-081",
+    "id": "timeline.zoomFit",
+    "label": "Zoom to Fit",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+Z",
+    "shortcuts": [
+      {
+        "key": "KeyZ",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-082",
+    "id": "timeline.addMarker",
+    "label": "Add Marker",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "M",
+    "shortcuts": [
+      {
+        "key": "KeyM",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-083",
+    "id": "timeline.editMarker",
+    "label": "Edit Marker…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+M",
+    "shortcuts": [
+      {
+        "key": "KeyM",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-084",
+    "id": "timeline.nextMarker",
+    "label": "Next Marker",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-085",
+    "id": "timeline.prevMarker",
+    "label": "Previous Marker",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-086",
+    "id": "timeline.addCaption",
+    "label": "Add Caption at Playhead",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+A",
+    "shortcuts": [
+      {
+        "key": "KeyA",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-087",
+    "id": "timeline.listView",
+    "label": "Timeline List View",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+L",
+    "shortcuts": [
+      {
+        "key": "KeyL",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": true,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-088",
+    "id": "timeline.recordVoiceOver",
+    "label": "Record Voice-over…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+R",
+    "shortcuts": [
+      {
+        "key": "KeyR",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-089",
+    "id": "timeline.autoDuck",
+    "label": "Auto-Duck Music…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-090",
+    "id": "timeline.transcribeSequence",
+    "label": "Transcribe Sequence…",
+    "menu": "Timeline",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-091",
+    "id": "tool.select",
+    "label": "Selection Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "V",
+    "shortcuts": [
+      {
+        "key": "KeyV",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-092",
+    "id": "tool.blade",
+    "label": "Blade Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "B",
+    "shortcuts": [
+      {
+        "key": "KeyB",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-093",
+    "id": "tool.trim",
+    "label": "Trim Tool (ripple at edge, roll at edit point)",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "T",
+    "shortcuts": [
+      {
+        "key": "KeyT",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-094",
+    "id": "tool.slip",
+    "label": "Slip Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "Y",
+    "shortcuts": [
+      {
+        "key": "KeyY",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-095",
+    "id": "tool.slide",
+    "label": "Slide Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "U",
+    "shortcuts": [
+      {
+        "key": "KeyU",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-096",
+    "id": "tool.hand",
+    "label": "Hand Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "H",
+    "shortcuts": [
+      {
+        "key": "KeyH",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-097",
+    "id": "tool.zoom",
+    "label": "Zoom Tool",
+    "menu": "Timeline",
+    "submenu": "Tools",
+    "paletteOnly": false,
+    "rawShortcut": "Z",
+    "shortcuts": [
+      {
+        "key": "KeyZ",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-098",
+    "id": "playback.playPause",
+    "label": "Play/Pause",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Space",
+    "shortcuts": [
+      {
+        "key": "Space",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-099",
+    "id": "playback.shuttleReverse",
+    "label": "Shuttle Reverse",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "J",
+    "shortcuts": [
+      {
+        "key": "KeyJ",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-100",
+    "id": "playback.pause",
+    "label": "Pause",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "K",
+    "shortcuts": [
+      {
+        "key": "KeyK",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-101",
+    "id": "playback.shuttleForward",
+    "label": "Shuttle Forward",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "L",
+    "shortcuts": [
+      {
+        "key": "KeyL",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-102",
+    "id": "playback.stepBack",
+    "label": "Previous Frame",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-103",
+    "id": "playback.stepForward",
+    "label": "Next Frame",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-104",
+    "id": "playback.stepBack10",
+    "label": "Back 10 Frames",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-105",
+    "id": "playback.stepForward10",
+    "label": "Forward 10 Frames",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-106",
+    "id": "playback.prevEdit",
+    "label": "Previous Edit Point",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Up",
+    "shortcuts": [
+      {
+        "key": "ArrowUp",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-107",
+    "id": "playback.nextEdit",
+    "label": "Next Edit Point",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Down",
+    "shortcuts": [
+      {
+        "key": "ArrowDown",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-108",
+    "id": "playback.goStart",
+    "label": "Go to Start",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Home",
+    "shortcuts": [
+      {
+        "key": "Home",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-109",
+    "id": "playback.goEnd",
+    "label": "Go to End",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "End",
+    "shortcuts": [
+      {
+        "key": "End",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-110",
+    "id": "playback.markIn",
+    "label": "Mark In",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "I",
+    "shortcuts": [
+      {
+        "key": "KeyI",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-111",
+    "id": "playback.markOut",
+    "label": "Mark Out",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "O",
+    "shortcuts": [
+      {
+        "key": "KeyO",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-112",
+    "id": "playback.clearIn",
+    "label": "Clear In",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+I",
+    "shortcuts": [
+      {
+        "key": "KeyI",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-113",
+    "id": "playback.clearOut",
+    "label": "Clear Out",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+O",
+    "shortcuts": [
+      {
+        "key": "KeyO",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-114",
+    "id": "playback.clearInOut",
+    "label": "Clear In and Out",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+X",
+    "shortcuts": [
+      {
+        "key": "KeyX",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-115",
+    "id": "playback.goIn",
+    "label": "Go to In",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+I",
+    "shortcuts": [
+      {
+        "key": "KeyI",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-116",
+    "id": "playback.goOut",
+    "label": "Go to Out",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+O",
+    "shortcuts": [
+      {
+        "key": "KeyO",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-117",
+    "id": "playback.playInToOut",
+    "label": "Play In to Out",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+Space",
+    "shortcuts": [
+      {
+        "key": "Space",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-118",
+    "id": "playback.toggleLoop",
+    "label": "Loop Playback",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+L",
+    "shortcuts": [
+      {
+        "key": "KeyL",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": true,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-119",
+    "id": "playback.goToTimecode",
+    "label": "Go to Timecode…",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+J",
+    "shortcuts": [
+      {
+        "key": "KeyJ",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-120",
+    "id": "playback.toggleAudioScrub",
+    "label": "Audio Scrubbing",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+S",
+    "shortcuts": [
+      {
+        "key": "KeyS",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-121",
+    "id": "playback.previewQuality",
+    "label": "Preview Resolution › Auto/Full/Half/Quarter",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-122",
+    "id": "playback.playEveryFrame",
+    "label": "Play Every Frame",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": true,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-123",
+    "id": "playback.fullscreen",
+    "label": "Full Screen",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "F11",
+    "shortcuts": [
+      {
+        "key": "F11",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-124",
+    "id": "playback.externalPreview",
+    "label": "External Preview Window…",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+F11",
+    "shortcuts": [
+      {
+        "key": "F11",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-125",
+    "id": "view.workspaceEdit",
+    "label": "Workspace › Edit",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+1",
+    "shortcuts": [
+      {
+        "key": "Digit1",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-126",
+    "id": "view.workspaceColor",
+    "label": "Workspace › Color",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+2",
+    "shortcuts": [
+      {
+        "key": "Digit2",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-127",
+    "id": "view.workspaceAudio",
+    "label": "Workspace › Audio",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+3",
+    "shortcuts": [
+      {
+        "key": "Digit3",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-128",
+    "id": "view.workspaceCaptions",
+    "label": "Workspace › Captions",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Alt+4",
+    "shortcuts": [
+      {
+        "key": "Digit4",
+        "ctrl": false,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-129",
+    "id": "view.saveWorkspace",
+    "label": "Save Workspace As…",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-130",
+    "id": "view.resetWorkspace",
+    "label": "Reset Workspace",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-131",
+    "id": "view.commandPalette",
+    "label": "Command Palette",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Shift+P",
+    "shortcuts": [
+      {
+        "key": "KeyP",
+        "ctrl": true,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-132",
+    "id": "view.maximizePanel",
+    "label": "Maximize Panel",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "` (Backquote)",
+    "shortcuts": [
+      {
+        "key": "Backquote",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-133",
+    "id": "view.nextPanel",
+    "label": "Next Panel",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "F6",
+    "shortcuts": [
+      {
+        "key": "F6",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-134",
+    "id": "view.prevPanel",
+    "label": "Previous Panel",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Shift+F6",
+    "shortcuts": [
+      {
+        "key": "F6",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-135",
+    "id": "view.focusMedia",
+    "label": "Media Panel",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+1",
+    "shortcuts": [
+      {
+        "key": "Digit1",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-136",
+    "id": "view.focusSource",
+    "label": "Source Viewer",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+2",
+    "shortcuts": [
+      {
+        "key": "Digit2",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-137",
+    "id": "view.focusTimeline",
+    "label": "Timeline",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+3",
+    "shortcuts": [
+      {
+        "key": "Digit3",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-138",
+    "id": "view.focusProgram",
+    "label": "Program Viewer",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+4",
+    "shortcuts": [
+      {
+        "key": "Digit4",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-139",
+    "id": "view.focusInspector",
+    "label": "Inspector",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+5",
+    "shortcuts": [
+      {
+        "key": "Digit5",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-140",
+    "id": "view.focusEffects",
+    "label": "Effects",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+6",
+    "shortcuts": [
+      {
+        "key": "Digit6",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-141",
+    "id": "view.focusCaptions",
+    "label": "Captions",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+7",
+    "shortcuts": [
+      {
+        "key": "Digit7",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-142",
+    "id": "view.focusMixer",
+    "label": "Mixer",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+8",
+    "shortcuts": [
+      {
+        "key": "Digit8",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-143",
+    "id": "view.focusScopes",
+    "label": "Scopes",
+    "menu": "View",
+    "submenu": "Panels",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+9",
+    "shortcuts": [
+      {
+        "key": "Digit9",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-144",
+    "id": "view.uiZoomIn",
+    "label": "Interface Zoom In",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+=",
+    "shortcuts": [
+      {
+        "key": "Equal",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-145",
+    "id": "view.uiZoomOut",
+    "label": "Interface Zoom Out",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+-",
+    "shortcuts": [
+      {
+        "key": "Minus",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-146",
+    "id": "view.uiZoomReset",
+    "label": "Interface Zoom Reset",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+0",
+    "shortcuts": [
+      {
+        "key": "Digit0",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-147",
+    "id": "view.toggleSafeAreas",
+    "label": "Safe Areas",
+    "menu": "View",
+    "submenu": "Overlays",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "viewer",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-148",
+    "id": "view.toggleGrid",
+    "label": "Grid",
+    "menu": "View",
+    "submenu": "Overlays",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "viewer",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-149",
+    "id": "view.compareSplit",
+    "label": "Before/After Split",
+    "menu": "View",
+    "submenu": "Overlays",
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "viewer",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-150",
+    "id": "view.theme",
+    "label": "Theme › Dark/Light/High Contrast",
+    "menu": "View",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": "WP-05"
+  },
+  {
+    "kb": "KB-151",
+    "id": "help.gettingStarted",
+    "label": "Getting Started",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-152",
+    "id": "help.userGuide",
+    "label": "User Guide",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "F1",
+    "shortcuts": [
+      {
+        "key": "F1",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-153",
+    "id": "help.shortcutSheet",
+    "label": "Keyboard Shortcuts Sheet",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+/",
+    "shortcuts": [
+      {
+        "key": "Slash",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-154",
+    "id": "help.replayTour",
+    "label": "Replay Tour",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-155",
+    "id": "help.reportProblem",
+    "label": "Report a Problem…",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-156",
+    "id": "help.diagnostics",
+    "label": "Create Diagnostics Bundle…",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-157",
+    "id": "help.checkUpdates",
+    "label": "Check for Updates…",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-158",
+    "id": "help.about",
+    "label": "About AfterLeads-Video-Spirits",
+    "menu": "Help",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "—",
+    "shortcuts": [],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-159",
+    "id": "playback.announceTimecode",
+    "label": "Announce Timecode (screen readers)",
+    "menu": "Playback",
+    "submenu": null,
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Alt+T",
+    "shortcuts": [
+      {
+        "key": "KeyT",
+        "ctrl": true,
+        "shift": false,
+        "alt": true
+      }
+    ],
+    "context": "global",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-160",
+    "id": "timeline.selectPrevClip",
+    "label": "Select Previous Clip on Track",
+    "menu": "Timeline",
+    "submenu": "Navigate",
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Left",
+    "shortcuts": [
+      {
+        "key": "ArrowLeft",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-161",
+    "id": "timeline.selectNextClip",
+    "label": "Select Next Clip on Track",
+    "menu": "Timeline",
+    "submenu": "Navigate",
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Right",
+    "shortcuts": [
+      {
+        "key": "ArrowRight",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-162",
+    "id": "timeline.focusTrackUp",
+    "label": "Focus Track Above",
+    "menu": "Timeline",
+    "submenu": "Navigate",
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Up",
+    "shortcuts": [
+      {
+        "key": "ArrowUp",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-163",
+    "id": "timeline.focusTrackDown",
+    "label": "Focus Track Below",
+    "menu": "Timeline",
+    "submenu": "Navigate",
+    "paletteOnly": false,
+    "rawShortcut": "Ctrl+Down",
+    "shortcuts": [
+      {
+        "key": "ArrowDown",
+        "ctrl": true,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-164",
+    "id": "timeline.trimEdgeLeft",
+    "label": "Trim Selected Edge Left 1 Frame",
+    "menu": "Timeline",
+    "submenu": "Trim",
+    "paletteOnly": false,
+    "rawShortcut": "[ (BracketLeft)",
+    "shortcuts": [
+      {
+        "key": "BracketLeft",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-165",
+    "id": "timeline.trimEdgeRight",
+    "label": "Trim Selected Edge Right 1 Frame",
+    "menu": "Timeline",
+    "submenu": "Trim",
+    "paletteOnly": false,
+    "rawShortcut": "] (BracketRight)",
+    "shortcuts": [
+      {
+        "key": "BracketRight",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-166",
+    "id": "timeline.trimEdgeLeft10",
+    "label": "Trim Selected Edge Left 10 Frames",
+    "menu": "Timeline",
+    "submenu": "Trim",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+[",
+    "shortcuts": [
+      {
+        "key": "BracketLeft",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-167",
+    "id": "timeline.trimEdgeRight10",
+    "label": "Trim Selected Edge Right 10 Frames",
+    "menu": "Timeline",
+    "submenu": "Trim",
+    "paletteOnly": false,
+    "rawShortcut": "Shift+]",
+    "shortcuts": [
+      {
+        "key": "BracketRight",
+        "ctrl": false,
+        "shift": true,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  },
+  {
+    "kb": "KB-168",
+    "id": "timeline.inspectSelection",
+    "label": "Show Selection in Inspector",
+    "menu": null,
+    "submenu": null,
+    "paletteOnly": true,
+    "rawShortcut": "Enter",
+    "shortcuts": [
+      {
+        "key": "Enter",
+        "ctrl": false,
+        "shift": false,
+        "alt": false
+      }
+    ],
+    "context": "timeline",
+    "checkable": false,
+    "implementedIn": null
+  }
+]
