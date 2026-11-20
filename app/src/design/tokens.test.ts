@@ -103,4 +103,26 @@ describe("token inventory (07 s7.4)", () => {
       expect(names.has("--accent-subtle")).toBe(true);
     },
   );
+
+  // Round-3 L-04: the forced-colors block and the manual HC block
+  // are two hand-maintained copies of one shared mapping (07 s7.4.3;
+  // tokens.css header) — they must define identical name→value maps.
+  it("forced-colors and manual high-contrast blocks map every token identically", () => {
+    const tokens = (body: string): Map<string, string> =>
+      new Map(
+        [...body.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [
+          m[1],
+          m[2].trim(),
+        ]),
+      );
+    const media = tokens(block("@media (forced-colors: active)"));
+    // Anchor with the brace: the file header comment mentions the
+    // manual selector verbatim (contrast.test.ts hit the same trap).
+    const manual = tokens(block('[data-theme="high-contrast"] {'));
+    expect(media.size).toBeGreaterThan(0);
+    const onlyMedia = [...media].filter(([k, v]) => manual.get(k) !== v);
+    const onlyManual = [...manual].filter(([k, v]) => media.get(k) !== v);
+    expect(onlyMedia.map(([k]) => k)).toEqual([]);
+    expect(onlyManual.map(([k]) => k)).toEqual([]);
+  });
 });
