@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Document set | AfterLeads-Video-Spirits implementation documentation |
-| Set version | 1.1.1 |
+| Set version | 1.1.2 |
 | Baseline date | 2026-11-01 |
 | Status | Approved baseline for implementation (v1.0 scope) |
 | Owner | AfterLeads (afterleadseg@gmail.com) |
@@ -210,6 +210,7 @@ Versions below were verified against the official registries on the baseline dat
 | Dev tools | cargo-nextest / cargo-deny / cargo-llvm-cov / cargo-about / cargo-cyclonedx / git-cliff / tauri-driver | 0.9.150 / 0.20.2 / 0.9.1 / 0.9.3 / 0.5.9 / 2.14.2 / 2.1.0 | Installed by `tools/setup/Install-DevTools.ps1` |
 | Dev tools | @cyclonedx/cyclonedx-npm | 6.x | npm SBOM (08 §8.3.3) |
 | UI | TypeScript | **6.0.x** | 7.x is not supported by `typescript-eslint` (peer `<6.1.0`) |
+| UI | @types/node | 26.x | Node API types for the node-run i18n gate and design tests (added WP-04 round 2; matches the Node 26 runtime) |
 | UI | React / Vite / @vitejs/plugin-react | 19.3.x / 8.3.x / 6.x | |
 | UI | react-aria-components | 1.22.x | Accessible, RTL-aware primitives |
 | UI | dockview | 8.8.x | Docking layout |
@@ -218,6 +219,7 @@ Versions below were verified against the official registries on the baseline dat
 | UI | lucide-react | 1.x | Icons (ISC) |
 | UI | react-markdown | 10.x | In-app help viewer |
 | UI tests | Vitest / @testing-library/react / jsdom | 5.x / 16.x / 30.x | |
+| UI tests | @testing-library/dom | 10.x | Required peer of `@testing-library/react` 16 (added WP-04) |
 | UI tests | Playwright / @axe-core/playwright | 1.64.x / 4.x | UI harness, visual and accessibility tests |
 | E2E | WebdriverIO + tauri-driver | 10.x + latest | Windows end-to-end tests |
 | Lint | ESLint | **9.39.x** | 10.x is not supported by `eslint-plugin-jsx-a11y` |

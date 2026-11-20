@@ -1,0 +1,150 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Collections (07 §7.6; tokens only; logical properties only). */
+
+.tree,
+.grid-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.tree-node {
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding-inline-start: var(--sp-3);
+}
+
+.tree-chevron {
+  color: var(--text-secondary);
+  transition: rotate var(--dur-fast) var(--ease-standard);
+}
+
+:global([dir="rtl"]) .tree-chevron {
+  rotate: 180deg;
+}
+
+.item[aria-expanded="true"] .tree-chevron {
+  rotate: 90deg;
+}
+
+:global([dir="rtl"]) .item[aria-expanded="true"] .tree-chevron {
+  rotate: 270deg;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.item:focus-visible,
+.item[data-focus-visible] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* RAC collection rows/options (GridList/Table/ListBox) receive
+   data-focus-visible on the row; ring them (US3/AC1). Tables focus
+   the row and mark data-focused — cover both hooks. */
+.grid-list [data-focus-visible],
+.options [data-focus-visible],
+.table [data-focus-visible],
+.table:has(:focus-visible) tr[data-focused] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.item[data-focused],
+.item:hover {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+  outline: none;
+}
+
+/* Focus ring wins over the hover rule above (equal specificity,
+   later wins) — data-focus-visible marks the keyboard focus. */
+.item[data-focus-visible] {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.item-label {
+  flex: 1;
+  text-align: start;
+}
+
+.table {
+  border-collapse: collapse;
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.table :global(th) {
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
+  border-block-end: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-weight: var(--weight-medium);
+  text-align: start;
+}
+
+.table :global(td) {
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.table :global(tr[data-focused]) {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.windowed-list {
+  max-block-size: 14rem;
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.windowed-list:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.option {
+  min-block-size: 1.75rem;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+}

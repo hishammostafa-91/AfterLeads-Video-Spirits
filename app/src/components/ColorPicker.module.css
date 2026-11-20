@@ -1,0 +1,87 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* ColorPicker (07 §7.6; tokens only; logical properties only). */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.area {
+  inline-size: 12rem;
+  block-size: 9rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Focus rings (US3/AC1): the area holds focus for its hidden x/y
+   inputs; the hue slider's input delegates to its thumb. */
+.area:focus-visible,
+.area:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.hue {
+  inline-size: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.slider-label {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: flex-end;
+}
+
+.hex-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.hex-input {
+  min-block-size: var(--control-height);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+}
+
+.hex-input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.recents {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.thumb {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: 2px solid var(--swatch-ring);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--swatch-halo);
+}
+
+.hue:has(input:focus-visible) .thumb {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

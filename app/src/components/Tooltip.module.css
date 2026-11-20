@@ -1,0 +1,14 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Tooltip (07 §7.6; tokens only; logical properties only). */
+
+.tooltip {
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+}

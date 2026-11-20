@@ -1,0 +1,88 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Harness shell layout (tokens only; logical properties only). */
+.shell {
+  box-sizing: border-box;
+  display: flex;
+  block-size: 100vh;
+  flex-direction: column;
+  gap: var(--sp-5);
+  inline-size: 100%;
+  padding: var(--sp-5);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--control-height);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.stories {
+  flex: 1;
+  overflow: auto;
+  padding: var(--sp-4);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.stories-title {
+  margin-block: 0 var(--sp-3);
+  font-size: var(--fs-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.story-grid {
+  display: grid;
+
+  /* Fixed rem tracks keep every card boundary at an integer device
+     pixel — 1fr tracks land on fractional offsets whose subpixel
+     antialiasing jitters between captures (D7 determinism). */
+  grid-template-columns: repeat(auto-fill, minmax(0, 18rem));
+  justify-content: start;
+  gap: var(--sp-3);
+}
+
+.story-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.story-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}

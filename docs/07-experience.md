@@ -79,21 +79,24 @@ Tokens are CSS custom properties in `app/src/design/tokens.css`; components refe
 | `--bg-hover` | `#2A2B31` | Hover |
 | `--bg-active` | `#33343B` | Pressed / selected row |
 | `--border-subtle` | `#2A2B30` | Separators |
-| `--border-strong` | `#3A3B42` | Input borders (3.3:1 vs panel) |
+| `--border-strong` | `#6C6D72` | Input borders (≥3:1 vs panel and raised: 3.44:1 / 3.04:1; owner ruling round-2 H-03) |
 | `--text-primary` | `#ECEDEE` | Body text (≈ 15:1) |
 | `--text-secondary` | `#A9ABB3` | Labels (≈ 7.6:1) |
 | `--text-tertiary` | `#83858E` | Hints (≈ 4.7:1) |
 | `--text-disabled` | `#5C5E66` | Disabled (exempt) |
-| `--accent-solid` | accent base (default `#3E63DD`) | Primary buttons (white text ≈ 5.3:1) |
+| `--accent-solid` | accent base (default `#3E63DD`) | Primary buttons (text via `--accent-foreground`) |
+| `--accent-foreground` | `#FFFFFF` (black for the green/orange/pink accents, CLR-04/CLR-02/CLR-08) | Text/icons on `--accent-solid` (≥ 4.5:1 per accent) |
 | `--accent-text` | `#8DA4EF` | Links, selected text (≈ 7.4:1) |
 | `--accent-subtle` | `#1E2A55` | Selection backgrounds |
+| `--accent-subtle-foreground` | equals `--accent-text` (`HighlightText` in High Contrast) | Text on `--accent-subtle` selection fills |
 | `--focus-ring` | `#8DA4EF` | 2 px outline + 1 px offset (≥ 3:1) |
 | `--danger` / `--danger-text` | `#E5484D` / `#FF9592` | Errors, record |
+| `--danger-foreground` | `#000000` | Text on `--danger` (6.0:1; CLR-01) |
 | `--warning` / `--warning-text` | `#FFC53D` / `#FFD885` | Warnings |
 | `--success` / `--success-text` | `#30A46C` / `#3DD68C` | Success |
 | `--info` | `#05A2C2` | Info |
 
-Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accent-subtle` with: purple `#8E4EC6`/`#C29FEB`/`#2F1E45`, green `#30A46C`/`#5BD39B`/`#16301F`, orange `#F76B15`/`#FFA066`/`#3A2010`, pink `#D6409F`/`#F08DC6`/`#3A1730`.
+Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accent-subtle` (and `--accent-foreground`: black for green `#30A46C`, orange `#F76B15`, and pink `#D6409F`, white otherwise) with: purple `#8E4EC6`/`#C29FEB`/`#2F1E45`, green `#30A46C`/`#5BD39B`/`#16301F`, orange `#F76B15`/`#FFA066`/`#3A2010`, pink `#D6409F`/`#F08DC6`/`#3A1730`. Dark-theme `--accent-text` values are §7.4.1's; the Light theme overrides `--accent-text` and `--accent-subtle` per accent in §7.4.2 (purple `#6A3A9A`/`#F0E6FA`, green `#1E5A3A`/`#D9F2E4`, orange `#9A3D00`/`#FDE8D9`, pink `#B02878`/`#FADCEC`) so every accent keeps ≥ 4.5:1 text on light surfaces and on its subtle selection background; the default accent (CLR-06) keeps `#3451C4`/`#E6ECFD`.
 
 ### 7.4.2 Color — Light theme
 
@@ -101,18 +104,18 @@ Accent alternatives (REQ-APP-009) swap `--accent-solid`/`--accent-text`/`--accen
 |---|---|---|---|
 | `--bg-app` | `#F3F4F6` | `--text-primary` | `#1A1B1E` |
 | `--bg-panel` | `#FFFFFF` | `--text-secondary` | `#4B4E57` |
-| `--bg-panel-header` | `#F7F8FA` | `--text-tertiary` | `#6A6D76` (≈ 5.3:1) |
+| `--bg-panel-header` | `#F7F8FA` | `--text-tertiary` | `#6A6D76` (≈ 5.1:1) |
 | `--bg-raised` | `#FFFFFF` | `--text-disabled` | `#A3A6AE` |
 | `--bg-hover` | `#EEF0F3` | `--accent-solid` | `#3E63DD` |
 | `--bg-active` | `#E3E6EB` | `--accent-text` | `#3451C4` (≈ 6.5:1) |
 | `--border-subtle` | `#E4E6EA` | `--accent-subtle` | `#E6ECFD` |
-| `--border-strong` | `#B9BCC4` | `--focus-ring` | `#3E63DD` |
+| `--border-strong` | `#8D9098` | `--focus-ring` | `#3E63DD` |
 
-Status colors are the same hues with darker text variants: danger text `#C62A2F`, warning text `#8A5A00`, success text `#18794E`.
+Status colors are the same hues with darker text variants: danger text `#C62A2F`, warning text `#8A5A00`, success text `#18794E`. The on-fill tokens (`--accent-foreground`, `--danger-foreground`) and the color-picker thumb outline (`--swatch-ring` `#FFFFFF` border with `--swatch-halo` `#000000` shadow, legible over any picked color) are theme-independent.
 
 ### 7.4.3 High Contrast
 
-When `forced-colors: active` (Windows contrast themes) or the user selects High Contrast, tokens map to system colors: backgrounds `Canvas`, text `CanvasText`, accents and selection `Highlight`/`HighlightText`, controls `ButtonFace`/`ButtonText`, disabled `GrayText`, links `LinkText`. Clip colors become outlined shapes with text labels; meters use `CanvasText` fills with patterns for clip and peak states.
+When `forced-colors: active` (Windows contrast themes) or the user selects High Contrast, tokens map to system colors: backgrounds `Canvas`, text `CanvasText`, accents and selection `Highlight`/`HighlightText`, controls `ButtonFace`/`ButtonText`, disabled `GrayText`, links `LinkText`. Selection fills (`--accent-subtle` → `Highlight`) pair with `--accent-subtle-foreground` → `HighlightText` (in dark/light it equals `--accent-text`), so selected and focused labels stay visible. Clip colors become outlined shapes with text labels; meters use `CanvasText` fills with patterns for clip and peak states.
 
 ### 7.4.4 Timeline and media colors
 

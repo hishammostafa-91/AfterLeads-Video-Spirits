@@ -14,6 +14,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* TypeScript 6 no longer auto-includes node_modules/@types; the
+     * node-run scripts and design tests use node: imports, and
+     * react/react-dom still resolve through their import specifiers. */
+    "types": ["node"],
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

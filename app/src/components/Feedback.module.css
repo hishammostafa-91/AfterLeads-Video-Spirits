@@ -1,0 +1,48 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Feedback (07 §7.6; tokens only; logical properties only;
+   reduced-motion zeroes the spinner animation per §7.4.6). */
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+}
+
+.bar-label {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: var(--weight-medium);
+}
+
+.spinner {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+
+.spinner-indeterminate {
+  transform-origin: center;
+  animation: alvs-spin 0.8s linear infinite;
+}
+
+@keyframes alvs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+}
+
+.skeleton-line {
+  min-block-size: 1rem;
+}
+
+.skeleton-block {
+  min-block-size: 4rem;
+}

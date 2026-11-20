@@ -1,0 +1,516 @@
+{
+  "a11y.errorsRegion": {
+    "description": "Accessible name of the assertive live region (07 s7.13 rule 3).",
+    "maxlength": 20
+  },
+  "a11y.statusRegion": {
+    "description": "Accessible name of the polite live region (07 s7.13 rule 3).",
+    "maxlength": 20
+  },
+  "components.badge.hdr": {
+    "description": "Badge: high dynamic range.",
+    "maxlength": 12
+  },
+  "components.badge.offline": {
+    "description": "Badge: media offline.",
+    "maxlength": 16
+  },
+  "components.badge.proxy": {
+    "description": "Badge: proxy media.",
+    "maxlength": 12
+  },
+  "components.badge.tenBit": {
+    "description": "Badge: 10-bit depth.",
+    "maxlength": 12
+  },
+  "components.badge.vfr": {
+    "description": "Badge: variable frame rate.",
+    "maxlength": 12
+  },
+  "components.button.edit": {
+    "description": "Edit button label (also used in icon tooltips).",
+    "maxlength": 12
+  },
+  "components.button.ok": {
+    "description": "OK button label.",
+    "maxlength": 8
+  },
+  "components.button.snap": {
+    "description": "Snapping toggle label.",
+    "maxlength": 16
+  },
+  "components.collections.binOne": {
+    "description": "Tree story bin name.",
+    "maxlength": 16
+  },
+  "components.collections.binLabel": {
+    "description": "Accessible name of the GridList story (07 s7.6 collections)."
+  },
+  "components.collections.binTwo": {
+    "description": "Tree story bin name.",
+    "maxlength": 16
+  },
+  "components.collections.clipOne": {
+    "description": "Demo clip name in collections.",
+    "maxlength": 24
+  },
+  "components.collections.clipTwo": {
+    "description": "Demo clip name in collections.",
+    "maxlength": 24
+  },
+  "components.collections.duration": {
+    "description": "Table column header: clip duration.",
+    "maxlength": 16
+  },
+  "components.collections.gridList": {
+    "description": "Accessible name of the media grid-list example.",
+    "maxlength": 14
+  },
+  "components.collections.listBox": {
+    "description": "Accessible name of the track list-box example.",
+    "maxlength": 13
+  },
+  "components.collections.mediaLabel": {
+    "description": "Accessible name of the Tree story (07 s7.6 collections)."
+  },
+  "components.collections.name": {
+    "description": "Table column header: clip name.",
+    "maxlength": 16
+  },
+  "components.collections.table": {
+    "description": "Accessible name of the demo table.",
+    "maxlength": 16
+  },
+  "components.collections.trackAudio": {
+    "description": "Track listbox option.",
+    "maxlength": 16
+  },
+  "components.collections.tracksLabel": {
+    "description": "Accessible name of the ListBox story (07 s7.6 collections)."
+  },
+  "components.collections.trackVideo": {
+    "description": "Track listbox option.",
+    "maxlength": 16
+  },
+  "components.collections.windowedLabel": {
+    "description": "Accessible name of the windowed ListBox story (07 s7.6 collections)."
+  },
+  "components.color.blue": {
+    "description": "Single-letter label of the blue channel field (locale letter).",
+    "maxlength": 2
+  },
+  "components.color.green": {
+    "description": "Single-letter label of the green channel field (locale letter).",
+    "maxlength": 2
+  },
+  "components.color.hex": {
+    "description": "Label of the hex value field.",
+    "maxlength": 8
+  },
+  "components.color.hue": {
+    "description": "Accessible name of the hue slider.",
+    "maxlength": 12
+  },
+  "components.color.luma": {
+    "description": "Accessible name of the luma slider.",
+    "maxlength": 16
+  },
+  "components.color.recent": {
+    "description": "Accessible name of the recent-colors swatch row.",
+    "maxlength": 32
+  },
+  "components.color.red": {
+    "description": "Single-letter label of the red channel field.",
+    "maxlength": 2
+  },
+  "components.color.saturationBrightness": {
+    "description": "Accessible name of the HSV square.",
+    "maxlength": 32
+  },
+  "components.color.wheel": {
+    "description": "Accessible name of the chroma wheel.",
+    "maxlength": 24
+  },
+  "components.curve.channel.blue": {
+    "description": "Blue curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.green": {
+    "description": "Green curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.red": {
+    "description": "Red curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channel.y": {
+    "description": "Luma curve channel tab.",
+    "maxlength": 8
+  },
+  "components.curve.channels": {
+    "description": "Accessible name of the curve channel tab list.",
+    "maxlength": 32
+  },
+  "components.curve.editor": {
+    "description": "Accessible name of the curve editor SVG.",
+    "maxlength": 24
+  },
+  "components.curve.handle": {
+    "description": "Label of the point handle-mode select.",
+    "maxlength": 12
+  },
+  "components.curve.handleNone": {
+    "description": "Handle mode: no handles.",
+    "maxlength": 8
+  },
+  "components.curve.handleSmooth": {
+    "description": "Handle mode: smooth (mirrored) handles.",
+    "maxlength": 12
+  },
+  "components.curve.point": {
+    "description": "Accessible name of one curve point ({index} is 1-based).",
+    "maxlength": 32
+  },
+  "components.curve.reset": {
+    "description": "Reset-curve button label.",
+    "maxlength": 12
+  },
+  "components.curve.x": {
+    "description": "Label of the point X field.",
+    "maxlength": 2
+  },
+  "components.curve.y": {
+    "description": "Label of the point Y field.",
+    "maxlength": 2
+  },
+  "components.dialog.cancel": {
+    "description": "Cancel button label (dialogs, alert dialogs).",
+    "maxlength": 12
+  },
+  "components.dialog.discard": {
+    "description": "Destructive confirmation action label.",
+    "maxlength": 12
+  },
+  "components.dialog.discardBody": {
+    "description": "One-sentence explanation of a destructive action.",
+    "maxlength": 80
+  },
+  "components.dialog.discardTitle": {
+    "description": "Alert dialog heading for discarding changes.",
+    "maxlength": 40
+  },
+  "components.dialog.open": {
+    "description": "Trigger that opens the demo dialog (harness).",
+    "maxlength": 20
+  },
+  "components.empty.action": {
+    "description": "Empty-state primary action label.",
+    "maxlength": 24
+  },
+  "components.empty.message": {
+    "description": "Empty-state sentence.",
+    "maxlength": 64
+  },
+  "components.empty.shortcutPrefix": {
+    "description": "Prefix before the shortcut hint key.",
+    "maxlength": 16
+  },
+  "components.feedback.cache": {
+    "description": "Meter label for cache fill.",
+    "maxlength": 24
+  },
+  "components.feedback.render": {
+    "description": "Progress bar label for rendering work.",
+    "maxlength": 24
+  },
+  "components.feedback.spinner": {
+    "description": "Accessible name of the spinner.",
+    "maxlength": 24
+  },
+  "components.fields.nameLabel": {
+    "description": "Text field label for a name.",
+    "maxlength": 16
+  },
+  "components.fields.namePlaceholder": {
+    "description": "Text field placeholder for a name.",
+    "maxlength": 24
+  },
+  "components.fields.notesLabel": {
+    "description": "Text area label for notes.",
+    "maxlength": 16
+  },
+  "components.fields.notesPlaceholder": {
+    "description": "Text area placeholder for notes.",
+    "maxlength": 24
+  },
+  "components.fields.searchLabel": {
+    "description": "Search field label.",
+    "maxlength": 16
+  },
+  "components.fields.searchPlaceholder": {
+    "description": "Search field placeholder.",
+    "maxlength": 16
+  },
+  "components.iconButton.tooltip": {
+    "description": "Icon-only button tooltip: the action label with its keyboard shortcut.",
+    "maxlength": 40
+  },
+  "components.keyframe.add": {
+    "description": "Accessible name for adding a keyframe.",
+    "maxlength": 24
+  },
+  "components.keyframe.next": {
+    "description": "Accessible name for jumping to the next keyframe.",
+    "maxlength": 28
+  },
+  "components.keyframe.prev": {
+    "description": "Accessible name for jumping to the previous keyframe.",
+    "maxlength": 28
+  },
+  "components.keyframe.remove": {
+    "description": "Accessible name for removing a keyframe.",
+    "maxlength": 24
+  },
+  "components.menu.barLabel": {
+    "description": "Accessible name of the menu bar.",
+    "maxlength": 24
+  },
+  "components.menu.contextArea": {
+    "description": "Instruction shown inside the context-menu story area.",
+    "maxlength": 48
+  },
+  "components.menu.edit": {
+    "description": "Edit menu title.",
+    "maxlength": 12
+  },
+  "components.menu.file": {
+    "description": "File menu title.",
+    "maxlength": 12
+  },
+  "components.menu.newProject": {
+    "description": "New-project menu item.",
+    "maxlength": 20
+  },
+  "components.menu.open": {
+    "description": "Accessible name of the context-area kebab trigger.",
+    "maxlength": 12
+  },
+  "components.menu.redo": {
+    "description": "Redo menu item.",
+    "maxlength": 12
+  },
+  "components.menu.rename": {
+    "description": "Rename context-menu item.",
+    "maxlength": 16
+  },
+  "components.menu.safeAreas": {
+    "description": "Checkable menu item toggling the safe-area guides.",
+    "maxlength": 20
+  },
+  "components.menu.undo": {
+    "description": "Undo menu item.",
+    "maxlength": 12
+  },
+  "components.menu.waveform": {
+    "description": "Checkable menu item toggling the audio waveform display.",
+    "maxlength": 22
+  },
+  "components.number.mixedLabel": {
+    "description": "Number-field label shown in the mixed-state story.",
+    "maxlength": 24
+  },
+  "components.number.scaleLabel": {
+    "description": "Number-field label for a scale percentage.",
+    "maxlength": 16
+  },
+  "components.popover.body": {
+    "description": "Sample popover content (harness).",
+    "maxlength": 40
+  },
+  "components.popover.filters": {
+    "description": "Trigger that opens the filters popover (harness).",
+    "maxlength": 16
+  },
+  "components.segmented.day": {
+    "description": "Day segment of the time-span control.",
+    "maxlength": 6
+  },
+  "components.segmented.duration": {
+    "description": "Label of the segmented control choosing a time span.",
+    "maxlength": 14
+  },
+  "components.segmented.month": {
+    "description": "Month segment of the time-span control.",
+    "maxlength": 7
+  },
+  "components.segmented.week": {
+    "description": "Week segment of the time-span control.",
+    "maxlength": 8
+  },
+  "components.selection.checkboxLabel": {
+    "description": "Checkbox story label (snapping).",
+    "maxlength": 16
+  },
+  "components.selection.comboLabel": {
+    "description": "ComboBox label for an effect choice.",
+    "maxlength": 16
+  },
+  "components.selection.fillLabel": {
+    "description": "Fill scale-mode radio label.",
+    "maxlength": 8
+  },
+  "components.selection.fitLabel": {
+    "description": "Fit scale-mode radio label.",
+    "maxlength": 8
+  },
+  "components.selection.groupLabel": {
+    "description": "Radio-group label for the scale mode.",
+    "maxlength": 24
+  },
+  "components.selection.optionFirst": {
+    "description": "First demo option in selects.",
+    "maxlength": 24
+  },
+  "components.selection.optionSecond": {
+    "description": "Second demo option in selects.",
+    "maxlength": 24
+  },
+  "components.selection.selectLabel": {
+    "description": "Select label for a mode choice.",
+    "maxlength": 12
+  },
+  "components.selection.switchLabel": {
+    "description": "Switch label for enabling proxy media.",
+    "maxlength": 20
+  },
+  "components.slider.angleLabel": {
+    "description": "Label for the angle dial and its number field.",
+    "maxlength": 16
+  },
+  "components.slider.opacityLabel": {
+    "description": "Slider label for opacity.",
+    "maxlength": 16
+  },
+  "components.tabs.effects": {
+    "description": "Effects tab title.",
+    "maxlength": 16
+  },
+  "components.tabs.inspectorLabel": {
+    "description": "Accessible name of the TabList stories (07 s7.6 tabs)."
+  },
+  "components.tabs.properties": {
+    "description": "Properties tab title.",
+    "maxlength": 16
+  },
+  "components.timecode.label": {
+    "description": "Accessible name of the timecode field.",
+    "maxlength": 16
+  },
+  "components.timecode.segment.ff": {
+    "description": "Accessible name of the frames segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.hh": {
+    "description": "Accessible name of the hours segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.mm": {
+    "description": "Accessible name of the minutes segment.",
+    "maxlength": 12
+  },
+  "components.timecode.segment.ss": {
+    "description": "Accessible name of the seconds segment.",
+    "maxlength": 12
+  },
+  "components.toast.region": {
+    "description": "Accessible name of the toast region.",
+    "maxlength": 24
+  },
+  "components.toast.saved": {
+    "description": "Toast text after a successful save.",
+    "maxlength": 24
+  },
+  "components.toast.show": {
+    "description": "Button that shows a demo toast (harness).",
+    "maxlength": 20
+  },
+  "components.tooltip.zoomIn": {
+    "description": "Tooltip text for zoom-in.",
+    "maxlength": 16
+  },
+  "harness.stories.count": {
+    "description": "Number of stories in the grid; {count} is a non-negative integer. Arabic uses all six plural categories (07 s7.12 rule 3)."
+  },
+  "harness.stories.title": {
+    "description": "Heading of the story grid.",
+    "maxlength": 20
+  },
+  "harness.subtitle": {
+    "description": "One-line description under the harness title.",
+    "maxlength": 60
+  },
+  "harness.title": {
+    "description": "Harness page title.",
+    "maxlength": 40
+  },
+  "harness.toolbar.accent": {
+    "description": "Label of the accent color selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.accent.blue": {
+    "description": "Accent option CLR-06 (default).",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.green": {
+    "description": "Accent option CLR-04.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.orange": {
+    "description": "Accent option CLR-02.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.pink": {
+    "description": "Accent option CLR-08.",
+    "maxlength": 12
+  },
+  "harness.toolbar.accent.purple": {
+    "description": "Accent option CLR-07.",
+    "maxlength": 12
+  },
+  "harness.toolbar.density": {
+    "description": "Label of the density selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.density.comfortable": {
+    "description": "Density option: 28 px controls.",
+    "maxlength": 16
+  },
+  "harness.toolbar.density.compact": {
+    "description": "Density option: 24 px controls.",
+    "maxlength": 16
+  },
+  "harness.toolbar.locale": {
+    "description": "Label of the language selector in the harness toolbar (BCP-47 tags as values).",
+    "maxlength": 16
+  },
+  "harness.toolbar.theme": {
+    "description": "Label of the theme selector in the harness toolbar.",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.dark": {
+    "description": "Theme option: dark (the default theme).",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.highContrast": {
+    "description": "Theme option: high contrast (follows Windows contrast themes or manual selection).",
+    "maxlength": 20
+  },
+  "harness.toolbar.theme.light": {
+    "description": "Theme option: light.",
+    "maxlength": 20
+  },
+  "harness.toolbar.zoom": {
+    "description": "Current zoom percentage; {value} is the integer 80-200.",
+    "maxlength": 16
+  }
+}

@@ -1,0 +1,137 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Menu family (07 §7.6; tokens only; logical properties only). */
+
+.menu {
+  min-inline-size: 12.5rem;
+  max-inline-size: 20rem;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-popover);
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* Checkable items (07 §7.6): the glyph slot keeps labels aligned
+   whether or not the item is checked. */
+.check-slot {
+  display: inline-flex;
+  align-items: center;
+  inline-size: 0.875rem;
+  color: var(--accent-text);
+}
+
+.item[data-focused] {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+  outline: none;
+}
+
+.item-label {
+  flex: 1;
+  text-align: start;
+}
+
+/* Shortcuts align to the inline end (right in LTR, left in RTL). */
+.shortcut {
+  margin-inline-start: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.submenu-arrow {
+  margin-inline-start: auto;
+  color: var(--text-secondary);
+}
+
+/* Mirrors the submenu arrow under RTL (07 §7.11). */
+:global([dir="rtl"]) .submenu-arrow {
+  transform: scaleX(-1);
+}
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.menu-bar-trigger {
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-3);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+
+.menu-bar-trigger:hover,
+.menu-bar-trigger[data-focused] {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+}
+
+.menu-bar-trigger:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.context-area {
+  position: relative;
+}
+
+/* Kebab trigger (FR-012 keyboard path): sits at the area's inline
+   end; opening from it anchors the menu at the button. */
+.context-kebab {
+  position: absolute;
+  inset-block-start: var(--sp-1);
+  inset-inline-end: var(--sp-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--target-min);
+  min-inline-size: var(--target-min);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.context-kebab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.context-kebab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* Zero-size anchor positioned at the pointer; the menu opens from it. */
+.context-anchor {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}

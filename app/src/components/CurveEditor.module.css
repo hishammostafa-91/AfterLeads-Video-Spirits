@@ -1,0 +1,52 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* CurveEditor (07 §7.6; tokens only; logical properties only). */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.curve {
+  inline-size: 10rem;
+  block-size: 10rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+}
+
+.path {
+  stroke: var(--accent-solid);
+}
+
+.point {
+  fill: var(--bg-raised);
+  stroke: var(--accent-solid);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.point-focused {
+  fill: var(--accent-solid);
+  stroke: var(--focus-ring);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.point:focus-visible,
+.point-focused:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

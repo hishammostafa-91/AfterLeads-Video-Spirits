@@ -1,0 +1,31 @@
+{
+  "families": [
+    {
+      "id": "FNT-01",
+      "family": "Inter",
+      "file": "InterVariable.woff2",
+      "format": "woff2-variations",
+      "sourceUrl": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip (web/InterVariable.woff2)",
+      "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+      "licenseFile": "Inter-OFL.txt"
+    },
+    {
+      "id": "FNT-02",
+      "family": "Noto Sans Arabic",
+      "file": "NotoSansArabic-Variable.ttf",
+      "format": "truetype-variations",
+      "sourceUrl": "https://github.com/google/fonts/raw/main/ofl/notosansarabic/NotoSansArabic%5Bwdth,wght%5D.ttf (the repository publishes the variable face as TTF only)",
+      "sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+      "licenseFile": "NotoSansArabic-OFL.txt"
+    },
+    {
+      "id": "FNT-03",
+      "family": "JetBrains Mono",
+      "file": "JetBrainsMono-Variable.ttf",
+      "format": "truetype-variations",
+      "sourceUrl": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip (fonts/variable/JetBrainsMono[wght].ttf; upstream ships no variable WOFF2)",
+      "sha256": "662a196d58f1183bf2d77428b6d5283fe3f45161ab021bea4036bc98e5cac016",
+      "licenseFile": "JetBrainsMono-OFL.txt"
+    }
+  ]
+}

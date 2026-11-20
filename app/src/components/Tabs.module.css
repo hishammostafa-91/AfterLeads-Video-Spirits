@@ -1,0 +1,47 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Tabs (07 §7.6; tokens only; logical properties only). */
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.tab-list {
+  display: flex;
+  gap: var(--sp-1);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.tab {
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
+  border-block-end: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tab[data-selected] {
+  border-block-end-color: var(--accent-solid);
+  color: var(--accent-text);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.tab-panel {
+  padding-block: var(--sp-3);
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}

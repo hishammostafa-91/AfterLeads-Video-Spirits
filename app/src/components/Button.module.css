@@ -1,0 +1,153 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Button variants (07 §7.6; tokens only; logical properties only). */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--control-height);
+  padding-inline: var(--sp-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.button[disabled],
+.button[data-disabled] {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.primary {
+  background: var(--accent-solid);
+  color: var(--accent-foreground);
+}
+
+.primary:hover:not([disabled]) {
+  filter: brightness(1.1);
+}
+
+.secondary {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.secondary:hover:not([disabled]) {
+  background: var(--bg-hover);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.ghost:hover:not([disabled]) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.danger {
+  background: var(--danger);
+
+  /* --danger-foreground (CLR-01, amended): black on the canonical
+     danger red = 6.0:1 in both themes; white measured only 3.9:1
+     (REQ-A11Y-003). */
+  color: var(--danger-foreground);
+}
+
+.danger:hover:not([disabled]) {
+  filter: brightness(1.1);
+}
+
+.toggle[data-selected] {
+  background: var(--accent-subtle);
+  border-color: var(--accent-solid);
+  color: var(--accent-subtle-foreground);
+}
+
+/* Icon-only buttons (07 §7.5): square target, no text padding. */
+.icon-button {
+  padding-inline: calc((var(--target-min) - 1px) / 2);
+  padding-block: calc((var(--target-min) - 1px) / 2);
+}
+
+/* SegmentedControl (07 §7.6): joined segments over radio semantics. */
+.segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.segment-field {
+  display: inline-flex;
+  position: relative;
+}
+
+/* The native radio holds focus and state; hide it from view (the
+   segment label is the visual) but keep it focusable. */
+.segment-field input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--control-height-compact);
+  padding-inline: var(--sp-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.segment:hover:not([disabled]) {
+  background: var(--bg-hover);
+}
+
+.segment[data-selected] {
+  background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
+}
+
+.segment[data-disabled] {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.segment[data-focus-visible],
+.segment-field:has(input:focus-visible) .segment {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* Compact density (07 §7.4.6: 24px controls). */
+:root[data-density="compact"] .button {
+  min-block-size: var(--control-height-compact);
+}
