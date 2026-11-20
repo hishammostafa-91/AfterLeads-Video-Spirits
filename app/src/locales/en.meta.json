@@ -43,6 +43,9 @@
     "description": "Tree story bin name.",
     "maxlength": 16
   },
+  "components.collections.binLabel": {
+    "description": "Accessible name of the GridList story (07 s7.6 collections)."
+  },
   "components.collections.binTwo": {
     "description": "Tree story bin name.",
     "maxlength": 16
@@ -67,6 +70,9 @@
     "description": "Accessible name of the track list-box example.",
     "maxlength": 13
   },
+  "components.collections.mediaLabel": {
+    "description": "Accessible name of the Tree story (07 s7.6 collections)."
+  },
   "components.collections.name": {
     "description": "Table column header: clip name.",
     "maxlength": 16
@@ -79,9 +85,15 @@
     "description": "Track listbox option.",
     "maxlength": 16
   },
+  "components.collections.tracksLabel": {
+    "description": "Accessible name of the ListBox story (07 s7.6 collections)."
+  },
   "components.collections.trackVideo": {
     "description": "Track listbox option.",
     "maxlength": 16
+  },
+  "components.collections.windowedLabel": {
+    "description": "Accessible name of the windowed ListBox story (07 s7.6 collections)."
   },
   "components.color.blue": {
     "description": "Single-letter label of the blue channel field (locale letter).",
@@ -382,6 +394,9 @@
   "components.tabs.effects": {
     "description": "Effects tab title.",
     "maxlength": 16
+  },
+  "components.tabs.inspectorLabel": {
+    "description": "Accessible name of the TabList stories (07 s7.6 tabs)."
   },
   "components.tabs.properties": {
     "description": "Properties tab title.",

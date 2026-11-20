@@ -33,8 +33,11 @@ import styles from "./stories.module.css";
 import type { StoryFile } from "./types";
 
 function Trees(): JSX.Element {
+  const { formatMessage } = useIntl();
   return (
-    <Tree aria-label="Media">
+    <Tree
+      aria-label={formatMessage({ id: "components.collections.mediaLabel" })}
+    >
       <TreeItem textValue="binOne">
         <FormattedMessage id="components.collections.binOne" />
         <TreeItem textValue="clipOne">
@@ -49,8 +52,11 @@ function Trees(): JSX.Element {
 }
 
 function Grids(): JSX.Element {
+  const { formatMessage } = useIntl();
   return (
-    <GridList aria-label="Bin">
+    <GridList
+      aria-label={formatMessage({ id: "components.collections.binLabel" })}
+    >
       <GridListItem>
         <FormattedMessage id="components.collections.clipOne" />
       </GridListItem>
@@ -92,8 +98,11 @@ function Tables(): JSX.Element {
 }
 
 function Lists(): JSX.Element {
+  const { formatMessage } = useIntl();
   return (
-    <ListBox aria-label="Tracks">
+    <ListBox
+      aria-label={formatMessage({ id: "components.collections.tracksLabel" })}
+    >
       <ListBoxOption id="v1">
         <FormattedMessage id="components.collections.trackVideo" />
       </ListBoxOption>
@@ -106,12 +115,13 @@ function Lists(): JSX.Element {
 
 function Windowed(): JSX.Element {
   const items = Array.from({ length: 250 }, (_, i) => `row-${String(i + 1)}`);
+  const { formatMessage } = useIntl();
   return (
     <WindowedListBox
       items={items}
       keyOf={(item) => item}
       renderOption={(item) => item}
-      aria-label="Windowed"
+      aria-label={formatMessage({ id: "components.collections.windowedLabel" })}
     />
   );
 }

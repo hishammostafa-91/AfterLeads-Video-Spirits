@@ -3,15 +3,18 @@
 /**
  * Tabs stories (07 §7.6; T020).
  */
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import type { JSX } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "../../components/Tabs";
 import type { StoryFile } from "./types";
 
 function TabsDemo(): JSX.Element {
+  const { formatMessage } = useIntl();
   return (
     <Tabs defaultSelectedKey="properties">
-      <TabList aria-label="Inspector">
+      <TabList
+        aria-label={formatMessage({ id: "components.tabs.inspectorLabel" })}
+      >
         <Tab id="properties">
           <FormattedMessage id="components.tabs.properties" />
         </Tab>
@@ -31,9 +34,12 @@ function TabsDemo(): JSX.Element {
 
 /** FR-007 disabled state: the middle tab is not selectable. */
 function TabsStates(): JSX.Element {
+  const { formatMessage } = useIntl();
   return (
     <Tabs defaultSelectedKey="properties">
-      <TabList aria-label="Inspector">
+      <TabList
+        aria-label={formatMessage({ id: "components.tabs.inspectorLabel" })}
+      >
         <Tab id="properties">
           <FormattedMessage id="components.tabs.properties" />
         </Tab>
