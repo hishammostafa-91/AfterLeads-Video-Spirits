@@ -10,7 +10,7 @@
 import type { Shortcut } from "./catalog";
 
 /** US-layout labels per physical code (12 §12.10: "the key names below are the US-layout labels"). */
-const US_LABELS: Readonly<Record<string, string>> = {
+const US_LABELS: Readonly<Partial<Record<string, string>>> = {
   Space: "Space",
   Enter: "Enter",
   Tab: "Tab",
