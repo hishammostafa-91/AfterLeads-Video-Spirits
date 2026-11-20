@@ -6,6 +6,11 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    ignore:
+      # rusqlite is pinned to 0.41.x by docs/00 s0.8 (G-11); minor
+      # proposals (0.42+) need a baseline change first.
+      - dependency-name: rusqlite
+        update-types: ["version-update:semver-minor"]
   - package-ecosystem: npm
     directory: "/app"
     schedule:
