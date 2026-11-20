@@ -71,7 +71,7 @@
 .item[data-focused],
 .item:hover {
   background: var(--accent-subtle);
-  color: var(--accent-text);
+  color: var(--accent-subtle-foreground);
   outline: none;
 }
 
@@ -110,6 +110,7 @@
 
 .table :global(tr[data-focused]) {
   background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
 }
 
 .options {
@@ -145,4 +146,5 @@
 
 .option:hover {
   background: var(--accent-subtle);
+  color: var(--accent-subtle-foreground);
 }
