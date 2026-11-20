@@ -25,13 +25,13 @@ Environment: Windows 11 x64, PowerShell 7, pnpm 12.x, Node 26.x; dates 2026-11-1
 | 3 | T-I18N-003 | `pnpm -C app test -- -t t_i18n_003` | PASS — 5 tests: Arabic plurals, `latn` numbers/dates, LTR-isolated timecode |
 | 4 | T-I18N-004 | `pnpm -C app i18n:check` then `pnpm -C app test -- -t t_i18n_004` | PASS — key sets equal (115 keys × 6 locales); 15 tests: LOC-90/LOC-91 pseudo-locales render unclipped |
 | 5 | T-A11Y-004 | `pnpm -C app harness -- --grep a11y` | PASS — 4 passed (one per project): per-story axe zero violations, visible 2 px `--focus-ring` focus rings (asserted by width + token color), reduced-motion zeroes transitions while progress indicators keep animating, badge text+icon |
-| 6 | Snapshots | `pnpm -C app harness` | PASS — 68 tests, 1,224 goldens byte-stable; repeat-run determinism asserted in-test (through Playwright's per-pixel threshold comparator — content-sized text boundaries jitter ±1 between rasterizations); axe clean per story |
+| 6 | Snapshots | `pnpm -C app harness` | PASS - 68 tests, 1,224 goldens threshold-stable; repeat-run determinism asserted in-test through Playwright's per-pixel threshold comparator (content-sized text boundaries jitter ±1 between rasterizations - byte equality would false-fail on that noise); axe clean per story |
 
 ## Snapshot matrix counts (T033 + convergence)
 
 - 4 Playwright projects: dark/light × en/ar (1280×720, reduced motion, fonts settled).
 - 44 story cards in the registry (41 components — several cards compose more than one; the convergence phase added `button.segmented` plus nine `*.states` cards).
-- `snapshots.spec.ts` "story matrix": 44 cards × 3 page modes (default, compact `?density=compact`, High Contrast `?theme=high-contrast`) × 4 projects = **528 goldens**; plus a repeat-capture byte-equality determinism check per project.
+- `snapshots.spec.ts` "story matrix": 44 cards × 3 page modes (default, compact `?density=compact`, High Contrast `?theme=high-contrast`) × 4 projects = **528 goldens**; plus a repeat-capture determinism check through the threshold comparator per project.
 - `snapshots.spec.ts` "interaction states": 42 cards with a primary control × hover/focus/pressed × 4 projects = **504 goldens** (the M10 selector widening added the Tree/GridList/Table/ListBox rows/options; cards whose only content matches nothing — `menu.context`'s area, progress, badges, empty states — have no interaction state to capture; the page-mode matrix covers them).
 - `hc.spec.ts`: 44 cards × 4 projects under CDP `forced-colors: active` = **176 goldens** (`Emulation.setEmulatedMedia`; `matchMedia("(forced-colors: active)")` asserted true before capture; the skip guard is lowercase-`chromium` — Playwright reports `"chromium"`).
 - `harness.spec.ts`: 4 shell goldens (one per project).
@@ -99,4 +99,22 @@ Fixes (atomic commits, verified individually):
 Round-2 verification: `pnpm -C app test` 158/158; `pnpm -C app harness` 68 passed over 1,224 goldens (regen then clean run); `pnpm -C app i18n:check` 125 keys; `pwsh -File tools/verify.ps1` all 13 gates PASS; `python tools/docs/check_docs.py` PASS.
 
 Still deferred (owner-tracked Phase 10, unchanged): T043-T050. The reviewer's M-09 warning stands: T046 (TimecodeField flicks API) should land before WP-05 binds the frames-based signature.
+
+
+
+## Reviewer round 3 (2026-11-20) - verdict FAIL, all seven findings fixed same day
+
+Report: `plan/tracking/reviews/WP-04-r3.md`. The round-2 batch was verified genuine (H-02/H-03 source-fixed with regression-proof assertions, M-01/M-04..M-07 and every LOW landed); the blocker was a residual of round-2 H-01 plus the harness gap that let it slip:
+
+- **H-01 residual (HIGH)** `c6766fa` - the round-2 fix covered six of nine `--accent-subtle` fills. The tree item hover/focused rule still painted `--accent-text` on the subtle fill (Highlight-on-High in manual HC) and the table focused row / windowed option hover kept inherited CanvasText on a Highlight fill. All three now take `--accent-subtle-foreground` (identical to `--accent-text` in dark/light, so only the two previously-unpaired rules changed appearance there).
+- **M-02** `c6766fa` - the harness never rendered an HC *interaction* state (HC was static-only; hover/focus ran in project themes) - exactly how H-01 survived round 2. `zoom-extremes.spec.ts` now hovers the real tree item and windowed option on the HC page and asserts fill and label resolve to the two *distinct* system colors through an in-page Highlight/HighlightText probe (Chromium computes system keywords to rgb; the probe makes the check palette-independent; it must run after navigation - a blank-page probe resolves a different palette). The table's `data-focused` rule cannot be driven until selection mode ships (RAC rows are inert - tracked T043/T049) and stays sheet-covered in contrast.test.ts.
+- **M-01** - evidence `:26` still said 115 keys/15 tests (round-2 M-03 half-fixed): now 130 keys x 6 locales, 16 tests, with the real-scan note.
+- **L-01** `76260fc` - six hard-coded harness accessible names (Media/Bin/Tracks/Windowed/Inspector x2) localized through `formatMessage` with five new keys in all six locales + meta (anchor-ordered insert; `i18n:check` 130 keys green).
+- **L-02** (no code) - the collections have no `[data-selected]` styling yet (latent until selectionMode; the tree item is hard-wired `aria-selected={false}`). It rides with T043/T049, which own collection selection semantics.
+- **L-03** - "byte-stable"/"byte-equality" determinism claims corrected to the threshold-comparator reality in evidence.md and quickstart.md.
+- **L-04** `eea844d` - tokens.test.ts now parses both HC blocks (forced-colors media + manual theme, the selector anchored with its brace because the header comment mentions it verbatim) and asserts identical name-to-value maps (~30 tokens, previously only 3 were checked).
+
+Round-3 verification: `pnpm -C app test` 159/159; `pnpm -C app i18n:check` 130 keys; `pnpm -C app harness` 72 tests over 1,224 goldens (regen pass then clean run; the test count grew by the HC-pairing test across the four projects); `pwsh -File tools/verify.ps1` all 13 gates PASS.
+
+Deferral list unchanged (T043-T050); with round-3 L-02 the collections `[data-selected]` styling is explicitly recorded to land with T043/T049.
 

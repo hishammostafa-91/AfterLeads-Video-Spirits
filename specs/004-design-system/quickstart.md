@@ -20,7 +20,7 @@ pwsh -File tools/verify.ps1
 | 3 | T-I18N-003 — ICU and locale formatting | `pnpm -C app test -- -t t_i18n_003` | Arabic plural categories; `Intl` numbers/dates with `latn`; timecode in an LTR isolate inside RTL prose |
 | 4 | T-I18N-004 — key sets and pseudo-locales | `pnpm -C app i18n:check` then `pnpm -C app test -- -t t_i18n_004` | equality check green (and fails when a key is deliberately removed); LOC-90 expansion (+40%) and LOC-91 RTL render without clipping |
 | 5 | T-A11Y-004 — contrast, forced colors, motion, color-alone | `pnpm -C app harness -- --grep a11y` | AA ratios in dark+light; forced-colors mapping; reduced motion zeroes durations; badges/labels carry text+icon |
-| 6 | Snapshots — every component, 9 states, dark/light × en/ar | `pnpm -C app harness` | all screenshots match; repeat run is byte-stable (determinism); axe reports zero violations per story |
+| 6 | Snapshots — every component, 9 states, dark/light × en/ar | `pnpm -C app harness` | all screenshots match; repeat run is stable through Playwright's per-pixel threshold comparator (determinism); axe reports zero violations per story |
 
 ## Point checks
 
