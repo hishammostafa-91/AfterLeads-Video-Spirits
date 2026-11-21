@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "Recortar borde seleccionado 1 imagen a la derecha",
   "kb.timeline.trimEdgeLeft10": "Recortar borde seleccionado 10 imágenes a la izquierda",
   "kb.timeline.trimEdgeRight10": "Recortar borde seleccionado 10 imágenes a la derecha",
-  "kb.timeline.inspectSelection": "Mostrar selección en el Inspector"
+  "kb.timeline.inspectSelection": "Mostrar selección en el Inspector",
+  "shell.menuBar.label": "Menú principal",
+  "shell.menu.File": "Archivo",
+  "shell.menu.Edit": "Edición",
+  "shell.menu.Clip": "Clip",
+  "shell.menu.Timeline": "Línea de tiempo",
+  "shell.menu.Playback": "Reproducción",
+  "shell.menu.View": "Ver",
+  "shell.menu.Help": "Ayuda"
 }

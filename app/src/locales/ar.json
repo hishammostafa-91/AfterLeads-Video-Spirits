@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "تقليم الحافة المحددة يمينًا إطارًا واحدًا",
   "kb.timeline.trimEdgeLeft10": "تقليم الحافة المحددة يسارًا عشرة إطارات",
   "kb.timeline.trimEdgeRight10": "تقليم الحافة المحددة يمينًا عشرة إطارات",
-  "kb.timeline.inspectSelection": "إظهار التحديد في المفتش"
+  "kb.timeline.inspectSelection": "إظهار التحديد في المفتش",
+  "shell.menuBar.label": "القائمة الرئيسية",
+  "shell.menu.File": "ملف",
+  "shell.menu.Edit": "تحرير",
+  "shell.menu.Clip": "مقطع",
+  "shell.menu.Timeline": "التسلسل الزمني",
+  "shell.menu.Playback": "تشغيل",
+  "shell.menu.View": "عرض",
+  "shell.menu.Help": "تعليمات"
 }

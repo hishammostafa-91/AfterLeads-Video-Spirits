@@ -1,0 +1,8 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Later-version note on disabled menu items (WP-05 card). */
+.later-note {
+  color: var(--text-tertiary);
+  font-size: var(--fs-xs);
+}

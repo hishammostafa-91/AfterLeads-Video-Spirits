@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "Rogner le bord sélectionné d'une image vers la droite",
   "kb.timeline.trimEdgeLeft10": "Rogner le bord sélectionné de 10 images vers la gauche",
   "kb.timeline.trimEdgeRight10": "Rogner le bord sélectionné de 10 images vers la droite",
-  "kb.timeline.inspectSelection": "Afficher la sélection dans l'Inspecteur"
+  "kb.timeline.inspectSelection": "Afficher la sélection dans l'Inspecteur",
+  "shell.menuBar.label": "Menu principal",
+  "shell.menu.File": "Fichier",
+  "shell.menu.Edit": "Édition",
+  "shell.menu.Clip": "Clip",
+  "shell.menu.Timeline": "Timeline",
+  "shell.menu.Playback": "Lecture",
+  "shell.menu.View": "Affichage",
+  "shell.menu.Help": "Aide"
 }

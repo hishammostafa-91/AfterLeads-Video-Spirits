@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "Trim Selected Edge Right 1 Frame",
   "kb.timeline.trimEdgeLeft10": "Trim Selected Edge Left 10 Frames",
   "kb.timeline.trimEdgeRight10": "Trim Selected Edge Right 10 Frames",
-  "kb.timeline.inspectSelection": "Show Selection in Inspector"
+  "kb.timeline.inspectSelection": "Show Selection in Inspector",
+  "shell.menuBar.label": "Main menu",
+  "shell.menu.File": "File",
+  "shell.menu.Edit": "Edit",
+  "shell.menu.Clip": "Clip",
+  "shell.menu.Timeline": "Timeline",
+  "shell.menu.Playback": "Playback",
+  "shell.menu.View": "View",
+  "shell.menu.Help": "Help"
 }

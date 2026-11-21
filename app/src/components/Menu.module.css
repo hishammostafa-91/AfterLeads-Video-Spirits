@@ -16,6 +16,13 @@
   font-size: var(--fs-md);
 }
 
+/* Group separators (12 s12.11). */
+.separator {
+  margin-block: var(--sp-1);
+  margin-inline: calc(var(--sp-1) * -1);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
 .item {
   display: flex;
   align-items: center;

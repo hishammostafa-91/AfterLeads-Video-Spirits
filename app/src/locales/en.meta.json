@@ -1028,5 +1028,29 @@
   },
   "commands.laterVersion": {
     "description": "Note shown on commands their work package has not shipped yet (WP-05 card)."
+  },
+  "shell.menuBar.label": {
+    "description": "Accessible name of the application menu bar (12 s12.11)."
+  },
+  "shell.menu.File": {
+    "description": "Menu bar: File."
+  },
+  "shell.menu.Edit": {
+    "description": "Menu bar: Edit."
+  },
+  "shell.menu.Clip": {
+    "description": "Menu bar: Clip."
+  },
+  "shell.menu.Timeline": {
+    "description": "Menu bar: Timeline."
+  },
+  "shell.menu.Playback": {
+    "description": "Menu bar: Playback."
+  },
+  "shell.menu.View": {
+    "description": "Menu bar: View."
+  },
+  "shell.menu.Help": {
+    "description": "Menu bar: Help."
   }
 }

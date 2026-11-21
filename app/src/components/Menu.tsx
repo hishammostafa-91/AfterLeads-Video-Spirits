@@ -19,6 +19,7 @@ import {
   MenuItem as RACMenuItem,
   type MenuItemProps,
   MenuTrigger,
+  Separator,
   SubmenuTrigger,
 } from "react-aria-components";
 import {
@@ -134,6 +135,11 @@ export interface SubmenuProps {
   /** The submenu's trigger label. */
   label: string;
   children: ReactNode;
+}
+
+/** A separator between menu groups (12 §12.11 group boundaries). */
+export function MenuSeparator(): JSX.Element {
+  return <Separator className={styles.separator} />;
 }
 
 /** A nested menu (RAC SubmenuTrigger + Menu). */

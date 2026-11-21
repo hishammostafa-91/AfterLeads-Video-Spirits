@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "Ausgewählte Kante 1 Bild nach rechts trimmen",
   "kb.timeline.trimEdgeLeft10": "Ausgewählte Kante 10 Bilder nach links trimmen",
   "kb.timeline.trimEdgeRight10": "Ausgewählte Kante 10 Bilder nach rechts trimmen",
-  "kb.timeline.inspectSelection": "Auswahl im Inspektor zeigen"
+  "kb.timeline.inspectSelection": "Auswahl im Inspektor zeigen",
+  "shell.menuBar.label": "Hauptmenü",
+  "shell.menu.File": "Datei",
+  "shell.menu.Edit": "Bearbeiten",
+  "shell.menu.Clip": "Clip",
+  "shell.menu.Timeline": "Timeline",
+  "shell.menu.Playback": "Wiedergabe",
+  "shell.menu.View": "Ansicht",
+  "shell.menu.Help": "Hilfe"
 }

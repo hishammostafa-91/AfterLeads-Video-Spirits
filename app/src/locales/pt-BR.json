@@ -300,5 +300,13 @@
   "kb.timeline.trimEdgeRight": "Aparar borda selecionada 1 quadro à direita",
   "kb.timeline.trimEdgeLeft10": "Aparar borda selecionada 10 quadros à esquerda",
   "kb.timeline.trimEdgeRight10": "Aparar borda selecionada 10 quadros à direita",
-  "kb.timeline.inspectSelection": "Mostrar seleção no Inspetor"
+  "kb.timeline.inspectSelection": "Mostrar seleção no Inspetor",
+  "shell.menuBar.label": "Menu principal",
+  "shell.menu.File": "Arquivo",
+  "shell.menu.Edit": "Editar",
+  "shell.menu.Clip": "Clipe",
+  "shell.menu.Timeline": "Linha de tempo",
+  "shell.menu.Playback": "Reprodução",
+  "shell.menu.View": "Exibir",
+  "shell.menu.Help": "Ajuda"
 }
