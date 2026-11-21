@@ -6,7 +6,9 @@
  * active locale, keyboard-navigable results (RAC ListBox arrows +
  * Enter), shortcut display in the current layout's glyphs
  * (REQ-I18N-005), and later-version commands visible but not
- * runnable with their note (WP-05 card).
+ * runnable with their note (WP-05 card). The body is a standalone
+ * component so the harness story renders it inline (the modal is
+ * fixed-position and cannot sit in the story grid).
  */
 import { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
@@ -56,19 +58,19 @@ function useKeyboardLayoutMap(): LayoutMapLike | null {
   return map;
 }
 
-export interface CommandPaletteProps {
-  isOpen: boolean;
-  onClose: () => void;
+export interface CommandPaletteBodyProps {
   flags: CommandRuntimeFlags;
+  /** Called after a command ran (the modal closes on it). */
+  onRan?: () => void;
 }
 
 const RESULT_LIMIT = 50;
 
-export function CommandPalette({
-  isOpen,
-  onClose,
+/** Heading + search field + ranked results; owns the query state. */
+export function CommandPaletteBody({
   flags,
-}: CommandPaletteProps): React.JSX.Element {
+  onRan,
+}: CommandPaletteBodyProps): React.JSX.Element {
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState("");
   const layoutMap = useKeyboardLayoutMap();
@@ -87,20 +89,89 @@ export function CommandPalette({
     [query, entries],
   );
 
-  useEffect(() => {
-    if (!isOpen) setQuery("");
-  }, [isOpen]);
-
   const label = (spec: CommandSpec): string =>
     formatMessage({ id: spec.labelKey });
 
   const run = (spec: CommandSpec): void => {
     const row = commandRow(spec, flags);
     if (!row.enabled) return;
-    onClose();
+    onRan?.();
     void runCommand(spec, flags);
   };
 
+  return (
+    <>
+      <DialogHeading className={styles.heading}>
+        {formatMessage({ id: "commands.palette.title" })}
+      </DialogHeading>
+      <input
+        type="text"
+        className={styles.input}
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+        }}
+        aria-label={formatMessage({ id: "commands.palette.placeholder" })}
+        placeholder={formatMessage({ id: "commands.palette.placeholder" })}
+      />
+      {results.length === 0 ? (
+        <p className={styles.empty}>
+          {formatMessage({ id: "commands.palette.noResults" })}
+        </p>
+      ) : (
+        <ListBox
+          aria-label={formatMessage({ id: "commands.palette.title" })}
+          selectionMode="none"
+          onAction={(key) => {
+            const spec = COMMANDS.find((command) => command.id === key);
+            if (spec) run(spec);
+          }}
+          className={styles.list}
+        >
+          {results.map(({ item: spec }) => {
+            const row = commandRow(spec, flags);
+            const shortcut: Shortcut | undefined =
+              spec.shortcuts.length > 0 ? spec.shortcuts[0] : undefined;
+            return (
+              <ListBoxOption
+                key={spec.id}
+                id={spec.id}
+                textValue={label(spec)}
+                isDisabled={!row.enabled}
+                className={styles.row}
+              >
+                <span className={styles.label}>{label(spec)}</span>
+                {shortcut ? (
+                  <kbd className={styles.kbd}>
+                    {chordLabel(shortcut, layoutMap)}
+                  </kbd>
+                ) : null}
+                {row.laterVersion ? (
+                  <span className={styles.later}>
+                    {formatMessage({ id: "commands.laterVersion" })}
+                  </span>
+                ) : null}
+              </ListBoxOption>
+            );
+          })}
+        </ListBox>
+      )}
+    </>
+  );
+}
+
+export interface CommandPaletteProps {
+  isOpen: boolean;
+  onClose: () => void;
+  flags: CommandRuntimeFlags;
+}
+
+export function CommandPalette({
+  isOpen,
+  onClose,
+  flags,
+}: CommandPaletteProps): React.JSX.Element {
+  const { formatMessage } = useIntl();
   return (
     <ModalOverlay
       isOpen={isOpen}
@@ -114,61 +185,12 @@ export function CommandPalette({
           className={styles.dialog}
           aria-label={formatMessage({ id: "commands.palette.title" })}
         >
-          <DialogHeading className={styles.heading}>
-            {formatMessage({ id: "commands.palette.title" })}
-          </DialogHeading>
-          <input
-            type="text"
-            className={styles.input}
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-            }}
-            aria-label={formatMessage({ id: "commands.palette.placeholder" })}
-            placeholder={formatMessage({ id: "commands.palette.placeholder" })}
+          {/* key remounts the body per open — the query resets. */}
+          <CommandPaletteBody
+            key={isOpen ? "open" : "closed"}
+            flags={flags}
+            onRan={onClose}
           />
-          {results.length === 0 ? (
-            <p className={styles.empty}>
-              {formatMessage({ id: "commands.palette.noResults" })}
-            </p>
-          ) : (
-            <ListBox
-              aria-label={formatMessage({ id: "commands.palette.title" })}
-              selectionMode="none"
-              onAction={(key) => {
-                const spec = COMMANDS.find((command) => command.id === key);
-                if (spec) run(spec);
-              }}
-              className={styles.list}
-            >
-              {results.map(({ item: spec }) => {
-                const row = commandRow(spec, flags);
-                const shortcut: Shortcut | undefined =
-                  spec.shortcuts.length > 0 ? spec.shortcuts[0] : undefined;
-                return (
-                  <ListBoxOption
-                    key={spec.id}
-                    id={spec.id}
-                    textValue={label(spec)}
-                    isDisabled={!row.enabled}
-                    className={styles.row}
-                  >
-                    <span className={styles.label}>{label(spec)}</span>
-                    {shortcut ? (
-                      <kbd className={styles.kbd}>
-                        {chordLabel(shortcut, layoutMap)}
-                      </kbd>
-                    ) : null}
-                    {row.laterVersion ? (
-                      <span className={styles.later}>
-                        {formatMessage({ id: "commands.laterVersion" })}
-                      </span>
-                    ) : null}
-                  </ListBoxOption>
-                );
-              })}
-            </ListBox>
-          )}
         </Dialog>
       </Modal>
     </ModalOverlay>
