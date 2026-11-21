@@ -147,6 +147,7 @@ export function Toolbar({ flags, activeWorkspace }: ToolbarProps): JSX.Element {
       />
       <span className={styles.divider} aria-hidden="true" />
       <MenuBarItem
+        standalone
         label={`${formatMessage({ id: "shell.toolbar.workspace" })}: ${formatMessage({ id: WORKSPACE_LABEL_KEY[activeWorkspace] })}`}
       >
         {WORKSPACES.map((ws) => (

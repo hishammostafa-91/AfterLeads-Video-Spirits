@@ -289,6 +289,13 @@ function menubarItemKeyDown(
 export interface MenuBarItemProps extends Omit<RACButtonProps, "className"> {
   /** The trigger's visible label (already translated). */
   label: ReactNode;
+  /**
+   * True when the trigger sits outside a menubar (e.g. a toolbar's
+   * workspace switcher): the button keeps its default button role —
+   * role=menuitem requires a menubar/menu parent (axe
+   * aria-required-parent).
+   */
+  standalone?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -296,6 +303,7 @@ export interface MenuBarItemProps extends Omit<RACButtonProps, "className"> {
 /** One top-level menubar entry: a trigger (role=menuitem) + its menu. */
 export function MenuBarItem({
   label,
+  standalone = false,
   className,
   children,
   ...props
@@ -304,9 +312,13 @@ export function MenuBarItem({
     <MenuTrigger>
       <RACButton
         {...props}
-        render={(renderProps) => (
-          <button {...renderProps} type="button" role="menuitem" />
-        )}
+        render={
+          standalone
+            ? undefined
+            : (renderProps) => (
+                <button {...renderProps} type="button" role="menuitem" />
+              )
+        }
         onKeyDown={menubarItemKeyDown}
         className={cx(styles.menuBarTrigger, className)}
       >
