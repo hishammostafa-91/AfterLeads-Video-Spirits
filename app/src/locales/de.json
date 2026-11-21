@@ -1,6 +1,10 @@
 {
   "a11y.errorsRegion": "Fehler",
   "a11y.statusRegion": "Status",
+  "commands.palette.title": "Befehlspalette",
+  "commands.palette.placeholder": "Befehle suchen…",
+  "commands.palette.noResults": "Keine passenden Befehle",
+  "commands.laterVersion": "In einer späteren Version verfügbar",
   "components.badge.hdr": "HDR",
   "components.badge.offline": "Offline",
   "components.badge.proxy": "Proxy",

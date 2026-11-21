@@ -1016,5 +1016,17 @@
   },
   "kb.timeline.inspectSelection": {
     "description": "Command label (12 §12.10 KB-168, palette only)."
+  },
+  "commands.palette.title": {
+    "description": "Accessible name of the command palette overlay (REQ-APP-004)."
+  },
+  "commands.palette.placeholder": {
+    "description": "Search field label of the command palette."
+  },
+  "commands.palette.noResults": {
+    "description": "Empty result message of the command palette."
+  },
+  "commands.laterVersion": {
+    "description": "Note shown on commands their work package has not shipped yet (WP-05 card)."
   }
 }

@@ -1,0 +1,73 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Command palette (07 s7.6 overlay + dialog tokens). */
+
+.modal {
+  position: fixed;
+  inset-block-start: 12vh;
+  margin-inline: auto;
+  inline-size: min(34rem, 92vi);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-dialog);
+  color: var(--text-primary);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: var(--weight-semibold);
+}
+
+.input {
+  padding-block: calc(var(--control-height) / 4);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+}
+
+.list {
+  max-block-size: 40vh;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+}
+
+.label {
+  flex: 1;
+}
+
+.kbd {
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+
+.later {
+  color: var(--text-tertiary);
+  font-size: var(--fs-xs);
+}
