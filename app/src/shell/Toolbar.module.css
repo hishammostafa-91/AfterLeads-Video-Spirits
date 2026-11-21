@@ -1,0 +1,25 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Toolbar (07 s7.2: 40 px). */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  block-size: 40px;
+  padding-inline: var(--sp-3);
+  border-block-end: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.divider {
+  inline-size: 1px;
+  block-size: var(--sp-5);
+  margin-inline: var(--sp-1);
+  background: var(--border-subtle);
+}
+
+.spacer {
+  flex: 1;
+}

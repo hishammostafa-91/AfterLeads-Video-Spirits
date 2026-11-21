@@ -7,10 +7,9 @@
  * commands unimplemented in any shipped work package render disabled
  * with the localized later-version note (WP-05 card).
  */
-import { Fragment, type JSX } from "react";
+import { type JSX } from "react";
 import { useIntl } from "react-intl";
 import {
-  Menu,
   MenuBar as ShellMenuBar,
   MenuBarItem,
   MenuItem,
@@ -40,7 +39,7 @@ function labelKeyFor(menu: MenuId): string {
   return entry.id;
 }
 
-function CommandMenuItem({
+export function CommandMenuItem({
   id,
   flags,
 }: {
@@ -93,18 +92,21 @@ export function AppMenuBar({ flags }: AppMenuBarProps): JSX.Element {
     <ShellMenuBar labelMessageId="shell.menuBar.label">
       {MENUS.map((menu) => {
         const label = formatMessage({ id: labelKeyFor(menu.id) });
+        // MenuBarItem renders its own RAC Menu — items (with group
+        // separators interleaved as flat array elements) are its
+        // direct children; wrapping them in another Menu would nest
+        // two collections.
+        const items = menu.groups.flatMap((group, groupIndex) => [
+          ...(groupIndex > 0
+            ? [<MenuSeparator key={`sep-${menu.id}-${String(groupIndex)}`} />]
+            : []),
+          ...group.items.map((id) => (
+            <CommandMenuItem key={id} id={id} flags={flags} />
+          )),
+        ]);
         return (
           <MenuBarItem key={menu.id} label={label}>
-            <Menu>
-              {menu.groups.map((group, groupIndex) => (
-                <Fragment key={`${menu.id}-${String(groupIndex)}`}>
-                  {groupIndex > 0 ? <MenuSeparator /> : null}
-                  {group.items.map((id) => (
-                    <CommandMenuItem key={id} id={id} flags={flags} />
-                  ))}
-                </Fragment>
-              ))}
-            </Menu>
+            {items}
           </MenuBarItem>
         );
       })}

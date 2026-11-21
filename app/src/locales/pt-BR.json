@@ -308,5 +308,21 @@
   "shell.menu.Timeline": "Linha de tempo",
   "shell.menu.Playback": "Reprodução",
   "shell.menu.View": "Exibir",
-  "shell.menu.Help": "Ajuda"
+  "shell.menu.Help": "Ajuda",
+  "shell.titleBar.neutral": "Nenhum projeto aberto",
+  "shell.titleBar.dirty": "Alterações não salvas",
+  "shell.toolbar.label": "Barra de ferramentas",
+  "shell.toolbar.workspace": "Espaço de trabalho",
+  "shell.toolbar.notifications": "Notificações",
+  "shell.toolbar.jobs": "Tarefas",
+  "shell.status.label": "Barra de status",
+  "shell.status.jobs": "Tarefas em segundo plano",
+  "shell.status.autosave": "Salvamento automático",
+  "shell.status.autosaving": "Salvando…",
+  "shell.status.autosaveFailed": "Falha ao salvar",
+  "shell.status.savedAt": "Salvo",
+  "shell.status.playback": "Estatísticas de reprodução",
+  "shell.status.proxy": "Modo proxy",
+  "shell.status.proxiesOn": "Proxies ATIVADOS",
+  "shell.status.renderer": "Renderizador"
 }

@@ -159,7 +159,7 @@ The seven menus in order with items in KB order and the documented group separat
 
 ### FR-004: Toolbar — REQ-APP-001; 07 §7.2
 40 px toolbar per the anatomy: tools (KB-091..097), undo/redo (KB-017/018), Snap (KB-070) and Link (KB-071) toggles, workspace switcher (WS-01..04), Export… (KB-008), notifications bell (REQ-APP-006), settings (KB-015), jobs (PNL-14 access). Icon-only buttons carry tooltips with label + shortcut (REQ-HLP-003).
-- AC1: every toolbar control maps to a KB id; none is unregistered chrome.
+- AC1: every toolbar control that invokes a command maps to a KB id; the bell and the jobs-panel access are panel controls from the 07 §7.2 anatomy (not commands) and carry their own accessible names.
 - AC2: icon-only controls expose accessible names + tooltips with shortcuts (T-HLP-003 share).
 
 ### FR-005: Status bar framework — REQ-APP-007 (framework); 07 §7.2/§7.10; 04 §4.10

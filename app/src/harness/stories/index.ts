@@ -15,6 +15,7 @@ import { menuStories } from "./Menu.stories";
 import { numericStories } from "./Numeric.stories";
 import { overlayStories } from "./Overlays.stories";
 import { selectionStories } from "./Selection.stories";
+import { shellStories } from "./Shell.stories";
 import { tabsStories } from "./Tabs.stories";
 
 const allStoryFiles: StoryFile[] = [
@@ -28,6 +29,7 @@ const allStoryFiles: StoryFile[] = [
   colorStories,
   collectionStories,
   commandsStories,
+  shellStories,
 ];
 
 export const storyFiles: StoryFile[] = allStoryFiles;

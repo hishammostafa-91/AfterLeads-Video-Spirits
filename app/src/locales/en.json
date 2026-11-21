@@ -308,5 +308,21 @@
   "shell.menu.Timeline": "Timeline",
   "shell.menu.Playback": "Playback",
   "shell.menu.View": "View",
-  "shell.menu.Help": "Help"
+  "shell.menu.Help": "Help",
+  "shell.titleBar.neutral": "No project open",
+  "shell.titleBar.dirty": "Unsaved changes",
+  "shell.toolbar.label": "Toolbar",
+  "shell.toolbar.workspace": "Workspace",
+  "shell.toolbar.notifications": "Notifications",
+  "shell.toolbar.jobs": "Jobs",
+  "shell.status.label": "Status bar",
+  "shell.status.jobs": "Background jobs",
+  "shell.status.autosave": "Autosave",
+  "shell.status.autosaving": "Saving…",
+  "shell.status.autosaveFailed": "Autosave failed",
+  "shell.status.savedAt": "Saved",
+  "shell.status.playback": "Playback statistics",
+  "shell.status.proxy": "Proxy mode",
+  "shell.status.proxiesOn": "Proxies ON",
+  "shell.status.renderer": "Renderer"
 }

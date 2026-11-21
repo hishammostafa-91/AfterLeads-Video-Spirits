@@ -308,5 +308,21 @@
   "shell.menu.Timeline": "Timeline",
   "shell.menu.Playback": "Lecture",
   "shell.menu.View": "Affichage",
-  "shell.menu.Help": "Aide"
+  "shell.menu.Help": "Aide",
+  "shell.titleBar.neutral": "Aucun projet ouvert",
+  "shell.titleBar.dirty": "Modifications non enregistrées",
+  "shell.toolbar.label": "Barre d'outils",
+  "shell.toolbar.workspace": "Espace de travail",
+  "shell.toolbar.notifications": "Notifications",
+  "shell.toolbar.jobs": "Tâches",
+  "shell.status.label": "Barre d'état",
+  "shell.status.jobs": "Tâches en arrière-plan",
+  "shell.status.autosave": "Sauvegarde automatique",
+  "shell.status.autosaving": "Enregistrement…",
+  "shell.status.autosaveFailed": "Échec de la sauvegarde",
+  "shell.status.savedAt": "Enregistré",
+  "shell.status.playback": "Statistiques de lecture",
+  "shell.status.proxy": "Mode proxy",
+  "shell.status.proxiesOn": "Proxys ACTIFS",
+  "shell.status.renderer": "Moteur de rendu"
 }

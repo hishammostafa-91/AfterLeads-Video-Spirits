@@ -308,5 +308,21 @@
   "shell.menu.Timeline": "التسلسل الزمني",
   "shell.menu.Playback": "تشغيل",
   "shell.menu.View": "عرض",
-  "shell.menu.Help": "تعليمات"
+  "shell.menu.Help": "تعليمات",
+  "shell.titleBar.neutral": "لا يوجد مشروع مفتوح",
+  "shell.titleBar.dirty": "تغييرات غير محفوظة",
+  "shell.toolbar.label": "شريط الأدوات",
+  "shell.toolbar.workspace": "مساحة العمل",
+  "shell.toolbar.notifications": "الإشعارات",
+  "shell.toolbar.jobs": "المهام",
+  "shell.status.label": "شريط الحالة",
+  "shell.status.jobs": "المهام في الخلفية",
+  "shell.status.autosave": "الحفظ التلقائي",
+  "shell.status.autosaving": "جارٍ الحفظ…",
+  "shell.status.autosaveFailed": "فشل الحفظ التلقائي",
+  "shell.status.savedAt": "حُفظ",
+  "shell.status.playback": "إحصاءات التشغيل",
+  "shell.status.proxy": "وضع النسخ البديلة",
+  "shell.status.proxiesOn": "النسخ البديلة مفعّلة",
+  "shell.status.renderer": "محرك العرض"
 }

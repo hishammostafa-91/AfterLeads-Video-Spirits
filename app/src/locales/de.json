@@ -308,5 +308,21 @@
   "shell.menu.Timeline": "Timeline",
   "shell.menu.Playback": "Wiedergabe",
   "shell.menu.View": "Ansicht",
-  "shell.menu.Help": "Hilfe"
+  "shell.menu.Help": "Hilfe",
+  "shell.titleBar.neutral": "Kein Projekt geöffnet",
+  "shell.titleBar.dirty": "Ungespeicherte Änderungen",
+  "shell.toolbar.label": "Werkzeugleiste",
+  "shell.toolbar.workspace": "Arbeitsbereich",
+  "shell.toolbar.notifications": "Benachrichtigungen",
+  "shell.toolbar.jobs": "Aufträge",
+  "shell.status.label": "Statusleiste",
+  "shell.status.jobs": "Hintergrundaufträge",
+  "shell.status.autosave": "Automatisches Speichern",
+  "shell.status.autosaving": "Speichern…",
+  "shell.status.autosaveFailed": "Speichern fehlgeschlagen",
+  "shell.status.savedAt": "Gespeichert",
+  "shell.status.playback": "Wiedergabestatistik",
+  "shell.status.proxy": "Proxy-Modus",
+  "shell.status.proxiesOn": "Proxys AN",
+  "shell.status.renderer": "Renderer"
 }
