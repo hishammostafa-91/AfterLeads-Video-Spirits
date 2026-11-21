@@ -27,10 +27,10 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 1 — Command runtime (plan Phase 1)
 
-- [ ] T004 `app/src/commands/registry.ts`: runtime registry — enable state (implementedIn + focused-panel context per 07 §7.9.1 + project flags), handler map, checked state, the localized later-version tooltip marker (US2)
-- [ ] T005 `app/src/commands/dispatcher.ts`: single keydown listener dispatching by physical code; text-field exception list (Ctrl+S/Ctrl+Shift+S/Ctrl+E/Ctrl+Shift+P/F1/F6/Shift+F6/F11), IME suppression, Esc field-then-panel rule per 07 §7.9.2 (US2)
-- [ ] T006 Unit tests for the dispatcher: code-sequence dispatch table, exceptions, IME, Esc chain (T-I18N-005 share)
-- [ ] T007 `app/src/commands/palette/CommandPalette.tsx`: Ctrl+Shift+P overlay, fuzzy search over labels+ids in six locales, keyboard-navigable, shortcut display, disabled entries non-runnable with tooltip (US2)
+- [X] T004 `app/src/commands/registry.ts`: runtime registry — enable state (implementedIn + focused-panel context per 07 §7.9.1 + project flags), handler map, checked state, the localized later-version tooltip marker (US2)
+- [X] T005 `app/src/commands/dispatcher.ts`: single keydown listener dispatching by physical code; text-field exception list (Ctrl+S/Ctrl+Shift+S/Ctrl+E/Ctrl+Shift+P/F1/F6/Shift+F6/F11), IME suppression, Esc field-then-panel rule per 07 §7.9.2 (US2)
+- [X] T006 Unit tests for the dispatcher: code-sequence dispatch table, exceptions, IME, Esc chain (T-I18N-005 share)
+- [X] T007 `app/src/commands/palette/CommandPalette.tsx`: Ctrl+Shift+P overlay, fuzzy search over labels+ids in six locales, keyboard-navigable, shortcut display, disabled entries non-runnable with tooltip (US2)
 - [ ] T008 Harness story for the palette; interaction goldens + a11y assertions (T-APP-003 share)
 
 ## Phase 2 — Shell chrome (plan Phase 2) — US1
