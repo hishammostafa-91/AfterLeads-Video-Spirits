@@ -62,7 +62,9 @@ export function collectIssues(
 
 /** Scan a source tree for message IDs used in code (`id="…"` JSX
  * props and any `*MessageId`/`messageId` literals in props or
- * objects). */
+ * objects). The command catalog's kb.* label keys are constructed
+ * dynamically (kb.<id> in commands/catalog.ts), so the doc-derived
+ * catalog fixture is read directly and its ids counted as used. */
 export function collectUsedIds(srcRoot: string): Set<string> {
   const used = new Set<string>();
   const pattern =
@@ -73,6 +75,15 @@ export function collectUsedIds(srcRoot: string): Set<string> {
       if (statSync(full).isDirectory()) {
         if (entry === "bindings" || entry === "node_modules") continue;
         walk(full);
+      } else if (entry === "catalog.fixture.json") {
+        // The command label keys are built dynamically; the fixture is
+        // the doc-derived source of those ids (12 s12.10).
+        const fixture = JSON.parse(
+          readFileSync(full, "utf8"),
+        ) as ReadonlyArray<{ id?: unknown }>;
+        for (const row of fixture) {
+          if (typeof row.id === "string") used.add(`kb.${row.id}`);
+        }
       } else if (/\.[cm]?tsx?$/.test(entry)) {
         const source = readFileSync(full, "utf8");
         for (const match of source.matchAll(pattern)) {

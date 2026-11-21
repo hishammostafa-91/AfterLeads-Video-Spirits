@@ -512,5 +512,509 @@
   "harness.toolbar.zoom": {
     "description": "Current zoom percentage; {value} is the integer 80-200.",
     "maxlength": 16
+  },
+  "kb.file.newProject": {
+    "description": "Command label (12 §12.10 KB-001, menu File)."
+  },
+  "kb.file.openProject": {
+    "description": "Command label (12 §12.10 KB-002, menu File)."
+  },
+  "kb.file.save": {
+    "description": "Command label (12 §12.10 KB-003, menu File)."
+  },
+  "kb.file.saveAs": {
+    "description": "Command label (12 §12.10 KB-004, menu File)."
+  },
+  "kb.file.closeProject": {
+    "description": "Command label (12 §12.10 KB-005, menu File)."
+  },
+  "kb.file.importMedia": {
+    "description": "Command label (12 §12.10 KB-006, menu File)."
+  },
+  "kb.file.importCaptions": {
+    "description": "Command label (12 §12.10 KB-007, menu File)."
+  },
+  "kb.file.export": {
+    "description": "Command label (12 §12.10 KB-008, menu File)."
+  },
+  "kb.file.exportFrame": {
+    "description": "Command label (12 §12.10 KB-009, menu File)."
+  },
+  "kb.file.exportMarkers": {
+    "description": "Command label (12 §12.10 KB-010, menu File)."
+  },
+  "kb.file.exportEdl": {
+    "description": "Command label (12 §12.10 KB-011, menu File)."
+  },
+  "kb.file.collectFiles": {
+    "description": "Command label (12 §12.10 KB-012, menu File)."
+  },
+  "kb.file.restoreBackup": {
+    "description": "Command label (12 §12.10 KB-013, menu File)."
+  },
+  "kb.file.projectSettings": {
+    "description": "Command label (12 §12.10 KB-014, menu File)."
+  },
+  "kb.file.settings": {
+    "description": "Command label (12 §12.10 KB-015, menu File)."
+  },
+  "kb.file.exit": {
+    "description": "Command label (12 §12.10 KB-016, menu File)."
+  },
+  "kb.edit.undo": {
+    "description": "Command label (12 §12.10 KB-017, menu Edit)."
+  },
+  "kb.edit.redo": {
+    "description": "Command label (12 §12.10 KB-018, menu Edit)."
+  },
+  "kb.edit.cut": {
+    "description": "Command label (12 §12.10 KB-019, menu Edit)."
+  },
+  "kb.edit.copy": {
+    "description": "Command label (12 §12.10 KB-020, menu Edit)."
+  },
+  "kb.edit.paste": {
+    "description": "Command label (12 §12.10 KB-021, menu Edit)."
+  },
+  "kb.edit.pasteInsert": {
+    "description": "Command label (12 §12.10 KB-022, menu Edit)."
+  },
+  "kb.edit.pasteAttributes": {
+    "description": "Command label (12 §12.10 KB-023, menu Edit)."
+  },
+  "kb.edit.duplicate": {
+    "description": "Command label (12 §12.10 KB-024, menu Edit)."
+  },
+  "kb.edit.delete": {
+    "description": "Command label (12 §12.10 KB-025, menu Edit)."
+  },
+  "kb.edit.rippleDelete": {
+    "description": "Command label (12 §12.10 KB-026, menu Edit)."
+  },
+  "kb.edit.selectAll": {
+    "description": "Command label (12 §12.10 KB-027, menu Edit)."
+  },
+  "kb.edit.deselectAll": {
+    "description": "Command label (12 §12.10 KB-028, menu Edit)."
+  },
+  "kb.edit.rename": {
+    "description": "Command label (12 §12.10 KB-029, menu Edit)."
+  },
+  "kb.edit.find": {
+    "description": "Command label (12 §12.10 KB-030, menu Edit)."
+  },
+  "kb.edit.keyboardShortcuts": {
+    "description": "Command label (12 §12.10 KB-031, menu Edit)."
+  },
+  "kb.clip.split": {
+    "description": "Command label (12 §12.10 KB-032, menu Clip)."
+  },
+  "kb.clip.splitAll": {
+    "description": "Command label (12 §12.10 KB-033, menu Clip)."
+  },
+  "kb.clip.toggleEnabled": {
+    "description": "Command label (12 §12.10 KB-034, menu Clip)."
+  },
+  "kb.clip.toggleLink": {
+    "description": "Command label (12 §12.10 KB-035, menu Clip)."
+  },
+  "kb.clip.group": {
+    "description": "Command label (12 §12.10 KB-036, menu Clip)."
+  },
+  "kb.clip.ungroup": {
+    "description": "Command label (12 §12.10 KB-037, menu Clip)."
+  },
+  "kb.clip.speedDuration": {
+    "description": "Command label (12 §12.10 KB-038, menu Clip)."
+  },
+  "kb.clip.reverse": {
+    "description": "Command label (12 §12.10 KB-039, menu Clip)."
+  },
+  "kb.clip.freezeFrame": {
+    "description": "Command label (12 §12.10 KB-040, menu Clip)."
+  },
+  "kb.clip.nest": {
+    "description": "Command label (12 §12.10 KB-041, menu Clip)."
+  },
+  "kb.clip.matchFrame": {
+    "description": "Command label (12 §12.10 KB-042, menu Clip)."
+  },
+  "kb.clip.addMaskRect": {
+    "description": "Command label (12 §12.10 KB-043, menu Clip)."
+  },
+  "kb.clip.addMaskEllipse": {
+    "description": "Command label (12 §12.10 KB-044, menu Clip)."
+  },
+  "kb.clip.addMaskPath": {
+    "description": "Command label (12 §12.10 KB-045, menu Clip)."
+  },
+  "kb.clip.labelColor": {
+    "description": "Command label (12 §12.10 KB-046, menu Clip)."
+  },
+  "kb.clip.normalizeLoudness": {
+    "description": "Command label (12 §12.10 KB-047, menu Clip)."
+  },
+  "kb.clip.stabilize": {
+    "description": "Command label (12 §12.10 KB-048, menu Clip)."
+  },
+  "kb.clip.transcribe": {
+    "description": "Command label (12 §12.10 KB-049, menu Clip)."
+  },
+  "kb.clip.copyGrade": {
+    "description": "Command label (12 §12.10 KB-050, menu Clip)."
+  },
+  "kb.clip.pasteGrade": {
+    "description": "Command label (12 §12.10 KB-051, menu Clip)."
+  },
+  "kb.media.createProxy": {
+    "description": "Command label (12 §12.10 KB-052, menu Clip)."
+  },
+  "kb.media.optimize": {
+    "description": "Command label (12 §12.10 KB-053, menu Clip)."
+  },
+  "kb.media.relink": {
+    "description": "Command label (12 §12.10 KB-054, menu Clip)."
+  },
+  "kb.media.revealInExplorer": {
+    "description": "Command label (12 §12.10 KB-055, menu Clip)."
+  },
+  "kb.timeline.newSequence": {
+    "description": "Command label (12 §12.10 KB-056, menu Timeline)."
+  },
+  "kb.timeline.sequenceSettings": {
+    "description": "Command label (12 §12.10 KB-057, menu Timeline)."
+  },
+  "kb.timeline.addVideoTrack": {
+    "description": "Command label (12 §12.10 KB-058, menu Timeline)."
+  },
+  "kb.timeline.addAudioTrack": {
+    "description": "Command label (12 §12.10 KB-059, menu Timeline)."
+  },
+  "kb.timeline.addCaptionTrack": {
+    "description": "Command label (12 §12.10 KB-060, menu Timeline)."
+  },
+  "kb.timeline.insert": {
+    "description": "Command label (12 §12.10 KB-061, menu Timeline)."
+  },
+  "kb.timeline.overwrite": {
+    "description": "Command label (12 §12.10 KB-062, menu Timeline)."
+  },
+  "kb.timeline.lift": {
+    "description": "Command label (12 §12.10 KB-063, menu Timeline)."
+  },
+  "kb.timeline.extract": {
+    "description": "Command label (12 §12.10 KB-064, menu Timeline)."
+  },
+  "kb.timeline.trimPrevToPlayhead": {
+    "description": "Command label (12 §12.10 KB-065, menu Timeline)."
+  },
+  "kb.timeline.trimNextToPlayhead": {
+    "description": "Command label (12 §12.10 KB-066, menu Timeline)."
+  },
+  "kb.timeline.extendEdit": {
+    "description": "Command label (12 §12.10 KB-067, menu Timeline)."
+  },
+  "kb.timeline.addVideoTransition": {
+    "description": "Command label (12 §12.10 KB-068, menu Timeline)."
+  },
+  "kb.timeline.addAudioTransition": {
+    "description": "Command label (12 §12.10 KB-069, menu Timeline)."
+  },
+  "kb.timeline.toggleSnapping": {
+    "description": "Command label (12 §12.10 KB-070, menu Timeline)."
+  },
+  "kb.timeline.toggleLinkedSelection": {
+    "description": "Command label (12 §12.10 KB-071, menu Timeline)."
+  },
+  "kb.timeline.closeGap": {
+    "description": "Command label (12 §12.10 KB-072, menu Timeline)."
+  },
+  "kb.timeline.deleteAllGaps": {
+    "description": "Command label (12 §12.10 KB-073, menu Timeline)."
+  },
+  "kb.timeline.nudgeLeft": {
+    "description": "Command label (12 §12.10 KB-074, menu Timeline)."
+  },
+  "kb.timeline.nudgeRight": {
+    "description": "Command label (12 §12.10 KB-075, menu Timeline)."
+  },
+  "kb.timeline.nudgeLeft10": {
+    "description": "Command label (12 §12.10 KB-076, menu Timeline)."
+  },
+  "kb.timeline.nudgeRight10": {
+    "description": "Command label (12 §12.10 KB-077, menu Timeline)."
+  },
+  "kb.timeline.audioSubframeNudge": {
+    "description": "Command label (12 §12.10 KB-078, menu Timeline)."
+  },
+  "kb.timeline.zoomIn": {
+    "description": "Command label (12 §12.10 KB-079, menu Timeline)."
+  },
+  "kb.timeline.zoomOut": {
+    "description": "Command label (12 §12.10 KB-080, menu Timeline)."
+  },
+  "kb.timeline.zoomFit": {
+    "description": "Command label (12 §12.10 KB-081, menu Timeline)."
+  },
+  "kb.timeline.addMarker": {
+    "description": "Command label (12 §12.10 KB-082, menu Timeline)."
+  },
+  "kb.timeline.editMarker": {
+    "description": "Command label (12 §12.10 KB-083, menu Timeline)."
+  },
+  "kb.timeline.nextMarker": {
+    "description": "Command label (12 §12.10 KB-084, menu Timeline)."
+  },
+  "kb.timeline.prevMarker": {
+    "description": "Command label (12 §12.10 KB-085, menu Timeline)."
+  },
+  "kb.timeline.addCaption": {
+    "description": "Command label (12 §12.10 KB-086, menu Timeline)."
+  },
+  "kb.timeline.listView": {
+    "description": "Command label (12 §12.10 KB-087, menu Timeline)."
+  },
+  "kb.timeline.recordVoiceOver": {
+    "description": "Command label (12 §12.10 KB-088, menu Timeline)."
+  },
+  "kb.timeline.autoDuck": {
+    "description": "Command label (12 §12.10 KB-089, menu Timeline)."
+  },
+  "kb.timeline.transcribeSequence": {
+    "description": "Command label (12 §12.10 KB-090, menu Timeline)."
+  },
+  "kb.tool.select": {
+    "description": "Command label (12 §12.10 KB-091, menu Timeline)."
+  },
+  "kb.tool.blade": {
+    "description": "Command label (12 §12.10 KB-092, menu Timeline)."
+  },
+  "kb.tool.trim": {
+    "description": "Command label (12 §12.10 KB-093, menu Timeline)."
+  },
+  "kb.tool.slip": {
+    "description": "Command label (12 §12.10 KB-094, menu Timeline)."
+  },
+  "kb.tool.slide": {
+    "description": "Command label (12 §12.10 KB-095, menu Timeline)."
+  },
+  "kb.tool.hand": {
+    "description": "Command label (12 §12.10 KB-096, menu Timeline)."
+  },
+  "kb.tool.zoom": {
+    "description": "Command label (12 §12.10 KB-097, menu Timeline)."
+  },
+  "kb.playback.playPause": {
+    "description": "Command label (12 §12.10 KB-098, menu Playback)."
+  },
+  "kb.playback.shuttleReverse": {
+    "description": "Command label (12 §12.10 KB-099, menu Playback)."
+  },
+  "kb.playback.pause": {
+    "description": "Command label (12 §12.10 KB-100, menu Playback)."
+  },
+  "kb.playback.shuttleForward": {
+    "description": "Command label (12 §12.10 KB-101, menu Playback)."
+  },
+  "kb.playback.stepBack": {
+    "description": "Command label (12 §12.10 KB-102, menu Playback)."
+  },
+  "kb.playback.stepForward": {
+    "description": "Command label (12 §12.10 KB-103, menu Playback)."
+  },
+  "kb.playback.stepBack10": {
+    "description": "Command label (12 §12.10 KB-104, menu Playback)."
+  },
+  "kb.playback.stepForward10": {
+    "description": "Command label (12 §12.10 KB-105, menu Playback)."
+  },
+  "kb.playback.prevEdit": {
+    "description": "Command label (12 §12.10 KB-106, menu Playback)."
+  },
+  "kb.playback.nextEdit": {
+    "description": "Command label (12 §12.10 KB-107, menu Playback)."
+  },
+  "kb.playback.goStart": {
+    "description": "Command label (12 §12.10 KB-108, menu Playback)."
+  },
+  "kb.playback.goEnd": {
+    "description": "Command label (12 §12.10 KB-109, menu Playback)."
+  },
+  "kb.playback.markIn": {
+    "description": "Command label (12 §12.10 KB-110, menu Playback)."
+  },
+  "kb.playback.markOut": {
+    "description": "Command label (12 §12.10 KB-111, menu Playback)."
+  },
+  "kb.playback.clearIn": {
+    "description": "Command label (12 §12.10 KB-112, menu Playback)."
+  },
+  "kb.playback.clearOut": {
+    "description": "Command label (12 §12.10 KB-113, menu Playback)."
+  },
+  "kb.playback.clearInOut": {
+    "description": "Command label (12 §12.10 KB-114, menu Playback)."
+  },
+  "kb.playback.goIn": {
+    "description": "Command label (12 §12.10 KB-115, menu Playback)."
+  },
+  "kb.playback.goOut": {
+    "description": "Command label (12 §12.10 KB-116, menu Playback)."
+  },
+  "kb.playback.playInToOut": {
+    "description": "Command label (12 §12.10 KB-117, menu Playback)."
+  },
+  "kb.playback.toggleLoop": {
+    "description": "Command label (12 §12.10 KB-118, menu Playback)."
+  },
+  "kb.playback.goToTimecode": {
+    "description": "Command label (12 §12.10 KB-119, menu Playback)."
+  },
+  "kb.playback.toggleAudioScrub": {
+    "description": "Command label (12 §12.10 KB-120, menu Playback)."
+  },
+  "kb.playback.previewQuality": {
+    "description": "Command label (12 §12.10 KB-121, menu Playback)."
+  },
+  "kb.playback.playEveryFrame": {
+    "description": "Command label (12 §12.10 KB-122, menu Playback)."
+  },
+  "kb.playback.fullscreen": {
+    "description": "Command label (12 §12.10 KB-123, menu Playback)."
+  },
+  "kb.playback.externalPreview": {
+    "description": "Command label (12 §12.10 KB-124, menu Playback)."
+  },
+  "kb.view.workspaceEdit": {
+    "description": "Command label (12 §12.10 KB-125, menu View)."
+  },
+  "kb.view.workspaceColor": {
+    "description": "Command label (12 §12.10 KB-126, menu View)."
+  },
+  "kb.view.workspaceAudio": {
+    "description": "Command label (12 §12.10 KB-127, menu View)."
+  },
+  "kb.view.workspaceCaptions": {
+    "description": "Command label (12 §12.10 KB-128, menu View)."
+  },
+  "kb.view.saveWorkspace": {
+    "description": "Command label (12 §12.10 KB-129, menu View)."
+  },
+  "kb.view.resetWorkspace": {
+    "description": "Command label (12 §12.10 KB-130, menu View)."
+  },
+  "kb.view.commandPalette": {
+    "description": "Command label (12 §12.10 KB-131, menu View)."
+  },
+  "kb.view.maximizePanel": {
+    "description": "Command label (12 §12.10 KB-132, menu View)."
+  },
+  "kb.view.nextPanel": {
+    "description": "Command label (12 §12.10 KB-133, menu View)."
+  },
+  "kb.view.prevPanel": {
+    "description": "Command label (12 §12.10 KB-134, menu View)."
+  },
+  "kb.view.focusMedia": {
+    "description": "Command label (12 §12.10 KB-135, menu View)."
+  },
+  "kb.view.focusSource": {
+    "description": "Command label (12 §12.10 KB-136, menu View)."
+  },
+  "kb.view.focusTimeline": {
+    "description": "Command label (12 §12.10 KB-137, menu View)."
+  },
+  "kb.view.focusProgram": {
+    "description": "Command label (12 §12.10 KB-138, menu View)."
+  },
+  "kb.view.focusInspector": {
+    "description": "Command label (12 §12.10 KB-139, menu View)."
+  },
+  "kb.view.focusEffects": {
+    "description": "Command label (12 §12.10 KB-140, menu View)."
+  },
+  "kb.view.focusCaptions": {
+    "description": "Command label (12 §12.10 KB-141, menu View)."
+  },
+  "kb.view.focusMixer": {
+    "description": "Command label (12 §12.10 KB-142, menu View)."
+  },
+  "kb.view.focusScopes": {
+    "description": "Command label (12 §12.10 KB-143, menu View)."
+  },
+  "kb.view.uiZoomIn": {
+    "description": "Command label (12 §12.10 KB-144, menu View)."
+  },
+  "kb.view.uiZoomOut": {
+    "description": "Command label (12 §12.10 KB-145, menu View)."
+  },
+  "kb.view.uiZoomReset": {
+    "description": "Command label (12 §12.10 KB-146, menu View)."
+  },
+  "kb.view.toggleSafeAreas": {
+    "description": "Command label (12 §12.10 KB-147, menu View)."
+  },
+  "kb.view.toggleGrid": {
+    "description": "Command label (12 §12.10 KB-148, menu View)."
+  },
+  "kb.view.compareSplit": {
+    "description": "Command label (12 §12.10 KB-149, menu View)."
+  },
+  "kb.view.theme": {
+    "description": "Command label (12 §12.10 KB-150, menu View)."
+  },
+  "kb.help.gettingStarted": {
+    "description": "Command label (12 §12.10 KB-151, menu Help)."
+  },
+  "kb.help.userGuide": {
+    "description": "Command label (12 §12.10 KB-152, menu Help)."
+  },
+  "kb.help.shortcutSheet": {
+    "description": "Command label (12 §12.10 KB-153, menu Help)."
+  },
+  "kb.help.replayTour": {
+    "description": "Command label (12 §12.10 KB-154, menu Help)."
+  },
+  "kb.help.reportProblem": {
+    "description": "Command label (12 §12.10 KB-155, menu Help)."
+  },
+  "kb.help.diagnostics": {
+    "description": "Command label (12 §12.10 KB-156, menu Help)."
+  },
+  "kb.help.checkUpdates": {
+    "description": "Command label (12 §12.10 KB-157, menu Help)."
+  },
+  "kb.help.about": {
+    "description": "Command label (12 §12.10 KB-158, menu Help)."
+  },
+  "kb.playback.announceTimecode": {
+    "description": "Command label (12 §12.10 KB-159, menu Playback)."
+  },
+  "kb.timeline.selectPrevClip": {
+    "description": "Command label (12 §12.10 KB-160, menu Timeline)."
+  },
+  "kb.timeline.selectNextClip": {
+    "description": "Command label (12 §12.10 KB-161, menu Timeline)."
+  },
+  "kb.timeline.focusTrackUp": {
+    "description": "Command label (12 §12.10 KB-162, menu Timeline)."
+  },
+  "kb.timeline.focusTrackDown": {
+    "description": "Command label (12 §12.10 KB-163, menu Timeline)."
+  },
+  "kb.timeline.trimEdgeLeft": {
+    "description": "Command label (12 §12.10 KB-164, menu Timeline)."
+  },
+  "kb.timeline.trimEdgeRight": {
+    "description": "Command label (12 §12.10 KB-165, menu Timeline)."
+  },
+  "kb.timeline.trimEdgeLeft10": {
+    "description": "Command label (12 §12.10 KB-166, menu Timeline)."
+  },
+  "kb.timeline.trimEdgeRight10": {
+    "description": "Command label (12 §12.10 KB-167, menu Timeline)."
+  },
+  "kb.timeline.inspectSelection": {
+    "description": "Command label (12 §12.10 KB-168, palette only)."
   }
 }
