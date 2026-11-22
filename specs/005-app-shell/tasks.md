@@ -35,7 +35,7 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 2 — Shell chrome (plan Phase 2) — US1
 
-- [ ] T009 Window config: min size 1280×720, per-monitor DPI (FR-002); Tauri window settings + verification notes in evidence
+- [X] T009 Window config: min size 1280×720, per-monitor DPI (FR-002); Tauri window settings + verification notes in evidence
 - [X] T010 `app/src/shell/TitleBar.tsx`: 32 px custom bar hosting the menu bar, project name + dirty marker slot, caption-button area preserving Snap Layouts (FR-002)
 - [X] T011 `app/src/shell/MenuBar.tsx` rendered from registry data with 12 §12.11 group separators and ✓ items (FR-003); story + goldens
 - [X] T012 `app/src/shell/Toolbar.tsx` per the 07 §7.2 anatomy (tools KB-091..097, undo/redo, Snap/Link, workspace switcher, Export…, bell, settings, jobs) with tooltips + accessible names (FR-004)
