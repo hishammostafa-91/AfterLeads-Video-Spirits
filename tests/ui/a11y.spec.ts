@@ -34,7 +34,7 @@ test("t_a11y_004 — stories are axe-clean, focus-visible rings show, motion is 
     theme: string;
     locale: string;
   };
-  await page.goto(`/?theme=${theme}&locale=${locale}`);
+  await page.goto(`/?harness=1&theme=${theme}&locale=${locale}`);
   await page.evaluate(() => document.fonts.ready);
 
   // Progress indicators (Spinner) keep animating under reduced

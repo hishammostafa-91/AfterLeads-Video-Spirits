@@ -1,0 +1,91 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The ALVS dockview theme (WP-05; 07 s7.4 tokens): dockview's engine
+ * styles ship in dockview/dist/styles/dockview.css; themes are pure
+ * --dv-* variable blocks. Every value maps to a design token, so the
+ * dock follows the active theme (dark/light/high-contrast) and RTL
+ * rules for free. Structural choices per 07 s7.2/s7.6: 28 px tab
+ * strips, 1 px group separators, panel-radius corners on tabs. */
+
+.dockview-theme-alvs {
+  color-scheme: dark;
+
+  /* Panel surfaces. */
+  --dv-group-view-background-color: var(--bg-panel);
+  --dv-separator-border: var(--border-subtle);
+  --dv-paneview-header-border-color: var(--border-subtle);
+
+  /* Tab strip. */
+  --dv-tabs-and-actions-container-background-color: var(--bg-panel-header);
+  --dv-tabs-and-actions-container-font-size: var(--fs-sm);
+  --dv-tabs-and-actions-container-height: 28px;
+  --dv-tab-font-size: var(--fs-sm);
+  --dv-tab-margin: var(--sp-1);
+  --dv-tab-border-radius: var(--radius-sm);
+  --dv-tab-divider-color: var(--border-subtle);
+  --dv-tabs-container-scrollbar-color: var(--border-strong);
+  --dv-scrollbar-background-color: transparent;
+  --dv-icon-hover-background-color: var(--bg-hover);
+  --dv-border-radius: var(--radius-sm);
+  --dv-dropdown-border-radius: var(--radius-sm);
+
+  /* Active group: the visible tab reads as the panel's own surface. */
+  --dv-activegroup-visiblepanel-tab-background-color: var(--bg-panel);
+  --dv-activegroup-visiblepanel-tab-color: var(--text-primary);
+  --dv-activegroup-hiddenpanel-tab-background-color: var(--bg-panel-header);
+  --dv-activegroup-hiddenpanel-tab-color: var(--text-secondary);
+  --dv-inactivegroup-visiblepanel-tab-background-color: var(--bg-panel-header);
+  --dv-inactivegroup-visiblepanel-tab-color: var(--text-secondary);
+  --dv-inactivegroup-hiddenpanel-tab-background-color: var(--bg-panel-header);
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--text-tertiary);
+
+  /* Drop feedback and overlays. */
+  --dv-drag-over-background-color: var(--accent-subtle);
+  --dv-drag-over-border: 1px solid var(--accent-solid);
+  --dv-drag-over-border-color: var(--accent-solid);
+  --dv-edge-dock-indicator-color: var(--accent-solid);
+  --dv-overlay-z-index: 40;
+
+  /* Floating groups (inside the window; FR-006). */
+  --dv-floating-box-shadow: var(--shadow-popover);
+  --dv-floating-border: 1px solid var(--border-subtle);
+  --dv-floating-group-border: 1px solid var(--border-subtle);
+  --dv-floating-group-dragging-opacity: 0.85;
+  --dv-floating-titlebar-height: 28px;
+  --dv-floating-titlebar-background-color: var(--bg-panel-header);
+  --dv-floating-titlebar-border-bottom: 1px solid var(--border-subtle);
+
+  /* Splitters: quiet until hovered/active. */
+  --dv-sash-color: transparent;
+  --dv-active-sash-color: var(--accent-solid);
+  --dv-active-sash-transition-duration: 0.1s;
+  --dv-active-sash-transition-delay: 0.3s;
+  --dv-sash-border-radius: var(--radius-sm);
+
+  /* Context menus dockview renders natively. */
+  --dv-context-menu-background-color: var(--bg-raised);
+  --dv-context-menu-color: var(--text-primary);
+  --dv-paneview-active-outline-color: var(--focus-ring);
+  --dv-transition-duration: 100ms;
+}
+
+/* Keyboard focus on a tab is always visible (G-14; WP-04 tokens). */
+.dockview-theme-alvs .dv-tab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+/* Light theme: the token layer flips underneath the same mapping. */
+[data-theme="light"] .dockview-theme-alvs {
+  color-scheme: light;
+}
+
+/* High contrast: crisper separators, keep the token mapping. */
+[data-theme="high-contrast"] .dockview-theme-alvs {
+  --dv-separator-border: var(--border-strong);
+  --dv-paneview-header-border-color: var(--border-strong);
+  --dv-tab-divider-color: var(--border-strong);
+  --dv-floating-border: 1px solid var(--border-strong);
+  --dv-floating-group-border: 1px solid var(--border-strong);
+}

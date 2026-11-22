@@ -71,6 +71,10 @@
   gap: var(--sp-3);
 }
 
+.story-card-wide {
+  grid-column: 1 / -1;
+}
+
 .story-card {
   display: flex;
   flex-direction: column;

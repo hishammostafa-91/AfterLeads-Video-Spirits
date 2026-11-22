@@ -44,11 +44,11 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 3 — Docking, workspaces, focus (plan Phase 3) — US4/US6
 
-- [ ] T015 `app/src/shell/dock/`: dockview 8.8.x integration (API verified against the installed package first, G-10); panel registry; dock/tab/resize/float/maximize/close/reopen (FR-006)
-- [ ] T016 Panel placeholders for later-WP panels (labeled, accessible, empty — owning WP named) (FR-006, D3)
-- [ ] T017 Workspace service: WS-01..04 default layouts per 07 §7.3 + 07 §7.2 region defaults; KB-125..128 switching; KB-130 reset; persistence via WP-03 settings into `alvs.workspaces.active`/`alvs.workspaces.saved` (FR-007)
-- [ ] T018 Focus model: F6/Shift+F6 cycle, Shift+1..9 (KB-135..143), focused-panel accent line (07 §7.9.1), live-region shell announcements (FR-015)
-- [ ] T019 Harness stories + tests: docking operations and workspace persistence (T-APP-002), keyboard-only walkthrough (T-A11Y-001)
+- [X] T015 `app/src/shell/dock/`: dockview 8.8.x integration (API verified against the installed package first, G-10); panel registry; dock/tab/resize/float/maximize/close/reopen (FR-006)
+- [X] T016 Panel placeholders for later-WP panels (labeled, accessible, empty — owning WP named) (FR-006, D3)
+- [X] T017 Workspace service: WS-01..04 default layouts per 07 §7.3 + 07 §7.2 region defaults; KB-125..128 switching; KB-130 reset; persistence via WP-03 settings into `alvs.workspaces.active`/`alvs.workspaces.saved` (FR-007)
+- [X] T018 Focus model: F6/Shift+F6 cycle, Shift+1..9 (KB-135..143), focused-panel accent line (07 §7.9.1), live-region shell announcements (FR-015)
+- [X] T019 Harness stories + tests: docking operations and workspace persistence (T-APP-002), keyboard-only walkthrough (T-A11Y-001)
 
 ## Phase 4 — Rust shell services (plan Phase 4) — US7
 

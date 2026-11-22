@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The shell frame: column of chrome regions around the dock. */
+.shell {
+  display: flex;
+  block-size: 100vh;
+  min-block-size: 100vh;
+  flex-direction: column;
+  background: var(--bg-app);
+  color: var(--text-primary);
+}

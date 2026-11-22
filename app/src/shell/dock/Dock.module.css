@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The dock region fills the shell between toolbar and status bar. */
+.dock {
+  flex: 1;
+  min-block-size: 0;
+  min-inline-size: 0;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.dock > :global(.dockview-theme-alvs) {
+  block-size: 100%;
+  inline-size: 100%;
+}

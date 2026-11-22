@@ -10,6 +10,7 @@ import { buttonStories } from "./Button.stories";
 import { collectionStories } from "./Collections.stories";
 import { colorStories } from "./Color.stories";
 import { commandsStories } from "./Commands.stories";
+import { dockStories } from "./Dock.stories";
 import { fieldsStories } from "./Fields.stories";
 import { menuStories } from "./Menu.stories";
 import { numericStories } from "./Numeric.stories";
@@ -29,6 +30,7 @@ const allStoryFiles: StoryFile[] = [
   colorStories,
   collectionStories,
   commandsStories,
+  dockStories,
   shellStories,
 ];
 

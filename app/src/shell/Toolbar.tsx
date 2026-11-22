@@ -36,7 +36,11 @@ import {
   type Shortcut,
 } from "../commands/catalog";
 import { chordLabel } from "../commands/keyLabel";
-import { commandRow, type CommandRuntimeFlags } from "../commands/registry";
+import {
+  commandRow,
+  runCommand,
+  type CommandRuntimeFlags,
+} from "../commands/registry";
 import styles from "./Toolbar.module.css";
 
 const TOOL_ICONS: Readonly<Record<string, ReactNode>> = {
@@ -79,6 +83,9 @@ function CommandIconButton({
       labelMessageId={spec.labelKey}
       shortcut={firstChord(spec)}
       isDisabled={!rowFor(id, flags)}
+      onPress={() => {
+        void runCommand(spec, flags);
+      }}
     />
   );
 }
@@ -161,7 +168,14 @@ export function Toolbar({ flags, activeWorkspace }: ToolbarProps): JSX.Element {
         <CommandMenuItem id="view.resetWorkspace" flags={flags} />
       </MenuBarItem>
       <span className={styles.spacer} aria-hidden="true" />
-      <Button variant="secondary" isDisabled={!rowFor("file.export", flags)}>
+      <Button
+        variant="secondary"
+        isDisabled={!rowFor("file.export", flags)}
+        onPress={() => {
+          const spec = COMMAND_BY_ID.get("file.export");
+          if (spec) void runCommand(spec, flags);
+        }}
+      >
         {formatMessage({ id: "kb.file.export" })}
       </Button>
       {/* Panel controls from the 07 s7.2 anatomy (FR-004 AC1). */}

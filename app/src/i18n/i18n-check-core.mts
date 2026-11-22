@@ -61,14 +61,16 @@ export function collectIssues(
 }
 
 /** Scan a source tree for message IDs used in code (`id="…"` JSX
- * props and any `*MessageId`/`messageId` literals in props or
- * objects). The command catalog's kb.* label keys are constructed
- * dynamically (kb.<id> in commands/catalog.ts), so the doc-derived
- * catalog fixture is read directly and its ids counted as used. */
+ * props and any `*MessageId`/`messageId`/`titleKey` literals in
+ * props or objects). The command catalog's kb.* label keys are
+ * constructed dynamically (kb.<id> in commands/catalog.ts), so the
+ * doc-derived catalog fixture is read directly and its ids counted
+ * as used; the panel registry's titleKey literals
+ * (panels.<slug>.title, 07 s7.7) match the same pattern. */
 export function collectUsedIds(srcRoot: string): Set<string> {
   const used = new Set<string>();
   const pattern =
-    /\b(?:id|(?:[a-zA-Z]+)?[Mm]essageId)\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
+    /\b(?:id|titleKey|(?:[a-zA-Z]+)?[Mm]essageId)\s*(?:=\s*"([^"]+)"|:\s*"([^"]+)")/g;
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
       const full = join(dir, entry);

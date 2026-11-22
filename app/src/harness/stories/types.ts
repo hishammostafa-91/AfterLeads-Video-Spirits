@@ -9,13 +9,18 @@ import type { JSX } from "react";
 
 export interface StorySpec {
   /**
-   * Story id — doubles as the documentation label shown above the
+   * Story id - doubles as the documentation label shown above the
    * demo (e.g. "button.primary"). The nine snapshot states of the
    * matrix (default, hover, focus-visible, pressed, disabled, error,
    * RTL, compact, high-contrast) are enumerated by the spec files.
    */
   id: string;
   render: () => JSX.Element;
+  /**
+   * Span the full grid row (product-surface stories like the dock
+   * need real estate; the fixed rem tracks stay intact).
+   */
+  wide?: boolean;
 }
 
 export interface StoryFile {

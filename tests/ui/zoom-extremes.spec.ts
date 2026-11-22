@@ -12,7 +12,7 @@ import { expect, test } from "@playwright/test";
 
 for (const zoom of [80, 200] as const) {
   test(`LOC-90 labels at zoom ${zoom} never clip`, async ({ page }) => {
-    await page.goto(`/?locale=en-XA&zoom=${zoom}`);
+    await page.goto(`/?harness=1&locale=en-XA&zoom=${zoom}`);
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("banner")).toBeVisible();
     const overflow = await page.evaluate(
@@ -33,7 +33,7 @@ for (const zoom of [80, 200] as const) {
 // broken `zoom` declaration would leave it passing).
 for (const zoom of [100, 125, 150, 175, 200] as const) {
   test(`zoom ${zoom} applies without overflow`, async ({ page }) => {
-    await page.goto(`/?locale=en&zoom=${zoom}`);
+    await page.goto(`/?harness=1&locale=en&zoom=${zoom}`);
     await page.evaluate(() => document.fonts.ready);
     const applied = await page.evaluate((z) => {
       const root = document.getElementById("root");
@@ -65,15 +65,15 @@ test("themes flip resolved token values (SC-001)", async ({ page }) => {
           .trim(),
       name,
     );
-  await page.goto("/?theme=dark&locale=en");
+  await page.goto("/?harness=1&theme=dark&locale=en");
   await page.evaluate(() => document.fonts.ready);
   const darkBg = await read("--bg-app");
-  await page.goto("/?theme=light&locale=en");
+  await page.goto("/?harness=1&theme=light&locale=en");
   const lightBg = await read("--bg-app");
   expect(darkBg).toBeTruthy();
   expect(lightBg).toBeTruthy();
   expect(darkBg).not.toBe(lightBg);
-  await page.goto("/?theme=high-contrast&locale=en");
+  await page.goto("/?harness=1&theme=high-contrast&locale=en");
   const hcBg = await read("--bg-app");
   expect(hcBg.trim().toLowerCase()).toBe("canvas");
   // H-01 (round 2): the HC selection pairing resolves at runtime —
@@ -95,7 +95,7 @@ test("High Contrast hovered/focused collection rows pair Highlight with Highligh
   // the comparison is palette-independent and still proves the
   // pairing (fill and label resolve to the two distinct system
   // colors, never High-on-High).
-  await page.goto("/?theme=high-contrast&story=collections.tree&locale=en");
+  await page.goto("/?harness=1&theme=high-contrast&story=collections.tree&locale=en");
   await page.evaluate(() => document.fonts.ready);
   const sys = await page.evaluate(() => {
     const probe = document.createElement("div");
@@ -123,7 +123,7 @@ test("High Contrast hovered/focused collection rows pair Highlight with Highligh
 
   // The `.option:hover` rule belongs to WindowedListBox's custom
   // option rows (the plain ListBox exports bare RAC items).
-  await page.goto("/?theme=high-contrast&story=collections.windowed&locale=en");
+  await page.goto("/?harness=1&theme=high-contrast&story=collections.windowed&locale=en");
   await page.evaluate(() => document.fonts.ready);
   const option = page.locator("[role=option]").first();
   await option.hover();
@@ -151,7 +151,7 @@ for (const accent of ["clr-07", "clr-04", "clr-02", "clr-08"] as const) {
   test(`accent ${accent} flips the resolved accent tokens (SC-001)`, async ({
     page,
   }) => {
-    await page.goto(`/?theme=dark&locale=en&accent=${accent}`);
+    await page.goto(`/?harness=1&theme=dark&locale=en&accent=${accent}`);
     await page.evaluate(() => document.fonts.ready);
     const solid = await page.evaluate(() =>
       getComputedStyle(document.documentElement)

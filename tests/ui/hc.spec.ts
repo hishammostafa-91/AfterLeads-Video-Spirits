@@ -22,7 +22,7 @@ test("forced-colors story captures", async ({ page, browser }, testInfo) => {
   await cdp.send("Emulation.setEmulatedMedia", {
     features: [{ name: "forced-colors", value: "active" }],
   });
-  await page.goto(`/?theme=dark&locale=${locale}`);
+  await page.goto(`/?harness=1&theme=dark&locale=${locale}`);
   await page.evaluate(() => document.fonts.ready);
 
   // The mapping must actually engage: forced-colors flips the canvas

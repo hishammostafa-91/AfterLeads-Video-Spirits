@@ -1,0 +1,38 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Later-WP panel placeholder (spec D3): centered, quiet, empty. */
+.placeholder {
+  display: flex;
+  block-size: 100%;
+  inline-size: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+}
+
+.icon {
+  color: var(--text-tertiary);
+}
+
+.icon > svg {
+  inline-size: 2rem;
+  block-size: 2rem;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}

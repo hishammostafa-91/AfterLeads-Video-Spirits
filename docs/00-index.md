@@ -213,7 +213,8 @@ Versions below were verified against the official registries on the baseline dat
 | UI | @types/node | 26.x | Node API types for the node-run i18n gate and design tests (added WP-04 round 2; matches the Node 26 runtime) |
 | UI | React / Vite / @vitejs/plugin-react | 19.3.x / 8.3.x / 6.x | |
 | UI | react-aria-components | 1.22.x | Accessible, RTL-aware primitives |
-| UI | dockview | 8.8.x | Docking layout |
+| UI | dockview | 8.8.x | Docking layout engine (core; no framework bindings) |
+| UI | dockview-react | 8.8.x | Docking React bindings (ADR-024; same project and MIT license as dockview) |
 | UI | zustand | 5.x | UI state |
 | UI | react-intl / @formatjs/cli | 12.x / 6.x | ICU MessageFormat localization |
 | UI | lucide-react | 1.x | Icons (ISC) |

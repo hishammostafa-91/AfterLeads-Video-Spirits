@@ -142,3 +142,10 @@
   border: none;
   background: transparent;
 }
+
+/* The popup layer around a dropdown menu (RAC Popover). */
+.popover {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}

@@ -29,7 +29,7 @@ test("story matrix", async ({ page }, testInfo) => {
     // H3: the HC mode must REPLACE the project theme, not append a
     // second ?theme= (URLSearchParams keeps the first value).
     const themeParam = mode.id === "hc" ? "high-contrast" : theme;
-    const url = `/?theme=${themeParam}&locale=${locale}${mode.density ? "&density=compact" : ""}`;
+    const url = `/?harness=1&theme=${themeParam}&locale=${locale}${mode.density ? "&density=compact" : ""}`;
     await page.goto(url);
     await page.evaluate(() => document.fonts.ready);
     const cards = page.locator("[data-story-id]");
@@ -67,7 +67,7 @@ test("interaction states", async ({ page }, testInfo) => {
   };
 
   // Collect the story ids from the full grid once…
-  await page.goto(`/?theme=${theme}&locale=${locale}`);
+  await page.goto(`/?harness=1&theme=${theme}&locale=${locale}`);
   await page.evaluate(() => document.fonts.ready);
   const storyIds = await page
     .locator("[data-story-id]")
@@ -83,7 +83,7 @@ test("interaction states", async ({ page }, testInfo) => {
     // dropdown trigger opens a RAC popover that would bleed into the
     // next card's captures on a shared page; per-story pages make the
     // states hermetic.
-    await page.goto(`/?theme=${theme}&locale=${locale}&story=${storyId}`);
+    await page.goto(`/?harness=1&theme=${theme}&locale=${locale}&story=${storyId}`);
     await page.evaluate(() => document.fonts.ready);
     const card = page.locator(`[data-story-id='${storyId}']`);
     await expect(card).toBeVisible();

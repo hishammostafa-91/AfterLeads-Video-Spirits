@@ -18,7 +18,11 @@ import {
 } from "../components/Menu";
 import { COMMAND_BY_ID, type Shortcut } from "../commands/catalog";
 import { chordLabel } from "../commands/keyLabel";
-import { commandRow, type CommandRuntimeFlags } from "../commands/registry";
+import {
+  commandRow,
+  runCommand,
+  type CommandRuntimeFlags,
+} from "../commands/registry";
 import { MENUS, type MenuId } from "./menus";
 import menuStyles from "./MenuBar.module.css";
 
@@ -62,6 +66,9 @@ export function CommandMenuItem({
         key={spec.id}
         isChecked={row.checked}
         isDisabled={!row.enabled}
+        onAction={() => {
+          void runCommand(spec, flags);
+        }}
       >
         {label}
       </MenuItemCheckbox>
@@ -72,6 +79,9 @@ export function CommandMenuItem({
       key={spec.id}
       isDisabled={!row.enabled}
       shortcut={shortcut ? chordLabel(shortcut) : undefined}
+      onAction={() => {
+        void runCommand(spec, flags);
+      }}
     >
       {label}
       {laterNote ? (

@@ -19,6 +19,7 @@ import {
   MenuItem as RACMenuItem,
   type MenuItemProps,
   MenuTrigger,
+  Popover,
   Separator,
   SubmenuTrigger,
 } from "react-aria-components";
@@ -41,16 +42,21 @@ export interface MenuWrapperProps extends Omit<MenuProps<object>, "className"> {
   children?: ReactNode;
 }
 
-/** A styled dropdown menu (render inside a MenuTrigger). */
+/** A styled dropdown menu (render inside a MenuTrigger). The menu
+ * rides a `Popover`: RAC toggles the overlay, and a bare Menu child
+ * would render inline, permanently (the overlay owns the open
+ * state, Escape, and outside-click). */
 export function Menu({
   className,
   children,
   ...props
 }: MenuWrapperProps): JSX.Element {
   return (
-    <RACMenu {...props} className={cx(styles.menu, className)}>
-      {children}
-    </RACMenu>
+    <Popover className={styles.popover}>
+      <RACMenu {...props} className={cx(styles.menu, className)}>
+        {children}
+      </RACMenu>
+    </Popover>
   );
 }
 
@@ -142,7 +148,7 @@ export function MenuSeparator(): JSX.Element {
   return <Separator className={styles.separator} />;
 }
 
-/** A nested menu (RAC SubmenuTrigger + Menu). */
+/** A nested menu (RAC SubmenuTrigger + Popover + Menu). */
 export function Submenu({ label, children }: SubmenuProps): JSX.Element {
   return (
     <SubmenuTrigger>
@@ -155,7 +161,9 @@ export function Submenu({ label, children }: SubmenuProps): JSX.Element {
           strokeWidth={ICON_STROKE_WIDTH}
         />
       </RACMenuItem>
-      <RACMenu className={styles.menu}>{children}</RACMenu>
+      <Popover className={styles.popover}>
+        <RACMenu className={styles.menu}>{children}</RACMenu>
+      </Popover>
     </SubmenuTrigger>
   );
 }
@@ -204,7 +212,9 @@ export function ContextMenu({
           style={{ insetInlineStart: point.x, top: point.y }}
           aria-hidden="true"
         />
-        <RACMenu className={styles.menu}>{items}</RACMenu>
+        <Popover className={styles.popover}>
+          <RACMenu className={styles.menu}>{items}</RACMenu>
+        </Popover>
       </MenuTrigger>
       <button
         type="button"
@@ -300,7 +310,8 @@ export interface MenuBarItemProps extends Omit<RACButtonProps, "className"> {
   children: ReactNode;
 }
 
-/** One top-level menubar entry: a trigger (role=menuitem) + its menu. */
+/** One top-level menubar entry: a trigger + its dropdown menu
+ * (the `Menu` wrapper owns the Popover overlay). */
 export function MenuBarItem({
   label,
   standalone = false,
@@ -324,7 +335,7 @@ export function MenuBarItem({
       >
         {label}
       </RACButton>
-      <RACMenu className={styles.menu}>{children}</RACMenu>
+      <Menu>{children}</Menu>
     </MenuTrigger>
   );
 }

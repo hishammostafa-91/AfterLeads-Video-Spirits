@@ -57,4 +57,9 @@ export {
   Settings2,
   Undo2,
   ZoomIn,
+  // Panel registry icons (WP-05 dock, 07 s7.7; keep sorted).
+  Captions,
+  History,
+  SlidersHorizontal,
+  Sparkles,
 } from "lucide-react";

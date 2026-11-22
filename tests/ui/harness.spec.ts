@@ -10,7 +10,7 @@ test("harness smoke (shell)", async ({ page }, testInfo) => {
     theme: string;
     locale: string;
   };
-  await page.goto(`/?theme=${theme}&locale=${locale}`);
+  await page.goto(`/?harness=1&theme=${theme}&locale=${locale}`);
   // Fonts must be settled before any capture (research D7).
   await page.evaluate(() => document.fonts.ready);
   await expect(page.getByRole("banner")).toBeVisible();

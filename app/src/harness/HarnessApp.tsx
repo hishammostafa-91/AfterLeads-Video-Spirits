@@ -28,6 +28,8 @@ import {
 } from "../i18n/runtime";
 import { pseudoBase, pseudoCatalog } from "../i18n/pseudo";
 import { storyFiles } from "./stories";
+import { setWorkspacePersistence } from "../shell/dock/workspaces";
+import { localStorageWorkspacePersistence } from "./mock/workspacePort";
 import ar from "../locales/ar.json";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
@@ -73,6 +75,9 @@ let urlPersistenceBound = false;
 function ensureUrlPersistence(initial: { theme: ThemeName }): void {
   if (urlPersistenceBound) return;
   urlPersistenceBound = true;
+  void setWorkspacePersistence(
+    localStorageWorkspacePersistence(window.localStorage),
+  );
   const apply = (): void => {
     const url = new URL(window.location.href);
     const { theme, accent, zoom } = useThemeStore.getState();
@@ -291,7 +296,11 @@ export function HarnessApp(): JSX.Element {
               .map((story) => (
                 <div
                   key={story.id}
-                  className={styles.storyCard}
+                  className={
+                    story.wide
+                      ? `${styles.storyCard} ${styles.storyCardWide}`
+                      : styles.storyCard
+                  }
                   data-story-id={story.id}
                 >
                   <span className={styles.storyLabel}>{story.id}</span>

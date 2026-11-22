@@ -1,0 +1,60 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* Panel tab: title + close glyph, with the 07 s7.9.1 accent line. */
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  block-size: 100%;
+  padding-inline: var(--sp-3);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+/* The 1 px accent line on the focused panel's tab (07 s7.9.1): the
+ * focused panel is the active tab of the active group. dockview
+ * maintains those classes live in the DOM (tabs are not re-rendered
+ * on focus moves), so the line follows them. */
+.tab::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  block-size: 1px;
+  inset-block-start: 0;
+  background: transparent;
+}
+
+:global(.dv-active-group) :global(.dv-active-tab) .tab::before {
+  background: var(--accent-solid);
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The close glyph is CSS-drawn (presentational; APG deletable tabs:
+ * no interactive child inside the tab role). */
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--sp-6);
+  block-size: var(--sp-6);
+  border-radius: var(--radius-sm);
+  color: inherit;
+}
+
+.close::after {
+  content: "\d7";
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+.close:hover {
+  background: var(--bg-hover);
+}

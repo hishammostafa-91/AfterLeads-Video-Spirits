@@ -1100,5 +1100,89 @@
   },
   "shell.status.renderer": {
     "description": "Status chip: renderer (GPU name or WARP, REQ-APP-007)."
+  },
+  "panels.media.title": {
+    "description": "Media panel title (PNL-01)."
+  },
+  "panels.effects.title": {
+    "description": "Effects panel title (PNL-02)."
+  },
+  "panels.transitions.title": {
+    "description": "Transitions panel title (PNL-03)."
+  },
+  "panels.titles.title": {
+    "description": "Titles panel title (PNL-04)."
+  },
+  "panels.inspector.title": {
+    "description": "Inspector panel title (PNL-05)."
+  },
+  "panels.program.title": {
+    "description": "Program viewer title (PNL-06)."
+  },
+  "panels.source.title": {
+    "description": "Source viewer title (PNL-07)."
+  },
+  "panels.timeline.title": {
+    "description": "Timeline title (PNL-08)."
+  },
+  "panels.mixer.title": {
+    "description": "Mixer panel title (PNL-09)."
+  },
+  "panels.scopes.title": {
+    "description": "Scopes panel title (PNL-10)."
+  },
+  "panels.captions.title": {
+    "description": "Captions panel title (PNL-11)."
+  },
+  "panels.markers.title": {
+    "description": "Markers panel title (PNL-12)."
+  },
+  "panels.history.title": {
+    "description": "History panel title (PNL-13)."
+  },
+  "panels.jobs.title": {
+    "description": "Jobs panel title (PNL-14)."
+  },
+  "panels.transcript.title": {
+    "description": "Transcript panel title (PNL-15)."
+  },
+  "panels.placeholder.body": {
+    "description": "Later-WP panel placeholder body; {wp} is the owning work package id."
+  },
+  "shell.dock.region": {
+    "description": "Accessible name of the dock region (main landmark)."
+  },
+  "shell.dock.closeTab": {
+    "description": "Accessible name of a tab's close button ({title})."
+  },
+  "shell.dock.closeTabPlain": {
+    "description": "Close-button name fallback without a title."
+  },
+  "shell.dock.panelOpened": {
+    "description": "Live region: a panel opened."
+  },
+  "shell.dock.panelClosed": {
+    "description": "Live region: a panel closed."
+  },
+  "shell.dock.groupMaximized": {
+    "description": "Live region: a group maximized."
+  },
+  "shell.dock.groupRestored": {
+    "description": "Live region: a group restored."
+  },
+  "shell.dock.groupFloated": {
+    "description": "Live region: a group floated."
+  },
+  "shell.dock.groupDocked": {
+    "description": "Live region: a group docked."
+  },
+  "shell.dock.groupPoppedOut": {
+    "description": "Live region: a group moved to a popout window."
+  },
+  "shell.dock.announceWorkspace": {
+    "description": "Live region: the active workspace switched."
+  },
+  "shell.dock.announceFocus": {
+    "description": "Live region: a panel received focus."
   }
 }
