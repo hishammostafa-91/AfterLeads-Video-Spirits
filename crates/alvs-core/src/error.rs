@@ -5,10 +5,12 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use ts_rs::TS;
 
 /// Severity of an error envelope (docs/04 §4.9).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "lowercase")]
+#[ts(export)]
 pub enum Severity {
     /// Toast, auto-dismiss.
     Info,
@@ -19,7 +21,8 @@ pub enum Severity {
 }
 
 /// Catalog error codes shared by the crates (docs/12 §12.13).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub enum ErrorCode {
     /// E0001 — an unexpected internal error occurred.
     E0001,
@@ -196,7 +199,8 @@ impl AppError {
 }
 
 /// A recovery action offered in the UI (docs/04 §4.9).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct RecoveryAction {
     /// A command ID from docs/12 §12.10 or a dialog action.
     #[serde(rename = "commandId")]
@@ -207,7 +211,8 @@ pub struct RecoveryAction {
 }
 
 /// The error envelope crossing to the UI (docs/04 §4.9).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct ErrorEnvelope {
     /// Catalog code.
     pub code: ErrorCode,

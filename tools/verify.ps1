@@ -56,7 +56,10 @@ Invoke-Gate 'crate-rules' (Test-Path 'tools/check_deps.py') 'created in WP-01' {
 Invoke-Gate 'placeholders' (Test-Path 'tools/check_placeholders.py') 'created in WP-01' { python tools/check_placeholders.py }
 Invoke-Gate 'rust-test' $hasCargo 'no Cargo workspace yet' { cargo test --workspace --locked }
 Invoke-Gate 'bindings-drift' ($hasCargo -and (Test-Path 'app/src/ipc/bindings')) 'no bindings yet' {
-    cargo test -p alvs-model export_bindings --locked
+    # Every crate with #[ts(export)] types regenerates into the same
+    # directory (ADR-010): alvs-core (error envelope), alvs-model
+    # (the model surface), and the app backend (04 4.3.1 DTOs).
+    cargo test -p alvs-core -p alvs-model -p afterleads-video-spirits export_bindings --locked
     if ($LASTEXITCODE -eq 0) { git diff --exit-code -- app/src/ipc/bindings }
 }
 Invoke-Gate 'ui-typecheck' (Test-AppScript 'typecheck') 'script not defined yet' { pnpm -C app typecheck }

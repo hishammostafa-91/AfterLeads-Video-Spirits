@@ -52,9 +52,9 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 4 — Rust shell services (plan Phase 4) — US7
 
-- [ ] T020 `app/src-tauri`: `app_info` (AppInfo DTO per 04 §4.3.1), `app_ready`, `app_quit { force }` per 02 §2.5; validation + ErrorEnvelope; cargo unit tests (FR-016)
-- [ ] T021 Register `tauri-plugin-single-instance` 2.5.x; forwarded `.alvs` path → `app:open-file` event (02 §2.5 step 4); verify the 02 §2.3 mode dispatch is untouched for worker/crash/cli (FR-001)
-- [ ] T022 ts-rs DTO exports + typed wrappers `app/src/ipc/commands.ts`; bindings-drift green (ADR-010); mock-backend coverage of every implemented command (FR-016, card)
+- [X] T020 `app/src-tauri`: `app_info` (AppInfo DTO per 04 §4.3.1), `app_ready`, `app_quit { force }` per 02 §2.5; validation + ErrorEnvelope; cargo unit tests (FR-016)
+- [X] T021 Register `tauri-plugin-single-instance` 2.5.x; forwarded `.alvs` path → `app:open-file` event (02 §2.5 step 4); verify the 02 §2.3 mode dispatch is untouched for worker/crash/cli (FR-001)
+- [X] T022 ts-rs DTO exports + typed wrappers `app/src/ipc/commands.ts`; bindings-drift green (ADR-010); mock-backend coverage of every implemented command (FR-016, card)
 
 ## Phase 5 — Project lifecycle UI (plan Phase 5) — US3
 

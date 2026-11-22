@@ -30,6 +30,8 @@ import { pseudoBase, pseudoCatalog } from "../i18n/pseudo";
 import { storyFiles } from "./stories";
 import { setWorkspacePersistence } from "../shell/dock/workspaces";
 import { localStorageWorkspacePersistence } from "./mock/workspacePort";
+import { setIpcTransport } from "../ipc/transport";
+import { ipcMockTransport } from "./mock/ipcMock";
 import ar from "../locales/ar.json";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
@@ -78,6 +80,7 @@ function ensureUrlPersistence(initial: { theme: ThemeName }): void {
   void setWorkspacePersistence(
     localStorageWorkspacePersistence(window.localStorage),
   );
+  setIpcTransport(ipcMockTransport());
   const apply = (): void => {
     const url = new URL(window.location.href);
     const { theme, accent, zoom } = useThemeStore.getState();

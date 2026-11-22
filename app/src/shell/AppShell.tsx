@@ -15,6 +15,7 @@ import { StatusBar } from "./StatusBar";
 import { Dock } from "./dock/Dock";
 import { CommandPalette } from "../commands/palette/CommandPalette";
 import { installDispatcher } from "../commands/dispatcher";
+import { app } from "../ipc/commands";
 import {
   INITIAL_RUNTIME_FLAGS,
   registerHandler,
@@ -34,6 +35,10 @@ export function AppShell(): JSX.Element {
     registerHandler("view.commandPalette", () => {
       setPaletteOpen((open) => !open);
     });
+    // The UI mounted - signal the backend (04 s4.3.1). Outside the
+    // Tauri shell (a plain dev browser) the mock or the normalized
+    // E0001 rejection lands here and is intentionally quiet.
+    void app.ready().catch(() => undefined);
     return () => {
       unregisterHandler("view.commandPalette");
       teardownDispatcher();
