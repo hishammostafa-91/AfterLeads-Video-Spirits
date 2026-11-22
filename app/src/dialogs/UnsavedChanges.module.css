@@ -1,0 +1,24 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* DLG-20 (07 s7.14). */
+.dialog {
+  min-inline-size: 26rem;
+  padding: var(--sp-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-dialog);
+  color: var(--text-primary);
+}
+
+.title {
+  margin-block: 0 var(--sp-4);
+  font-size: var(--fs-lg);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+}

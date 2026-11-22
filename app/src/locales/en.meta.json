@@ -1184,5 +1184,167 @@
   },
   "shell.dock.announceFocus": {
     "description": "Live region: a panel received focus."
+  },
+  "presets.sqp.SQP-01": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-02": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-03": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-04": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-05": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-06": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-07": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-08": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-09": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-10": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-11": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.sqp.SQP-12": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-01": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-02": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-03": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-04": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-05": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-06": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-07": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "presets.fps.FPS-08": {
+    "description": "presets string (WP-05 phase 5)."
+  },
+  "dlg.newProject.title": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.name": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.nameLength": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.nameReserved": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.nameChars": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.nameTrailing": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.location": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.browse": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.preset": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.frameRate": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.sampleRate": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.hz": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.autoNote": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.create": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.creating": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.newProject.cancel": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.unsaved.title": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.unsaved.save": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.unsaved.dontSave": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.unsaved.cancel": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.lock.title": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.lock.body": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.lock.openReadonly": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.lock.takeOver": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "dlg.lock.cancel": {
+    "description": "dlg string (WP-05 phase 5)."
+  },
+  "banner.readOnly": {
+    "description": "banner string (WP-05 phase 5)."
+  },
+  "welcome.title": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.subtitle": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.newProject": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.openProject": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.recents": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.recentsEmpty": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.missing": {
+    "description": "welcome string (WP-05 phase 5)."
+  },
+  "welcome.gettingStarted": {
+    "description": "welcome string (WP-05 phase 5)."
   }
 }

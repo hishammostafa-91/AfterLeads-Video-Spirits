@@ -10,3 +10,13 @@
   background: var(--bg-app);
   color: var(--text-primary);
 }
+
+/* The read-only banner (07 s7.10: yellow, under the toolbar). */
+.read-only-banner {
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
+  border-block-end: 1px solid var(--warning);
+  background: var(--accent-subtle);
+  color: var(--warning-text);
+  font-size: var(--fs-sm);
+}

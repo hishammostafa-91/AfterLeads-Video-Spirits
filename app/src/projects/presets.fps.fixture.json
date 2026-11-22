@@ -1,0 +1,58 @@
+[
+  {
+    "id": "FPS-01",
+    "display": "23.976",
+    "num": 24000,
+    "den": 1001,
+    "dropFrameDefault": false
+  },
+  {
+    "id": "FPS-02",
+    "display": "24",
+    "num": 24,
+    "den": 1,
+    "dropFrameDefault": false
+  },
+  {
+    "id": "FPS-03",
+    "display": "25",
+    "num": 25,
+    "den": 1,
+    "dropFrameDefault": false
+  },
+  {
+    "id": "FPS-04",
+    "display": "29.97",
+    "num": 30000,
+    "den": 1001,
+    "dropFrameDefault": true
+  },
+  {
+    "id": "FPS-05",
+    "display": "30",
+    "num": 30,
+    "den": 1,
+    "dropFrameDefault": false
+  },
+  {
+    "id": "FPS-06",
+    "display": "50",
+    "num": 50,
+    "den": 1,
+    "dropFrameDefault": false
+  },
+  {
+    "id": "FPS-07",
+    "display": "59.94",
+    "num": 60000,
+    "den": 1001,
+    "dropFrameDefault": true
+  },
+  {
+    "id": "FPS-08",
+    "display": "60",
+    "num": 60,
+    "den": 1,
+    "dropFrameDefault": false
+  }
+]

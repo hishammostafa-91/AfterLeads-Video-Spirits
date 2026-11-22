@@ -1,0 +1,86 @@
+[
+  {
+    "id": "SQP-01",
+    "width": null,
+    "height": null,
+    "aspect": null,
+    "autoMatch": true
+  },
+  {
+    "id": "SQP-02",
+    "width": 1920,
+    "height": 1080,
+    "aspect": "16:9",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-03",
+    "width": 1280,
+    "height": 720,
+    "aspect": "16:9",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-04",
+    "width": 2560,
+    "height": 1440,
+    "aspect": "16:9",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-05",
+    "width": 3840,
+    "height": 2160,
+    "aspect": "16:9",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-06",
+    "width": 1080,
+    "height": 1920,
+    "aspect": "9:16",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-07",
+    "width": 2160,
+    "height": 3840,
+    "aspect": "9:16",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-08",
+    "width": 1080,
+    "height": 1080,
+    "aspect": "1:1",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-09",
+    "width": 1080,
+    "height": 1350,
+    "aspect": "4:5",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-10",
+    "width": 3840,
+    "height": 1608,
+    "aspect": "2.39:1",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-11",
+    "width": 2048,
+    "height": 1080,
+    "aspect": "~1.9:1",
+    "autoMatch": false
+  },
+  {
+    "id": "SQP-12",
+    "width": 4096,
+    "height": 2160,
+    "aspect": "~1.9:1",
+    "autoMatch": false
+  }
+]

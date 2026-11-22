@@ -359,18 +359,42 @@ impl ProjectStore {
     /// fields kept.
     pub fn open<H: DocumentHooks>(&self) -> Result<Opened<H::Doc>, StoreError> {
         let len = std::fs::metadata(&self.path)
-            .map_err(|e| StoreError::from_io(&e))?
+            .map_err(|e| {
+                if e.kind() == std::io::ErrorKind::NotFound {
+                    // 12 s12.13 E1001: the file was not found (03
+                    // s3.9.1's open ladder starts here).
+                    StoreError::ProjectNotFound {
+                        path: self.path.to_string_lossy().into_owned(),
+                    }
+                } else {
+                    StoreError::from_io(&e)
+                }
+            })?
             .len();
         if let Some(reason) = H::check_size(len) {
             return Err(StoreError::ValidationFailed { detail: reason });
         }
-        let bytes = std::fs::read(&self.path).map_err(|e| StoreError::from_io(&e))?;
-        let version = H::schema_version(&bytes)?;
+        let bytes = std::fs::read(&self.path).map_err(|e| {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                StoreError::ProjectNotFound {
+                    path: self.path.to_string_lossy().into_owned(),
+                }
+            } else {
+                StoreError::from_io(&e)
+            }
+        })?;
+        // Parse failures are damage (E1002, 12 s12.13), never a
+        // validation verdict on well-formed content (E1003).
+        let damaged = |e: StoreError| match e {
+            StoreError::ValidationFailed { detail } => StoreError::ProjectDamaged { detail },
+            other => other,
+        };
+        let version = H::schema_version(&bytes).map_err(damaged)?;
         let current = H::current_version();
 
         // Newer file: read-only, unknown fields kept (§3.9.6; E1004).
         if version > current {
-            let doc = H::parse(&bytes)?;
+            let doc = H::parse(&bytes).map_err(damaged)?;
             if let Err(e) = self.record_recent() {
                 tracing::warn!("recent-projects update after open failed: {e}");
             }
@@ -397,7 +421,7 @@ impl ProjectStore {
             (bytes, None)
         };
 
-        let mut doc = H::parse(&bytes)?;
+        let mut doc = H::parse(&bytes).map_err(damaged)?;
         H::validate(&doc)?;
         // §3.9.4: a live same-host holder offers read-only (E1007); a
         // dead or expired holder offers take-over — both as data for the

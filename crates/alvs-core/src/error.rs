@@ -34,8 +34,12 @@ pub enum ErrorCode {
     E1004,
     /// E1005 — the project could not be upgraded; the original is unchanged.
     E1005,
-    /// E1006 — a sequence cannot contain itself.
+    /// E1006 - a sequence cannot contain itself.
     E1006,
+    /// E1001 - the project file was not found (03 s3.9.1).
+    E1001,
+    /// E1002 - the project file is damaged (invalid JSON; 03 s3.9.1).
+    E1002,
     /// E1007 — the project is open in another window or computer (03 §3.9.4).
     E1007,
     /// E1008 — the project could not be saved (03 §3.9.1).
@@ -67,6 +71,8 @@ impl ErrorCode {
         match self {
             ErrorCode::E0001 => "E0001",
             ErrorCode::E0002 => "E0002",
+            ErrorCode::E1001 => "E1001",
+            ErrorCode::E1002 => "E1002",
             ErrorCode::E1003 => "E1003",
             ErrorCode::E1004 => "E1004",
             ErrorCode::E1005 => "E1005",
@@ -90,6 +96,8 @@ impl ErrorCode {
         match self {
             ErrorCode::E0001
             | ErrorCode::E0002
+            | ErrorCode::E1001
+            | ErrorCode::E1002
             | ErrorCode::E1003
             | ErrorCode::E1005
             | ErrorCode::E1008

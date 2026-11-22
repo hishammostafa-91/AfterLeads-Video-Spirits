@@ -941,27 +941,9 @@ use ApplyOutcome::Rejected;
 /// The concrete format of a named sequence preset (12 §12.8): the catalog
 /// dimensions at the 30 fps / 48 kHz stereo / Rec.709 SDR defaults of
 /// REQ-PRJ-001. `None` for SQP-01 (auto-match, SQP-02 fallback pending) and
-/// SQP-13 (custom — requires an explicit format).
+/// SQP-13 (custom - requires an explicit format).
 fn preset_format(preset: &str) -> Option<SequenceFormat> {
-    let (width, height) = match preset {
-        "SQP-02" => (1920, 1080),
-        "SQP-03" => (1280, 720),
-        "SQP-04" => (2560, 1440),
-        "SQP-05" => (3840, 2160),
-        "SQP-06" => (1080, 1920),
-        "SQP-07" => (2160, 3840),
-        "SQP-08" => (1080, 1080),
-        "SQP-09" => (1080, 1350),
-        "SQP-10" => (3840, 1608),
-        "SQP-11" => (2048, 1080),
-        "SQP-12" => (4096, 2160),
-        _ => return None,
-    };
-    let mut format = sqp02_fallback_format();
-    format.width = width;
-    format.height = height;
-    format.auto_match_pending = false;
-    Some(format)
+    crate::sequence::preset_format(preset)
 }
 
 /// Mint fresh ids for every entity of a duplicated sequence so the copy is

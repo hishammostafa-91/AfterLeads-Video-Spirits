@@ -86,13 +86,40 @@ export function collectUsedIds(srcRoot: string): Set<string> {
         for (const row of fixture) {
           if (typeof row.id === "string") used.add(`kb.${row.id}`);
         }
+      } else if (entry === "presets.sqp.fixture.json") {
+        // Sequence preset names resolve via presetLabelKey (12 s12.8).
+        const fixture = JSON.parse(
+          readFileSync(full, "utf8"),
+        ) as ReadonlyArray<{ id?: unknown }>;
+        for (const row of fixture) {
+          if (typeof row.id === "string") used.add(`presets.sqp.${row.id}`);
+        }
+      } else if (entry === "presets.fps.fixture.json") {
+        // Frame-rate names resolve via frameRateLabelKey (12 s12.9).
+        const fixture = JSON.parse(
+          readFileSync(full, "utf8"),
+        ) as ReadonlyArray<{ id?: unknown }>;
+        for (const row of fixture) {
+          if (typeof row.id === "string") used.add(`presets.fps.${row.id}`);
+        }
       } else if (/\.[cm]?tsx?$/.test(entry)) {
         const source = readFileSync(full, "utf8");
         for (const match of source.matchAll(pattern)) {
           // The regex tuple types both capture groups as string, but
-          // at most one is present at runtime — read them as optional.
+          // at most one is present at runtime - read them as optional.
           const groups = match as ReadonlyArray<string | undefined>;
           used.add(groups[1] ?? groups[2] ?? "");
+        }
+        // String literals returned through helper functions (e.g.
+        // the DLG-01 name-rule message ids) count as usage too.
+        // Test files are excluded: their fiction keys exist to prove
+        // the checker itself (i18n-check.test.ts).
+        if (!/\.test\.[cm]?tsx?$/.test(entry)) {
+          for (const match of source.matchAll(
+            /"((?:[a-z]+\.){1,3}[A-Za-z0-9.-]+)"/g,
+          )) {
+            used.add(match[1]);
+          }
         }
       }
     }

@@ -1,0 +1,120 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The Welcome screen (REQ-APP-005; fs-2xl per 07 s7.4.5). */
+.welcome {
+  display: flex;
+  block-size: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-7);
+  background: var(--bg-app);
+  color: var(--text-primary);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-2xl);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.recents {
+  display: flex;
+  inline-size: 34rem;
+  max-inline-size: 100%;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.recents-title {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+}
+
+.recents-empty {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+
+.recents-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  padding: var(--sp-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  text-align: start;
+  cursor: pointer;
+}
+
+.recent:hover {
+  background: var(--bg-hover);
+}
+
+.recent:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* Thumbnail placeholder (WP-08 writes real thumbs). */
+.thumb {
+  inline-size: 3rem;
+  block-size: 1.75rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+}
+
+.recent-name {
+  font-size: var(--fs-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.missing {
+  margin-inline-start: var(--sp-2);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-sm);
+  color: var(--warning-text);
+  font-size: var(--fs-xs);
+}
+
+.recent-path {
+  margin-inline-start: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-tertiary);
+  font-size: var(--fs-xs);
+}
+
+.getting-started {
+  color: var(--accent-text);
+}

@@ -205,12 +205,15 @@ fn t_prj_002_recent_failure_never_fails_save_or_open() {
 }
 
 #[test]
-fn t_prj_002_corrupt_document_reports_e1003_not_e1005() {
+fn t_prj_002_corrupt_document_reports_e1002_not_e1005() {
     // Review F-04: `open` consults the schema version before parsing, so
-    // a corrupt document must surface the validation verdict (E1003,
-    // "restore from backup") — not the migration verdict (E1005,
-    // "report a problem").
-    let dir = scratch("corrupt-e1003");
+    // a corrupt document must surface the damage verdict (12 s12.13's
+    // E1002 "damaged (invalid JSON)", restore from backup) - not the
+    // migration verdict (E1005, "report a problem"). WP-05 phase 5
+    // added E1001/E1002 to the enums, so the original E1003
+    // compromise (the closest damage code that existed in WP-03)
+    // tightens to the catalog's own row.
+    let dir = scratch("corrupt-e1002");
     let project_path = dir.join("broken.alvs");
     std::fs::write(&project_path, b"\x00not json at all").unwrap_or(());
     let store = ProjectStore::new(&project_path, 20);
@@ -218,14 +221,30 @@ fn t_prj_002_corrupt_document_reports_e1003_not_e1005() {
         Ok(_) => panic!("must reject"),
         Err(e) => e,
     };
-    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1003);
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1002);
     // A parseable document without a schemaVersion is equally corrupt.
     std::fs::write(&project_path, b"{ \"name\": \"no version\" }").unwrap_or(());
     let err = match store.open::<ProjectHooks>() {
         Ok(_) => panic!("must reject"),
         Err(e) => e,
     };
-    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1003);
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1002);
+    std::fs::remove_dir_all(&dir).unwrap_or(());
+}
+
+#[test]
+fn t_prj_002_missing_file_reports_e1001() {
+    // 12 s12.13 E1001 ("the project file was not found") - the open
+    // ladder's first verdict, distinct from a failed save (E1008)
+    // which the generic io mapping produced before the codes existed
+    // (WP-05 phase 5).
+    let dir = scratch("missing-e1001");
+    let store = ProjectStore::new(&dir.join("absent.alvs"), 20);
+    let err = match store.open::<ProjectHooks>() {
+        Ok(_) => panic!("must reject"),
+        Err(e) => e,
+    };
+    assert_eq!(err.code(), alvs_core::error::ErrorCode::E1001);
     std::fs::remove_dir_all(&dir).unwrap_or(());
 }
 

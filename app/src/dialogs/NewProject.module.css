@@ -1,0 +1,58 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* DLG-01 (07 s7.14): content-driven, at least 420 px wide. */
+.dialog {
+  min-inline-size: 30rem;
+  padding: var(--sp-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-dialog);
+  color: var(--text-primary);
+}
+
+.title {
+  margin-block: 0 var(--sp-4);
+  font-size: var(--fs-xl);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.location {
+  display: flex;
+  align-items: end;
+  gap: var(--sp-3);
+}
+
+.row {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.row > * {
+  flex: 1;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+
+.error {
+  margin-block: var(--sp-3) 0;
+  font-size: var(--fs-sm);
+  color: var(--danger-text);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  margin-block-start: var(--sp-5);
+}

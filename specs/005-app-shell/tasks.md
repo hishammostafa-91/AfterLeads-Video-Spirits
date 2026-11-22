@@ -58,11 +58,11 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 5 — Project lifecycle UI (plan Phase 5) — US3
 
-- [ ] T023 `app/src/shell/Welcome.tsx`: New/Open/recents with thumbnails placeholder + missing indicator + Getting Started; three states (FR-011, T-APP-004)
-- [ ] T024 `app/src/dialogs/NewProject.tsx` (DLG-01) with SQP/FPS catalog data files + fixture tests (D1 pattern); wired to `project_new`; E1008/E8004 surfaces (FR-012)
-- [ ] T025 `app/src/dialogs/UnsavedChanges.tsx` (DLG-20) three-way gate on close/exit/open (FR-013, T-APP-007)
-- [ ] T026 File-command wiring: open (picker + `project_open` + read-only banner + take-over), save/saveAs, close/exit; `model:dirty` → title dot (FR-013)
-- [ ] T027 Harness stories + e2e-lite flows for welcome/dialog/unsaved (mock backend); T-APP-004/007 green
+- [X] T023 `app/src/shell/Welcome.tsx`: New/Open/recents with thumbnails placeholder + missing indicator + Getting Started; three states (FR-011, T-APP-004)
+- [X] T024 `app/src/dialogs/NewProject.tsx` (DLG-01) with SQP/FPS catalog data files + fixture tests (D1 pattern); wired to `project_new`; E1008/E8004 surfaces (FR-012)
+- [X] T025 `app/src/dialogs/UnsavedChanges.tsx` (DLG-20) three-way gate on close/exit/open (FR-013, T-APP-007)
+- [X] T026 File-command wiring: open (picker + `project_open` + read-only banner + take-over), save/saveAs, close/exit; `model:dirty` → title dot (FR-013)
+- [X] T027 Harness stories + e2e-lite flows for welcome/dialog/unsaved (mock backend); T-APP-004/007 green
 
 ## Phase 6 — Notifications and status wiring (plan Phase 6) — US5
 

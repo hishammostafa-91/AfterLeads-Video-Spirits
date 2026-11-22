@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The E1007 recovery surface. */
+.dialog {
+  min-inline-size: 28rem;
+  padding: var(--sp-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-dialog);
+  color: var(--text-primary);
+}
+
+.title {
+  margin-block: 0 var(--sp-3);
+  font-size: var(--fs-lg);
+}
+
+.body {
+  margin-block: 0 var(--sp-4);
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+}

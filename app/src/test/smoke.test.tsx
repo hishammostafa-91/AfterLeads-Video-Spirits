@@ -24,18 +24,19 @@ afterEach(() => {
 });
 
 describe("app root routing", () => {
-  it("default route mounts the application shell", () => {
+  it("default route mounts the shell with the Welcome surface", () => {
     const { container } = render(
       <Wrapper>
         <App />
       </Wrapper>,
     );
-    // The 07 s7.2 chrome: custom title bar (header), toolbar, the dock
-    // main landmark, the status bar (contentinfo).
-    expect(container.querySelector('[role="menubar"]')).not.toBeNull();
-    expect(screen.getByRole("toolbar", { name: "Toolbar" })).toBeTruthy();
-    expect(screen.getByRole("main", { name: "Panels" })).toBeTruthy();
-    expect(screen.getByRole("contentinfo")).not.toBeNull();
+    // REQ-APP-005: no restored project -> Welcome (New / Open /
+    // recents / Getting Started), not the editing chrome.
+    expect(screen.getByText("Welcome")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "New Project" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Open Project" })).toBeTruthy();
+    expect(screen.getByText("Recent projects")).toBeTruthy();
+    expect(container.querySelector('[role="menubar"]')).toBeNull();
   });
 
   it("?harness=1 mounts the UI harness", () => {

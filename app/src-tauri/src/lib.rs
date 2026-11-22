@@ -9,7 +9,9 @@
 pub mod commands;
 pub mod dto;
 pub mod locale;
+pub mod project_commands;
 pub mod project_io;
+pub mod services;
 pub mod state;
 
 use state::AppState;
@@ -43,11 +45,22 @@ pub mod gui {
                 // Focus the running instance's windows (the plugin's
                 // contract: the second process never reaches run).
             }))
+            .plugin(tauri_plugin_dialog::init())
             .manage(state)
+            .manage(project_commands::ProjectState::default())
+            .manage(services::Services::open())
             .invoke_handler(tauri::generate_handler![
                 commands::app_info,
                 commands::app_ready,
-                commands::app_quit
+                commands::app_quit,
+                project_commands::project_new,
+                project_commands::project_open,
+                project_commands::project_open_readonly,
+                project_commands::project_take_over_lock,
+                project_commands::project_save,
+                project_commands::project_save_as,
+                project_commands::project_close,
+                project_commands::project_recent
             ])
             .setup(|app| {
                 // A launch-time project path takes the same road as

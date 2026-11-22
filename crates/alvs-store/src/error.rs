@@ -65,11 +65,23 @@ pub enum StoreError {
         /// The denied path (redacted per 04 §4.9 when crossing to the UI).
         path: String,
     },
-    /// E5003 — a write failed (disk full or removed); the export-side
+    /// E5003 - a write failed (disk full or removed); the export-side
     /// wording of REQ-REL-007's second half (WP-22).
     #[error("write failed: {detail}")]
     WriteFailed {
         /// Which write failed and why.
+        detail: String,
+    },
+    /// E1001 - the project file was not found on open (03 s3.9.1).
+    #[error("project file not found: {path}")]
+    ProjectNotFound {
+        /// The missing path (redacted per 04 s4.9 when crossing).
+        path: String,
+    },
+    /// E1002 - the project file is damaged (invalid JSON; 03 s3.9.1).
+    #[error("project file damaged: {detail}")]
+    ProjectDamaged {
+        /// The parse failure.
         detail: String,
     },
     /// E9005 — a file path was rejected by the SEC-04 policy (05 §5.7).
@@ -94,6 +106,8 @@ impl StoreError {
             StoreError::CacheRebuilt { .. } => ErrorCode::E8003,
             StoreError::AccessDenied { .. } => ErrorCode::E8004,
             StoreError::WriteFailed { .. } => ErrorCode::E5003,
+            StoreError::ProjectNotFound { .. } => ErrorCode::E1001,
+            StoreError::ProjectDamaged { .. } => ErrorCode::E1002,
             StoreError::PathRejected { .. } => ErrorCode::E9005,
         }
     }

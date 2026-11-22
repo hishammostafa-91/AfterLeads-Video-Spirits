@@ -45,3 +45,88 @@ pub struct AppInfo {
     /// Windows display language when supported, else English).
     pub locale: String,
 }
+
+/// The `project_new` request (04 s4.3.2).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct NewProjectRequest {
+    /// Project name (1-200 chars, Windows file-name safe).
+    pub name: String,
+    /// The parent folder; the project file lands in
+    /// `<folder>\<name>\<name>.alvs` (DLG-01).
+    pub folder: String,
+    /// Sequence preset id (12 s12.8; SQP-01 auto, SQP-02..12 named -
+    /// SQP-13 custom needs the explicit-format path, not this
+    /// request).
+    pub sequence_preset: String,
+    /// Frame-rate id (12 s12.9, FPS-01..08).
+    pub frame_rate: String,
+    /// Audio sample rate: 44,100 or 48,000 (model rule 13).
+    pub sample_rate: u32,
+}
+
+/// Why an open project is read-only (the banner states of 07 s7.10).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ReadOnlyState {
+    /// `"newerSchema"` (E1004) or `"locked"` (E1007 read-only open).
+    pub reason: ReadOnlyReasonKind,
+    /// Whether a lock take-over is offered (03 s3.9.4; dead or
+    /// expired holder). Only meaningful with `locked`.
+    pub takeover_available: bool,
+}
+
+/// The read-only reason kinds.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub enum ReadOnlyReasonKind {
+    /// Opened from a newer application version (E1004).
+    NewerSchema,
+    /// Opened while another holder keeps the lock (E1007).
+    Locked,
+}
+
+/// The full project state the UI holds (04 s4.3.2 `ProjectSnapshot`:
+/// "full normalized state" - the document plus the open context).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ProjectSnapshot {
+    /// The project document.
+    pub project: alvs_model::project::Project,
+    /// The open project file.
+    pub path: String,
+    /// Set when the project opened read-only.
+    pub read_only: Option<ReadOnlyState>,
+}
+
+/// The save result (04 s4.3.2 `SaveResult`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct SaveResult {
+    /// The saved project file.
+    pub path: String,
+    /// The backup written this save, if any.
+    pub backup_path: Option<String>,
+}
+
+/// One recent-project row (04 s4.3.2 `project_recent`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct RecentProject {
+    /// Project file path.
+    pub path: String,
+    /// Display name.
+    pub name: String,
+    /// Thumbnail reference (written by later packages).
+    pub thumbnail: Option<String>,
+    /// Last-opened time (ISO-8601 UTC).
+    pub opened_utc: String,
+    /// Pinned flag.
+    pub pinned: bool,
+}

@@ -191,6 +191,7 @@ Versions below were verified against the official registries on the baseline dat
 | Toolchain | vcpkg | baseline commit pinned at WP-06 | Builds FFmpeg and its codecs |
 | Shell | Tauri | 2.12.x (crate 2.12.5; `@tauri-apps/api`/`cli` 2.12.4) | Desktop shell |
 | Shell | tauri-plugin-updater / -dialog / -single-instance | 2.14.x / 2.8.x / 2.5.x | |
+| Shell | @tauri-apps/plugin-dialog | 2.8.x | Dialog JS API of the baselined Rust plugin (ADR-025) |
 | Shell | webview2-com | 0.39.x | Must match the version used by Tauri's runtime |
 | Engine | wgpu | 30.x | Direct3D 12 backend, WARP fallback |
 | Engine | FFmpeg | 9.0.2 via vcpkg port `ffmpeg` 9.0.2 | GPL-enabled build, static, see 02 ADR-004 |
