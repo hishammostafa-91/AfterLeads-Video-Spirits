@@ -24,7 +24,10 @@ import "dockview/dist/styles/dockview.css";
 import "./dockview-theme.css";
 import { PanelPlaceholder } from "../../panels/PanelPlaceholder";
 import { PANEL_BY_FOCUS_COMMAND, PANEL_BY_ID } from "../../panels/registry";
+import { useShellPanelsStore } from "../notifications/shellPanels";
+import { NotificationCenter } from "../notifications/NotificationCenter";
 import { announceStatus } from "../../components/a11y";
+import { useProjectStore } from "../../projects/store";
 import { registerHandler, unregisterHandler } from "../../commands/registry";
 import {
   DEFAULT_LAYOUTS,
@@ -45,6 +48,14 @@ const DOCKVIEW_THEME = {
 /** A panel body: the placeholder surface until its WP ships. */
 function PanelBody({ api }: IDockviewPanelProps): JSX.Element {
   return <PanelPlaceholder id={api.id} />;
+}
+
+/** The notification center body (a shell-owned panel, FR-014). */
+function NotificationsBody(): JSX.Element {
+  const projectOpen = useProjectStore((s) => s.snapshot !== null);
+  return (
+    <NotificationCenter flags={{ focusedContext: "global", projectOpen }} />
+  );
 }
 
 const PERSIST_DEBOUNCE_MS = 500;
@@ -301,6 +312,31 @@ export function Dock(): JSX.Element {
     );
   }, [active, formatMessage]);
 
+  // Shell-owned panels: the bell's request opens (or focuses) the
+  // notification center panel in the dock (FR-004/FR-014).
+  const shellPanelRequests = useShellPanelsStore((state) => state.requestSeq);
+  useEffect(() => {
+    if (shellPanelRequests === 0) return;
+    const api = apiRef.current;
+    if (!api) return;
+    const existing = api.getPanel("notifications");
+    if (existing) {
+      existing.api.setActive();
+      focusTabHost("notifications");
+      return;
+    }
+    const group =
+      api.activeGroup ?? (api.groups.length > 0 ? api.groups[0] : undefined);
+    if (!group) return;
+    api.addPanel({
+      id: "notifications",
+      title: "notifications",
+      component: "notifications",
+      position: { referenceGroup: group.id },
+    });
+    focusTabHost("notifications");
+  }, [shellPanelRequests]);
+
   return (
     <main
       className={styles.dock}
@@ -310,7 +346,7 @@ export function Dock(): JSX.Element {
     >
       <DockviewReact
         onReady={onReady}
-        components={{ panel: PanelBody }}
+        components={{ panel: PanelBody, notifications: NotificationsBody }}
         defaultTabComponent={PanelTab}
         theme={DOCKVIEW_THEME}
         messages={messages}

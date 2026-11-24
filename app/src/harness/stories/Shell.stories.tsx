@@ -5,10 +5,12 @@
  * toolbar, status bar) in their neutral state and with live-looking
  * values (stories are fixtures — product code never fakes data).
  */
+import { useEffect } from "react";
 import { StatusBar } from "../../shell/StatusBar";
 import { TitleBar } from "../../shell/TitleBar";
 import { Toolbar } from "../../shell/Toolbar";
 import type { CommandRuntimeFlags } from "../../commands/registry";
+import { useStatusStore, resetStatusStoreForTests } from "../../shell/status";
 import type { StoryFile } from "./types";
 
 const flags: CommandRuntimeFlags = {
@@ -25,21 +27,37 @@ function ToolbarDemo(): React.JSX.Element {
 }
 
 function StatusBarNeutral(): React.JSX.Element {
+  useEffect(() => {
+    resetStatusStoreForTests();
+  }, []);
   return <StatusBar />;
 }
 
 function StatusBarLive(): React.JSX.Element {
   return (
-    <StatusBar
-      jobsSummary="2 jobs running"
-      autosaveState="saved"
-      lastSavedAt="12:30"
-      fps={30}
-      droppedFrames={0}
-      proxyMode
-      rendererName="NVIDIA GeForce RTX 3060"
+    <StatusLive
+      jobs={{ running: 2 }}
+      autosave={{ state: "saved", timeUtc: "2026-01-01T12:30:00Z" }}
+      renderer="NVIDIA GeForce RTX 3060"
     />
   );
+}
+
+/** Story-only seam: seed the status store for the live card. */
+function StatusLive(props: {
+  jobs: { running: number };
+  autosave: {
+    state: "idle" | "saving" | "saved" | "failed";
+    timeUtc: string | null;
+  };
+  renderer: string;
+}): React.JSX.Element {
+  useEffect(() => {
+    useStatusStore.getState().setJobs(props.jobs);
+    useStatusStore.getState().setAutosave(props.autosave);
+    useStatusStore.setState({ renderer: props.renderer });
+  }, [props]);
+  return <StatusBar />;
 }
 
 export const shellStories: StoryFile = {

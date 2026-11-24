@@ -41,7 +41,10 @@
 .note {
   margin: 0;
   font-size: var(--fs-sm);
-  color: var(--text-tertiary);
+
+  /* text-secondary, not tertiary: the note can sit on raised
+   * surfaces where tertiary misses 4.5:1 (axe color-contrast). */
+  color: var(--text-secondary);
 }
 
 .error {

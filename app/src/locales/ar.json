@@ -323,7 +323,6 @@
   "shell.status.savedAt": "حُفظ",
   "shell.status.playback": "إحصاءات التشغيل",
   "shell.status.proxy": "وضع النسخ البديلة",
-  "shell.status.proxiesOn": "النسخ البديلة مفعّلة",
   "shell.status.renderer": "محرك العرض",
   "panels.media.title": "الوسائط",
   "panels.effects.title": "التأثيرات",
@@ -406,5 +405,10 @@
   "welcome.recents": "المشاريع الحديثة",
   "welcome.recentsEmpty": "لا توجد مشاريع حديثة بعد.",
   "welcome.missing": "مفقود",
-  "welcome.gettingStarted": "بدء الاستخدام"
+  "welcome.gettingStarted": "بدء الاستخدام",
+  "notifications.title": "الإشعارات",
+  "notifications.empty": "لا توجد إشعارات.",
+  "notifications.count": "{count, plural, zero {لا إشعارات} one {إشعار واحد} two {إشعاران} few {# إشعارات} many {# إشعارًا} other {# إشعار}}",
+  "notifications.clear": "مسح الكل",
+  "shell.status.jobsRunning": "{count, plural, zero {لا مهام} one {مهمة واحدة} two {مهمتان} few {# مهام} many {# مهمة} other {# مهمة}}"
 }

@@ -1095,9 +1095,6 @@
   "shell.status.proxy": {
     "description": "Status chip: proxy mode (REQ-APP-007)."
   },
-  "shell.status.proxiesOn": {
-    "description": "Status chip text when proxies are active."
-  },
   "shell.status.renderer": {
     "description": "Status chip: renderer (GPU name or WARP, REQ-APP-007)."
   },
@@ -1346,5 +1343,20 @@
   },
   "welcome.gettingStarted": {
     "description": "welcome string (WP-05 phase 5)."
+  },
+  "notifications.title": {
+    "description": "Notification center panel title (dock tab)."
+  },
+  "notifications.empty": {
+    "description": "Notification center empty state."
+  },
+  "notifications.count": {
+    "description": "Notification center row count header."
+  },
+  "notifications.clear": {
+    "description": "Clear-all action in the notification center."
+  },
+  "shell.status.jobsRunning": {
+    "description": "Status chip: running job count (REQ-APP-007)."
   }
 }

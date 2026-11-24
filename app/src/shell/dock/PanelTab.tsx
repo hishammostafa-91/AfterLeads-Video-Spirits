@@ -19,17 +19,26 @@ import { useEffect, useRef } from "react";
 import type { JSX } from "react";
 import type { IDockviewPanelHeaderProps } from "dockview-react";
 import { PANEL_BY_ID } from "../../panels/registry";
+import {
+  SHELL_PANEL_TITLE_KEY,
+  type ShellPanelId,
+} from "../notifications/shellPanels";
 import styles from "./PanelTab.module.css";
 
 export function PanelTab({ api }: IDockviewPanelHeaderProps): JSX.Element {
   const { formatMessage } = useIntl();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const middleButton = useRef(false);
-  // The stored title is the panel slug; render the localized name.
+  // The stored title is the panel slug; render the localized name
+  // (registry panels and shell panels both).
   const panel = PANEL_BY_ID.get(api.title ?? "");
+  const shellTitleKey: string | undefined =
+    SHELL_PANEL_TITLE_KEY[api.title as ShellPanelId];
   const title = panel
     ? formatMessage({ id: panel.titleKey })
-    : (api.title ?? "");
+    : shellTitleKey
+      ? formatMessage({ id: shellTitleKey })
+      : (api.title ?? "");
   // Keep the dockview host's aria-label equal to the visible text.
   useEffect(() => {
     api.setTitle(title);

@@ -30,6 +30,7 @@ import {
 import { Button, IconButton } from "../components/Button";
 import { MenuBarItem, MenuSeparator } from "../components/Menu";
 import { CommandMenuItem } from "./MenuBar";
+import { useShellPanelsStore } from "./notifications/shellPanels";
 import {
   COMMAND_BY_ID,
   type CommandSpec,
@@ -182,7 +183,9 @@ export function Toolbar({ flags, activeWorkspace }: ToolbarProps): JSX.Element {
       <IconButton
         icon={<Bell aria-hidden="true" />}
         labelMessageId="shell.toolbar.notifications"
-        isDisabled
+        onPress={() => {
+          useShellPanelsStore.getState().openPanel("notifications");
+        }}
       />
       <IconButton
         icon={<Settings2 aria-hidden="true" />}

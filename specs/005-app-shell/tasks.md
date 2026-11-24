@@ -66,9 +66,9 @@ description: "Task list for WP-05 - Application shell"
 
 ## Phase 6 — Notifications and status wiring (plan Phase 6) — US5
 
-- [ ] T028 Event fabric: subscribe `app:notify`, `autosave:status`, `jobs:update`, `renderer:changed`; status-bar live fields (FR-005)
-- [ ] T029 Notification center (dock panel, history) + toast fabric over the WP-04 Toast; error code + recovery action (FR-014, T-APP-005; T048 stays tracked)
-- [ ] T030 Harness stories with mocked events; T-APP-005 green
+- [X] T028 Event fabric: subscribe `app:notify`, `autosave:status`, `jobs:update`, `renderer:changed`; status-bar live fields (FR-005)
+- [X] T029 Notification center (dock panel, history) + toast fabric over the WP-04 Toast; error code + recovery action (FR-014, T-APP-005; T048 stays tracked)
+- [X] T030 Harness stories with mocked events; T-APP-005 green
 
 ## Phase 7 — Hardening and e2e activation (plan Phase 7) — US7
 

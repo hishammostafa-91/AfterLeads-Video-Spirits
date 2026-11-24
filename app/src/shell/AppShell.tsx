@@ -37,6 +37,8 @@ import {
 import { app } from "../ipc/commands";
 import { onEvent } from "../ipc/events";
 import { useProjectStore } from "../projects/store";
+import { useStatusStore } from "./status";
+import { useNotificationStore } from "./notifications/store";
 import styles from "./AppShell.module.css";
 
 /** What waits behind the DLG-20 gate (FR-013 AC2's three triggers). */
@@ -210,15 +212,35 @@ export function AppShell(): JSX.Element {
         }
       },
     );
+    // The renderer chip from app_info (FR-005 AC2).
+    void app
+      .info()
+      .then((info) => {
+        useStatusStore.getState().setRendererFromInfo(info);
+      })
+      .catch(() => undefined);
+    // The notification fabric (FR-014): app:notify feeds history +
+    // toasts; autosave:status feeds the chip (FR-005 AC2).
+    const offNotify = onEvent<Record<string, unknown>>(
+      "app:notify",
+      (payload) => {
+        useNotificationStore.getState().notify(payload as never);
+      },
+    );
+    const offAutosave = onEvent<{
+      state: "idle" | "saving" | "saved" | "failed";
+      timeUtc: string | null;
+    }>("autosave:status", (payload) => {
+      useStatusStore.getState().setAutosave(payload);
+    });
     return () => {
       unregisterHandler("view.commandPalette");
       teardownDispatcher();
-      void offDirty.then((off) => {
-        off();
-      });
-      void offOpenFile.then((off) => {
-        off();
-      });
+      for (const off of [offDirty, offOpenFile, offNotify, offAutosave]) {
+        void off.then((unsubscribe) => {
+          unsubscribe();
+        });
+      }
     };
   }, []);
 

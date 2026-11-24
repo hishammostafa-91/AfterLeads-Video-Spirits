@@ -7,11 +7,12 @@
  * their tooltip labels (REQ-HLP-003), and the status bar renders its
  * five fields with the neutral dash until data exists (REQ-APP-007).
  */
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import type { JSX, ReactNode } from "react";
 import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 import en from "../locales/en.json";
+import { resetStatusStoreForTests, useStatusStore } from "./status";
 import { StatusBar } from "./StatusBar";
 import { TitleBar } from "./TitleBar";
 import { Toolbar } from "./Toolbar";
@@ -67,7 +68,8 @@ describe("t_app_001 — shell chrome", () => {
   });
 
   it("status bar: neutral dashes, then live values", () => {
-    const { rerender } = render(
+    resetStatusStoreForTests();
+    render(
       <Wrapper>
         <StatusBar />
       </Wrapper>,
@@ -75,23 +77,16 @@ describe("t_app_001 — shell chrome", () => {
     const bar = screen.getByRole("contentinfo");
     // Five fields render the neutral dash; split() adds one more part.
     expect(bar.textContent.split("—").length).toBe(6);
-    rerender(
-      <Wrapper>
-        <StatusBar
-          jobsSummary="2 jobs running"
-          autosaveState="saved"
-          lastSavedAt="12:30"
-          fps={30}
-          droppedFrames={0}
-          proxyMode
-          rendererName="NVIDIA GeForce RTX 3060"
-        />
-      </Wrapper>,
-    );
+    act(() => {
+      useStatusStore.getState().setJobs({ running: 2 });
+      useStatusStore.getState().setAutosave({
+        state: "saved",
+        timeUtc: "2026-01-01T12:30:00Z",
+      });
+      useStatusStore.setState({ renderer: "NVIDIA GeForce RTX 3060" });
+    });
     expect(bar.textContent).toContain("2 jobs running");
-    expect(bar.textContent).toContain("Saved 12:30");
-    expect(bar.textContent).toContain("30 fps • 0");
-    expect(bar.textContent).toContain("Proxies ON");
+    expect(bar.textContent).toContain("Saved");
     expect(bar.textContent).toContain("NVIDIA GeForce RTX 3060");
   });
 });

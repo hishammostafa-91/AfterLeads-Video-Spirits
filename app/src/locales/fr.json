@@ -323,7 +323,6 @@
   "shell.status.savedAt": "Enregistré",
   "shell.status.playback": "Statistiques de lecture",
   "shell.status.proxy": "Mode proxy",
-  "shell.status.proxiesOn": "Proxys ACTIFS",
   "shell.status.renderer": "Moteur de rendu",
   "panels.media.title": "Médias",
   "panels.effects.title": "Effets",
@@ -406,5 +405,10 @@
   "welcome.recents": "Projets récents",
   "welcome.recentsEmpty": "Aucun projet récent pour le moment.",
   "welcome.missing": "Introuvable",
-  "welcome.gettingStarted": "Premiers pas"
+  "welcome.gettingStarted": "Premiers pas",
+  "notifications.title": "Notifications",
+  "notifications.empty": "Aucune notification.",
+  "notifications.count": "{count, plural, one {# notification} other {# notifications}}",
+  "notifications.clear": "Tout effacer",
+  "shell.status.jobsRunning": "{count, plural, one {# tâche en cours} other {# tâches en cours}}"
 }

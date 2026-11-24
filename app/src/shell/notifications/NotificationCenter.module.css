@@ -1,0 +1,72 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 AfterLeads <afterleadseg@gmail.com> */
+
+/* The notification center panel body (07 s7.10). */
+.center {
+  display: flex;
+  block-size: 100%;
+  flex-direction: column;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.count {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: var(--sp-3);
+  overflow-block: auto;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.row[data-kind="error"] {
+  border-color: var(--danger);
+}
+
+.code {
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1;
+  font-size: var(--fs-sm);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.empty {
+  display: flex;
+  block-size: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--text-tertiary);
+}
